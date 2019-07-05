@@ -7,13 +7,21 @@ Your [design product spec](https://hackmd.io/s/H1wGpVUh7) (described in that lin
 
 **Required Must-have Stories**
 
- * [fill in your required user stories here]
- * ...
+ * [Login/Signup screen]
+   * [Set home location]
+   * [Toggle between local and visitor]
+ * [Lyft map to see locals nearby]
+   * [Click on dot to see their profile]
+   * [Ratings]
+ * [Select person, (within radius), time, date]
+    * [Display everyone nearby, only show preferences]
+    * [search for preferences]
 
 **Optional Nice-to-have Stories**
 
- * [fill in your required user stories here]
- * ...
+ * [Group meetup]
+ * [Messaging within the app]
+ * [Cancel]
 
 ## 2. Screen Archetypes
 
