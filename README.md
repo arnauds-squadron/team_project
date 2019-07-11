@@ -73,12 +73,15 @@ Your [design product spec](https://hackmd.io/s/H1wGpVUh7) (described in that lin
 
 User object
   - id
+  - facebook id
   - name
   - username
   - email
   - password
   - profile picture
   - bio
+  - total stars [1/2]
+  - number of ratings [2/2]
   - [optional] phone number
 
 Event object
@@ -105,4 +108,34 @@ Messages object
   - id
   - Pointer to sender User
   - body
-  
+
+## Parse Network Requests
+
+Login Screen
+  - Create/POST - sign up a  user
+  - Read/GET    - login user 
+  - Update/PUT  - update user info
+  - Delete/DELETE - delete user
+
+Home Screen
+  - Create/POST - create new event
+  - Read/GET - see all events you are hosting/visiting
+  - Update/PUT - update pending field if they accept or deny
+  - Update/PUT - update host rating if you're user, update all visitors if you're host
+  - Delete/DELETE - cancel events
+  (3 cancels in a week is bad/freeze account)
+
+Visitor Search Screen
+  - Read/GET - see all events nearby
+
+Event Creation Screen
+  - Create/POST - create new event
+
+(Host) Event Detail Screen
+  - Read/GET - get details of event
+  - Update/PUT - update pending guests to accepted or remove them
+
+(Visitor) Event Detail Screen
+  - Read/GET - get details of events
+  - Update/PUT - book and cancel
+
