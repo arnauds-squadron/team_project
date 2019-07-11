@@ -67,3 +67,42 @@ Your [design product spec](https://hackmd.io/s/H1wGpVUh7) (described in that lin
  * [Local/Visitor screen]
    * [Settings action view]
    * [Swipe back for home screen]
+
+
+## Schema Design
+
+User object
+  - id
+  - name
+  - username
+  - email
+  - password
+  - profile picture
+  - bio
+  - [optional] phone number
+
+Event object
+  - id
+  - address
+  - food type
+  - restaurant/home-cooked
+  - date/time
+  - 21+ toggle
+  - Number of guests
+  - Pointer to host User
+  - Pointer to accepted visitors
+  - Pointer to pending visitors
+  - description
+  - Pointer to Conversation
+
+Conversation object
+  - id
+  - array of Users
+  - array of Messages
+  (deleted after event)
+
+Messages object
+  - id
+  - Pointer to sender User
+  - body
+  
