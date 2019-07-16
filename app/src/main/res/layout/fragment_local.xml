@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LocalFragment">
@@ -37,7 +38,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvTitle">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/etEventAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,7 +60,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tilEventAddress">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/etEventFoodType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -81,7 +82,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tilEventFoodType">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/etEventTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -97,13 +98,12 @@
             android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:text="Confirm"
+            android:text="Create Event"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tilEventTime" />
 
     </android.support.constraint.ConstraintLayout>
-
 
 </FrameLayout>

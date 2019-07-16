@@ -32,10 +32,10 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0)
-            return LocalFragment.newInstance(position + 1);
+            return LocalFragment.newInstance();
         if (position == 1)
-            return HomeFragment.newInstance(position + 1);
-        return HomeFragment.newInstance(position + 1);
+            return HomeFragment.newInstance();
+        return HomeFragment.newInstance();
     }
 
 
