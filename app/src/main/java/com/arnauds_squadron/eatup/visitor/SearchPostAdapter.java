@@ -1,38 +1,35 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.visitor;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Rating;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.instagram.PostDetailsActivity;
-import com.example.instagram.UserTimelineActivity;
-import com.example.instagram.models.Post;
-import com.example.instagram.utils.TimeFormatter;
-import com.parse.ParseFile;
-import com.parse.ParseUser;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.ViewHolder> {
+public class SearchPostAdapter extends RecyclerView.Adapter<SearchPostAdapter.ViewHolder> {
 
     private List<Post> posts;
-    private final String KEY_PROFILE_IMAGE = "profileImage";
     // context defined as global variable so Glide in onBindViewHolder has access
     private Context context;
 
     // pass Post array in constructor
-    public BrowsePostAdapter(Context context, List<Post> posts) {
+    public SearchPostAdapter(Context context, List<Post> posts) {
         this.context = context;
         this.posts = posts;
     }
@@ -42,7 +39,7 @@ public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int ViewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View postView = inflater.inflate(R.layout.browse_post_grid, parent, false);
+        View postView = inflater.inflate(R.layout.search_post_linear, parent, false);
         return new ViewHolder(postView);
     }
 
@@ -61,22 +58,29 @@ public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.Vi
 
     // create ViewHolder class
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.ivPostImage)
-        public ImageView ivPostImage;
-        @BindView(R.id.tvPostTitle)
-        public TextView tvPostTitle;
+        @BindView(R.id.ivProfileImage)
+        public ImageView ivProfileImage;
+        @BindView(R.id.tvName)
+        public TextView tvUsername;
+        @BindView(R.id.ratingBar)
+        public RatingBar ratingBar;
+        @BindView(R.id.tvCuisine)
+        public TextView tvCuisine;
+        @BindView(R.id.tvDistance)
+        public TextView tvDistance;
+        @BindView(R.id.btBook)
+        public Button btBook;
 
         // constructor takes in inflated layout
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
-
         }
 
         public void bind(Post post) {
             // populate views according to data
-            tvTitle.setText(post.getUser().getUsername());
+            tvDescription.setText(post.getDescription());
             ParseFile postImage = post.getImage();
             if (postImage != null) {
                 Glide.with(context)

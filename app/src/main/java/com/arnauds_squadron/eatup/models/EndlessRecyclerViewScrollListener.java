@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.models;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
