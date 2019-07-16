@@ -4,6 +4,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -51,8 +52,8 @@ public class VisitorSearchActivity extends AppCompatActivity {
         // construct adapter from data source
         eventAdapter = new SearchEventAdapter(this, mEvents);
         // RecyclerView setup
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
-        rvEvents.setLayoutManager(gridLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        rvEvents.setLayoutManager(linearLayoutManager);
         rvEvents.setAdapter(eventAdapter);
 
         user = getIntent().getParcelableExtra("user");
