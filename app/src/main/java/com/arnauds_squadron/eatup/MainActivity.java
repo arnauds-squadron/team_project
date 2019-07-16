@@ -23,10 +23,15 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        // TODO: change local icon
         int[] icons = {
-                R.drawable.ic_launcher_background
+                R.drawable.local_temp,
+                R.drawable.home_outline,
+                R.drawable.home_outline
         };
 
-        tabLayout.getTabAt(0).setIcon(icons[0]);
+        for(int i = 0; i < tabLayout.getTabCount(); i++) {
+            tabLayout.getTabAt(i).setIcon(icons[i]);
+        }
     }
 }
