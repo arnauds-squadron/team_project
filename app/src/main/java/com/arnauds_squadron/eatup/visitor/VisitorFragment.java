@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.EndlessRecyclerViewScrollListener;
-import com.arnauds_squadron.eatup.visitor.BrowsePostAdapter;
 
 import java.util.ArrayList;
 
@@ -37,8 +36,8 @@ public class VisitorFragment extends Fragment {
     TextView tvCurrentLocation;
     private Unbinder unbinder;
     private EndlessRecyclerViewScrollListener scrollListener;
-    private BrowsePostAdapter postAdapter;
-    private ArrayList<Post> mPosts;
+    private BrowseEventAdapter postAdapter;
+    private ArrayList<Event> mEvents;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,9 +50,9 @@ public class VisitorFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // initialize data source
-        mPosts = new ArrayList<>();
+        mEvents = new ArrayList<>();
         // construct adapter from data source
-        postAdapter = new BrowsePostAdapter(getContext(), mPosts);
+        postAdapter = new BrowseEventAdapter(getContext(), mEvents);
         // RecyclerView setup
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false);
         rvBrowse.setLayoutManager(gridLayoutManager);
@@ -87,7 +86,7 @@ public class VisitorFragment extends Fragment {
 //        // if opening app for the first time, get top 20 and clear old items
 //        // otherwise, query for posts older than the oldest
 //        if (maxDate.equals(new Date(0))) {
-//            postAdapter.clear();
+//            eventAdapter.clear();
 //            postsQuery.getTop().withUser();
 //        } else {
 //            postsQuery.getOlder(maxDate).getTop().withUser();
@@ -98,8 +97,8 @@ public class VisitorFragment extends Fragment {
 //            public void done(List<Post> objects, ParseException e) {
 //                if (e == null) {
 //                    for (int i = 0; i < objects.size(); ++i) {
-//                        mPosts.add(objects.get(i));
-//                        postAdapter.notifyItemInserted(mPosts.size() - 1);
+//                        mEvents.add(objects.get(i));
+//                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
 //                        // on successful reload, signal that refresh has completed
 //                        swipeContainer.setRefreshing(false);
 //                    }
@@ -113,11 +112,11 @@ public class VisitorFragment extends Fragment {
 //
 //    // get date of oldest post
 //    protected Date getMaxDate() {
-//        int postsSize = mPosts.size();
+//        int postsSize = mEvents.size();
 //        if (postsSize == 0) {
 //            return (new Date(0));
 //        } else {
-//            Post oldest = mPosts.get(mPosts.size() - 1);
+//            Post oldest = mEvents.get(mEvents.size() - 1);
 //            return oldest.getCreatedAt();
 //        }
 //    }

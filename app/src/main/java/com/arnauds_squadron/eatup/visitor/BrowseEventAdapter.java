@@ -12,10 +12,6 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.bumptech.glide.Glide;
-import com.example.instagram.PostDetailsActivity;
-import com.example.instagram.UserTimelineActivity;
-import com.example.instagram.models.Post;
-import com.example.instagram.utils.TimeFormatter;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
@@ -24,17 +20,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.ViewHolder> {
+public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.ViewHolder> {
 
-    private List<Post> posts;
+    private List<Event> events;
     private final String KEY_PROFILE_IMAGE = "profileImage";
     // context defined as global variable so Glide in onBindViewHolder has access
     private Context context;
 
-    // pass Post array in constructor
-    public BrowsePostAdapter(Context context, List<Post> posts) {
+    // pass Event array in constructor
+    public BrowseEventAdapter(Context context, List<Event> events) {
         this.context = context;
-        this.posts = posts;
+        this.events = events;
     }
 
     // for each row, inflate layout and cache references into ViewHolder
@@ -42,29 +38,29 @@ public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int ViewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View postView = inflater.inflate(R.layout.browse_post_grid, parent, false);
-        return new ViewHolder(postView);
+        View eventView = inflater.inflate(R.layout.browse_event_grid, parent, false);
+        return new ViewHolder(eventView);
     }
 
     // bind values based on element position
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // get data according to position
-        Post post = posts.get(position);
-        holder.bind(post);
+        Event event = events.get(position);
+        holder.bind(event);
     }
 
     @Override
     public int getItemCount() {
-        return posts.size();
+        return events.size();
     }
 
     // create ViewHolder class
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.ivPostImage)
-        public ImageView ivPostImage;
-        @BindView(R.id.tvPostTitle)
-        public TextView tvPostTitle;
+        @BindView(R.id.ivEventImage)
+        public ImageView ivEventImage;
+        @BindView(R.id.tvEventTitle)
+        public TextView tvEventTitle;
 
         // constructor takes in inflated layout
         public ViewHolder(View itemView) {
@@ -74,15 +70,15 @@ public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.Vi
 
         }
 
-        public void bind(Post post) {
+        public void bind(Event event) {
             // populate views according to data
-            tvTitle.setText(post.getUser().getUsername());
-            ParseFile postImage = post.getImage();
-            if (postImage != null) {
+            tvTitle.setText(event.getUser().getUsername());
+            ParseFile eventImage = event.getImage();
+            if (eventImage != null) {
                 Glide.with(context)
-                        .load(postImage.getUrl())
+                        .load(eventImage.getUrl())
                         .centerCrop()
-                        .into(ivPostImage);
+                        .into(ivEventImage);
             }
         }
 
@@ -91,11 +87,11 @@ public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.Vi
             int position = getAdapterPosition();
             // ensure position valid (exists in view)
             if (position != RecyclerView.NO_POSITION) {
-                Log.d("PostAdapter", "View Post Details");
-                Post post = posts.get(position);
+                Log.d("BrowseEventAdapter", "View Event Details");
+                Event event = events.get(position);
 
                 Intent intent = new Intent(context, EventDetailsActivity.class);
-                intent.putExtra("post_id", post.getObjectId());
+                intent.putExtra("event_id", event.getObjectId());
                 context.startActivity(intent);
             }
         }
@@ -104,13 +100,13 @@ public class BrowsePostAdapter extends RecyclerView.Adapter<BrowsePostAdapter.Vi
     // RecyclerView adapter helper methods to clear items from or add items to underlying dataset
     // clean recycler elements
     public void clear() {
-        posts.clear();
+        events.clear();
         notifyDataSetChanged();
     }
 
-    // add list of posts - change list type depending on item type used
-    public void addAll(List<Post> list) {
-        posts.addAll(list);
+    // add list of events - change list type depending on item type used
+    public void addAll(List<Event> list) {
+        events.addAll(list);
         notifyDataSetChanged();
     }
 }

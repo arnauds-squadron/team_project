@@ -2,7 +2,6 @@ package com.arnauds_squadron.eatup.visitor;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Rating;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,23 +14,22 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchPostAdapter extends RecyclerView.Adapter<SearchPostAdapter.ViewHolder> {
+public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
-    private List<Post> posts;
+    private List<Event> events;
     // context defined as global variable so Glide in onBindViewHolder has access
     private Context context;
 
-    // pass Post array in constructor
-    public SearchPostAdapter(Context context, List<Post> posts) {
+    // pass event array in constructor
+    public SearchEventAdapter(Context context, List<Event> events) {
         this.context = context;
-        this.posts = posts;
+        this.events = events;
     }
 
     // for each row, inflate layout and cache references into ViewHolder
@@ -39,21 +37,21 @@ public class SearchPostAdapter extends RecyclerView.Adapter<SearchPostAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int ViewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View postView = inflater.inflate(R.layout.search_post_linear, parent, false);
-        return new ViewHolder(postView);
+        View eventView = inflater.inflate(R.layout.search_event_linear, parent, false);
+        return new ViewHolder(eventView);
     }
 
     // bind values based on element position
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // get data according to position
-        Post post = posts.get(position);
-        holder.bind(post);
+        Event event = events.get(position);
+        holder.bind(event);
     }
 
     @Override
     public int getItemCount() {
-        return posts.size();
+        return events.size();
     }
 
     // create ViewHolder class
@@ -78,15 +76,15 @@ public class SearchPostAdapter extends RecyclerView.Adapter<SearchPostAdapter.Vi
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Post post) {
+        public void bind(Event event) {
             // populate views according to data
-            tvDescription.setText(post.getDescription());
-            ParseFile postImage = post.getImage();
-            if (postImage != null) {
+            tvDescription.setText(event.getDescription());
+            ParseFile eventImage = event.getImage();
+            if (eventImage != null) {
                 Glide.with(context)
-                        .load(postImage.getUrl())
+                        .load(eventImage.getUrl())
                         .centerCrop()
-                        .into(ivPostImage);
+                        .into(ivEventImage);
             }
         }
 
@@ -95,11 +93,11 @@ public class SearchPostAdapter extends RecyclerView.Adapter<SearchPostAdapter.Vi
             int position = getAdapterPosition();
             // ensure position valid (exists in view)
             if (position != RecyclerView.NO_POSITION) {
-                Log.d("PostAdapter", "View Post Details");
-                Post post = posts.get(position);
+                Log.d("eventAdapter", "View event Details");
+                Event event = events.get(position);
 
                 Intent intent = new Intent(context, EventDetailsActivity.class);
-                intent.putExtra("post_id", post.getObjectId());
+                intent.putExtra("event_id", event.getObjectId());
                 context.startActivity(intent);
             }
         }
@@ -108,13 +106,13 @@ public class SearchPostAdapter extends RecyclerView.Adapter<SearchPostAdapter.Vi
     // RecyclerView adapter helper methods to clear items from or add items to underlying dataset
     // clean recycler elements
     public void clear() {
-        posts.clear();
+        events.clear();
         notifyDataSetChanged();
     }
 
-    // add list of posts - change list type depending on item type used
-    public void addAll(List<Post> list) {
-        posts.addAll(list);
+    // add list of events - change list type depending on item type used
+    public void addAll(List<Event> list) {
+        events.addAll(list);
         notifyDataSetChanged();
     }
 }

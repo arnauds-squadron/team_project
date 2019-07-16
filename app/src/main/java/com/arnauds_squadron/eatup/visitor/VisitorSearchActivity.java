@@ -25,9 +25,9 @@ import butterknife.ButterKnife;
 public class VisitorSearchActivity extends AppCompatActivity {
 
     // initialize adapter, views, scroll listener
-    protected SearchPostAdapter postAdapter;
-    protected ArrayList<Post> mPosts;
-    private RecyclerView rvPosts;
+    protected SearchEventAdapter eventAdapter;
+    protected ArrayList<Event> mEvents;
+    private RecyclerView rvEvents;
     protected SwipeRefreshLayout swipeContainer;
     private EndlessRecyclerViewScrollListener scrollListener;
     private ProgressBar progressBar;
@@ -39,20 +39,21 @@ public class VisitorSearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_visitor_search);
         ButterKnife.bind(this);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        rvPosts = (RecyclerView) findViewById(R.id.rvSearchResults);
+        rvEvents = (RecyclerView) findViewById(R.id.rvSearchResults);
 
         // initialize data source
-        mPosts = new ArrayList<>();
+        mEvents = new ArrayList<>();
         // construct adapter from data source
-        postAdapter = new SearchPostAdapter(this, mPosts);
+        eventAdapter = new SearchEventAdapter(this, mEvents);
         // RecyclerView setup
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
-        rvPosts.setLayoutManager(gridLayoutManager);
-        rvPosts.setAdapter(postAdapter);
+        rvEvents.setLayoutManager(gridLayoutManager);
+        rvEvents.setAdapter(eventAdapter);
 
         user = getIntent().getParcelableExtra("user");
         tvUsername.setText(user.getUsername());
@@ -64,7 +65,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
                     .into(ivProfileImage);
         }
 
-        loadTopPosts(user, new Date(0));
+        loadTopEvents(user, new Date(0));
 
         // retain instance so can call "resetStates" for fresh searches
         scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
@@ -72,18 +73,18 @@ public class VisitorSearchActivity extends AppCompatActivity {
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Date maxPostId = getMaxDate();
                 Log.d("DATE", maxPostId.toString());
-                loadTopPosts(user, getMaxDate());
+                loadTopEvents(user, getMaxDate());
             }
         };
         // add endless scroll listener to RecyclerView
-        rvPosts.addOnScrollListener(scrollListener);
+        rvEvents.addOnScrollListener(scrollListener);
 
         // set up refresh listener that triggers new data loading
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadTopPosts(user, new Date(0));
+                loadTopEvents(user, new Date(0));
             }
         });
         // configure refreshing colors
@@ -93,25 +94,25 @@ public class VisitorSearchActivity extends AppCompatActivity {
                 getResources().getColor(android.R.color.holo_red_light));
     }
 
-    private void loadTopPosts(ParseUser user, Date maxDate) {
+    private void loadTopEvents(ParseUser user, Date maxDate) {
         progressBar.setVisibility(View.VISIBLE);
-        final Post.Query postsQuery = new Post.Query();
+        final Event.Query eventsQuery = new Event.Query();
         // if opening app for the first time, get top 20 and clear old items
-        // otherwise, query for posts older than the oldest
+        // otherwise, query for events older than the oldest
         if (maxDate.equals(new Date(0))) {
-            postAdapter.clear();
-            postsQuery.getTop().withUser().whereEqualTo(Post.KEY_USER, user);
+            eventAdapter.clear();
+            eventsQuery.getTop().withUser().whereEqualTo(Event.KEY_USER, user);
         } else {
-            postsQuery.getOlder(maxDate).getTop().withUser().whereEqualTo(Post.KEY_USER, user);
+            eventsQuery.getOlder(maxDate).getTop().withUser().whereEqualTo(Event.KEY_USER, user);
         }
 
-        postsQuery.findInBackground(new FindCallback<Post>() {
+        eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
-            public void done(List<Post> objects, ParseException e) {
+            public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < objects.size(); ++i) {
-                        mPosts.add(objects.get(i));
-                        postAdapter.notifyItemInserted(mPosts.size() - 1);
+                        mEvents.add(objects.get(i));
+                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
                         // on successful reload, signal that refresh has completed
                         swipeContainer.setRefreshing(false);
                     }
@@ -123,13 +124,13 @@ public class VisitorSearchActivity extends AppCompatActivity {
         });
     }
 
-    // get date of oldest post
+    // get date of oldest event
     private Date getMaxDate() {
-        int postsSize = mPosts.size();
-        if (postsSize == 0) {
+        int eventsSize = mEvents.size();
+        if (eventsSize == 0) {
             return (new Date(0));
         } else {
-            Post oldest = mPosts.get(mPosts.size() - 1);
+            Event oldest = mEvents.get(mEvents.size() - 1);
             return oldest.getCreatedAt();
         }
     }
