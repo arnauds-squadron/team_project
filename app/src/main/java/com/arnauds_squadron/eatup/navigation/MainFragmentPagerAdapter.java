@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.arnauds_squadron.eatup.HomeFragment;
+import com.arnauds_squadron.eatup.LocalFragment;
 import com.arnauds_squadron.eatup.R;
 
 public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -30,7 +31,9 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (position == 0)
+        if(position == 0)
+            return LocalFragment.newInstance(position + 1);
+        if (position == 1)
             return HomeFragment.newInstance(position + 1);
         return HomeFragment.newInstance(position + 1);
     }
