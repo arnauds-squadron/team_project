@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LocalConfirmationActivity"></activity>
+        <activity android:name=".local.LocalConfirmationActivity"></activity>
         <activity android:name=".visitor.VisitorSearchActivity" />
         <activity android:name=".LocalActivity" />
         <activity android:name=".MainActivity">
