@@ -80,6 +80,7 @@ public class VisitorFragment extends Fragment {
         unbinder.unbind();
     }
 
+    // TODO fix query for loading the event into the recyclerview
 // methods to load posts into the recyclerview based on location
 //    protected void loadTopPosts(Date maxDate) {
 //        progressBar.setVisibility(View.VISIBLE);

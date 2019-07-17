@@ -74,8 +74,8 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
 
         public void bind(Event event) {
             // populate views according to data
-            tvEventTitle.setText(event.getUser().getUsername());
-            ParseFile eventImage = event.getImage();
+            tvEventTitle.setText(event.getTitle());
+            ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)
                         .load(eventImage.getUrl())

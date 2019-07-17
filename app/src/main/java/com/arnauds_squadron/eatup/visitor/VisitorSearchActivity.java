@@ -104,11 +104,12 @@ public class VisitorSearchActivity extends AppCompatActivity {
         final Event.Query eventsQuery = new Event.Query();
         // if opening app for the first time, get top 20 and clear old items
         // otherwise, query for events older than the oldest
+        // TODO fix query for loading the event into the recyclerview
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withUser().whereEqualTo(Event.KEY_USER, user);
+            eventsQuery.getTop().withUser().whereEqualTo(Event.KEY_HOST, user);
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withUser().whereEqualTo(Event.KEY_USER, user);
+            eventsQuery.getOlder(maxDate).getTop().withUser().whereEqualTo(Event.KEY_HOST, user);
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {

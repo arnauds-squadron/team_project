@@ -77,11 +77,21 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+
+            btBook.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO send request to Parse server with request to make reservation
+                }
+            });
         }
 
         public void bind(Event event) {
             // populate views according to data
-            ParseFile eventImage = event.getImage();
+            tvEventName.setText(event.getTitle());
+            // TODO set rating bar, cuisine
+            // TODO calculate distance
+            ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)
                         .load(eventImage.getUrl())
