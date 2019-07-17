@@ -44,4 +44,9 @@ dependencies {
     // parse
     implementation 'com.parse.bolts:bolts-android:1.4.0'
     implementation 'com.parse:parse-android:1.17.3'
+    implementation 'com.parse:parseui-widget-android:0.0.2'
+
+    //parcel
+    implementation 'org.parceler:parceler-api:1.1.12'
+    annotationProcessor 'org.parceler:parceler:1.1.12'
 }
