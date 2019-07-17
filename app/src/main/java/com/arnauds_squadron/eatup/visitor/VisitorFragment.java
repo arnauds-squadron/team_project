@@ -13,6 +13,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 
@@ -39,6 +40,13 @@ public class VisitorFragment extends Fragment {
     private EndlessRecyclerViewScrollListener scrollListener;
     private BrowseEventAdapter postAdapter;
     private ArrayList<Event> mEvents;
+
+    public static VisitorFragment newInstance() {
+        Bundle args = new Bundle();
+        VisitorFragment fragment = new VisitorFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -73,6 +73,7 @@ fastlane/readme.md
 
 # Version control
 vcs.xml
+secrets.xml
 
 # lint
 lint/intermediates/

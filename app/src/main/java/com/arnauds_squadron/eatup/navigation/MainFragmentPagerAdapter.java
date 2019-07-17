@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
+import com.arnauds_squadron.eatup.visitor.VisitorFragment;
 
 public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 3;
@@ -29,6 +30,8 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
             return LocalFragment.newInstance();
         if (position == 1)
             return HomeFragment.newInstance();
+        if (position == 2)
+            return VisitorFragment.newInstance();
         return HomeFragment.newInstance();
     }
 

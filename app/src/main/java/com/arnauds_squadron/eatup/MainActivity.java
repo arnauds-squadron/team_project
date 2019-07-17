@@ -26,9 +26,9 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: change local icon
         int[] icons = {
-                R.drawable.local_temp,
-                R.drawable.home_outline,
-                R.drawable.home_outline
+                R.drawable.host_create_tab,
+                R.drawable.home_tab,
+                R.drawable.visitor_meal_tab,
         };
 
         for(int i = 0; i < tabLayout.getTabCount(); i++) {
