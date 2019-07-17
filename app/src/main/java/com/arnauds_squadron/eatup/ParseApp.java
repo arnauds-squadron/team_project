@@ -1,3 +1,5 @@
+package com.arnauds_squadron.eatup;
+
 import android.app.Application;
 
 import com.arnauds_squadron.eatup.models.Event;

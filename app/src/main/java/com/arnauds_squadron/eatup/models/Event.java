@@ -26,6 +26,7 @@ public class Event extends ParseObject {
     public static final String KEY_CREATED_AT = "createdAt";
 
 
+    public Event() {}
     // ParseFile - class in SDK that allows accessing files stored with Parse
     public ParseFile getEventImage() {
         return getParseFile(KEY_EVENT_IMAGE);
