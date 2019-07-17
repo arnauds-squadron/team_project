@@ -13,7 +13,7 @@ public class LocalConfirmationActivity extends AppCompatActivity {
 
     @BindView(R.id.btAccept)
     Button btAccept;
-    @BindView(R.id.btAccept)
+    @BindView(R.id.btDeny)
     Button btDeny;
 
     @Override

@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         int[] icons = {
                 R.drawable.local_temp,
                 R.drawable.home_outline,
-                R.drawable.home_outline
+                R.drawable.home_outline,
         };
 
         for(int i = 0; i < tabLayout.getTabCount(); i++) {
