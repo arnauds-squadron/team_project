@@ -1,9 +1,6 @@
-package com.example.instagram;
-
 import android.app.Application;
 
-import com.example.instagram.models.Comment;
-import com.example.instagram.models.Post;
+import com.arnauds_squadron.eatup.models.Event;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -13,13 +10,12 @@ public class ParseApp extends Application {
         super.onCreate();
 
         // tell Parse that Post is a custom Parse model created to encapsulate data
-        ParseObject.registerSubclass(Post.class);
-        ParseObject.registerSubclass(Comment.class);
+        ParseObject.registerSubclass(Event.class);
 
         final Parse.Configuration configuration = new Parse.Configuration.Builder(this)
-                .applicationId("fbuInsta")
-                .clientKey("fbuInsta3141")
-                .server("http://fbuinsta.herokuapp.com/parse")
+                .applicationId("eat_up")
+                .clientKey("arnaud")
+                .server("http://fbu-eat-up.herokuapp.com/parse")
                 .build();
 
         Parse.initialize(configuration);

@@ -12,8 +12,11 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.EventDetailsActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
+import com.parse.ParseFile;
 
 import java.util.List;
 
@@ -56,10 +59,10 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
 
     // create ViewHolder class
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.ivProfileImage)
-        public ImageView ivProfileImage;
-        @BindView(R.id.tvName)
-        public TextView tvUsername;
+        @BindView(R.id.ivEventImage)
+        public ImageView ivEventImage;
+        @BindView(R.id.tvEventName)
+        public TextView tvEventName;
         @BindView(R.id.ratingBar)
         public RatingBar ratingBar;
         @BindView(R.id.tvCuisine)
@@ -78,7 +81,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
 
         public void bind(Event event) {
             // populate views according to data
-            tvDescription.setText(event.getDescription());
             ParseFile eventImage = event.getImage();
             if (eventImage != null) {
                 Glide.with(context)

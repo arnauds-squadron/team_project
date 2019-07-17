@@ -13,7 +13,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.models.EndlessRecyclerViewScrollListener;
+import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 
 import java.util.ArrayList;
 

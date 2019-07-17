@@ -3,7 +3,6 @@ package com.arnauds_squadron.eatup.visitor;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,23 +12,28 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.models.EndlessRecyclerViewScrollListener;
+import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.parse.FindCallback;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.ButterKnife;
 
 public class VisitorSearchActivity extends AppCompatActivity {
 
     // initialize adapter, views, scroll listener
-    protected SearchEventAdapter eventAdapter;
-    protected ArrayList<Event> mEvents;
+    private SearchEventAdapter eventAdapter;
+    private ArrayList<Event> mEvents;
     private RecyclerView rvEvents;
-    protected SwipeRefreshLayout swipeContainer;
+    private SwipeRefreshLayout swipeContainer;
     private EndlessRecyclerViewScrollListener scrollListener;
     private ProgressBar progressBar;
     private ParseUser user;
@@ -52,7 +56,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
         // construct adapter from data source
         eventAdapter = new SearchEventAdapter(this, mEvents);
         // RecyclerView setup
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvEvents.setLayoutManager(linearLayoutManager);
         rvEvents.setAdapter(eventAdapter);
 
@@ -69,7 +73,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
         loadTopEvents(user, new Date(0));
 
         // retain instance so can call "resetStates" for fresh searches
-        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Date maxPostId = getMaxDate();
@@ -109,7 +113,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
-            public void done(List<Event> objects, ParseException e) {
+            public void done(List<Event> objects, com.parse.ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < objects.size(); ++i) {
                         mEvents.add(objects.get(i));

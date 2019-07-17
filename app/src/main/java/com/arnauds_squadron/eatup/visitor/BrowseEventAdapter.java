@@ -10,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.EventDetailsActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -72,7 +74,7 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
 
         public void bind(Event event) {
             // populate views according to data
-            tvTitle.setText(event.getUser().getUsername());
+            tvEventTitle.setText(event.getUser().getUsername());
             ParseFile eventImage = event.getImage();
             if (eventImage != null) {
                 Glide.with(context)
