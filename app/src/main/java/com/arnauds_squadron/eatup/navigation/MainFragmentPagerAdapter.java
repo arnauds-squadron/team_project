@@ -30,7 +30,7 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
             return LocalFragment.newInstance();
         if (position == 1)
             return HomeFragment.newInstance();
-        if (position == 1)
+        if (position == 2)
             return VisitorFragment.newInstance();
         return HomeFragment.newInstance();
     }
