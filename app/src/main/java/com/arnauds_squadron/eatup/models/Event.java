@@ -10,6 +10,7 @@ import java.util.Date;
 
 @ParseClassName("Event")
 public class Event extends ParseObject {
+    public static final String KEY_EVENT_IMAGE = "eventImage";
     public static final String KEY_DATE = "date";
     public static final String KEY_TITLE = "title";
     public static final String KEY_HOST = "host";
@@ -22,9 +23,17 @@ public class Event extends ParseObject {
     public static final String KEY_CONVERSATION = "conversation";
     public static final String KEY_PENDING_GUESTS = "pendingGuests";
     public static final String KEY_UPDATED_GUESTS = "updatedGuests";
-    public static final String KEY_EVENT_IMAGE = "eventImage";
     public static final String KEY_CREATED_AT = "createdAt";
 
+
+    // ParseFile - class in SDK that allows accessing files stored with Parse
+    public ParseFile getEventImage() {
+        return getParseFile(KEY_EVENT_IMAGE);
+    }
+
+    public void setImage(ParseFile image) {
+        put(KEY_EVENT_IMAGE, image);
+    }
 
     public Date getDate() {
         return getDate(KEY_DATE);
@@ -50,12 +59,30 @@ public class Event extends ParseObject {
         put(KEY_HOST, host);
     }
 
+    // TODO figure out how to turn geopointer into string and vice versa
+    public String getAddress() {
+        return getString(KEY_ADDRESS);
+    }
+
+    public void setAddress(String address) {
+        put(KEY_ADDRESS, address);
+    }
+
     public String getDescription() {
         return getString(KEY_DESCRIPTION);
     }
 
     public void setDescription(String description) {
         put(KEY_DESCRIPTION, description);
+    }
+
+    // TODO figure out if this should be set as multiple tags in array rather than a string
+    public String getCuisine() {
+        return getString(KEY_FOOD_TYPE);
+    }
+
+    public void setCuisine(String foodType) {
+        put(KEY_FOOD_TYPE, foodType);
     }
 
     public int getMaxGuests() {
@@ -82,14 +109,7 @@ public class Event extends ParseObject {
         put(KEY_RESTAURANT, restaurant);
     }
 
-    // ParseFile - class in SDK that allows accessing files stored with Parse
-    public ParseFile getEventImage() {
-        return getParseFile(KEY_EVENT_IMAGE);
-    }
-
-    public void setImage(ParseFile image) {
-        put(KEY_EVENT_IMAGE, image);
-    }
+    // TODO how to access conversation/do we actually need to use the create/update at methods
 
     // inner class to query post model
     public static class Query extends ParseQuery<Event> {
