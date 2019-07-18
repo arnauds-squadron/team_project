@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup.local.creation.address;
+package com.arnauds_squadron.eatup.local.creation;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,8 +31,11 @@ public class AddressFragment extends Fragment {
 
     private final static String TAG = "AddressFragment";
 
+    // The place that the user selects after searching for its address
     private Place selectedPlace;
 
+    // The listener that communicates to the LocalFragment to update the address when
+    // the user hits the next button
     private OnFragmentInteractionListener mListener;
 
     public static AddressFragment newInstance() {
@@ -80,13 +83,12 @@ public class AddressFragment extends Fragment {
 
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
-        if(selectedPlace == null) {
+        if (selectedPlace == null) {
             Toast.makeText(getActivity(), "Select an address first!", Toast.LENGTH_LONG).show();
         } else {
             double latitude = selectedPlace.getLatLng().latitude;
             double longitude = selectedPlace.getLatLng().longitude;
-            ParseGeoPoint point = new ParseGeoPoint(latitude,longitude);
-            mListener.updateAddress(point);
+            mListener.updateAddress(new ParseGeoPoint(latitude,longitude));
         }
     }
 
@@ -99,8 +101,6 @@ public class AddressFragment extends Fragment {
                 getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         autocompleteFragment.setHint("Address");
-
-        // Fields to return
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID,
                 Place.Field.NAME,
                 Place.Field.LAT_LNG));
@@ -113,7 +113,7 @@ public class AddressFragment extends Fragment {
 
             @Override
             public void onError(@NonNull Status status) {
-                Toast.makeText(getActivity(), "Error getting the addresss", Toast.LENGTH_SHORT)
+                Toast.makeText(getActivity(), "Error getting the address", Toast.LENGTH_SHORT)
                         .show();
                 Log.i(TAG, "An error occurred: " + status);
             }
@@ -122,8 +122,8 @@ public class AddressFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         /**
-         * When called by the parent fragment, it should switch to the next fragment in the
-         * setup queue
+         * Method called in the parent to update the event object to have the user's selected
+         * address, and to switch to the next setup fragment
          */
         void updateAddress(ParseGeoPoint address);
     }

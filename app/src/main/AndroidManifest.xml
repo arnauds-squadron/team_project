@@ -12,7 +12,7 @@
 
     <meta-data
         android:name="com.google.android.geo.API_KEY"
-        android:value="@string/google_maps_key" />
+        android:value="@string/google_api_key" />
 
     <application
         android:name=".ParseApp"
@@ -22,8 +22,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".home.HomeDetailsActivity"></activity>
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:targetApi="m">
+        <activity android:name=".home.HomeDetailsActivity" />
         <activity android:name=".EventDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
         <activity android:name=".visitor.VisitorSearchActivity" />
