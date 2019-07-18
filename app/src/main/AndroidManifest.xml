@@ -25,6 +25,10 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <service
+            android:name=".utils.FetchAddressIntentService"
+            android:exported="false" />
+
         <activity android:name=".home.HomeDetailsActivity" />
         <activity android:name=".EventDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
