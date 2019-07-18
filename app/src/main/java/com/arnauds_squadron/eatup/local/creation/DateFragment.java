@@ -70,7 +70,7 @@ public class DateFragment extends Fragment {
         mListener = null;
     }
 
-    @OnClick(R.id.btnNext)
+    @OnClick(R.id.btnCreateEvent)
     public void goToNextFragment() {
         mListener.updateDate(new Date());
     }

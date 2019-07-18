@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,8 +33,8 @@ import butterknife.ButterKnife;
  */
 public class LocalFragment extends Fragment implements
         AddressFragment.OnFragmentInteractionListener,
-FoodTypeFragment.OnFragmentInteractionListener,
-DateFragment.OnFragmentInteractionListener {
+        FoodTypeFragment.OnFragmentInteractionListener,
+        DateFragment.OnFragmentInteractionListener {
 
     private final static String TAG = "LocalFragment";
 
@@ -59,9 +60,7 @@ DateFragment.OnFragmentInteractionListener {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         Fragment childFragment = new AddressFragment();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.add(R.id.child_fragment_container, childFragment)
-                .addToBackStack("Address")
-                .commit();
+        transaction.add(R.id.child_fragment_container, childFragment).commit();
     }
 
     @Override
@@ -69,8 +68,7 @@ DateFragment.OnFragmentInteractionListener {
         super.onAttach(context);
         try {
             mListener = (OnFragmentInteractionListener) context;
-        }
-        catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement the interface");
         }
     }
@@ -101,17 +99,29 @@ DateFragment.OnFragmentInteractionListener {
                 .commit();
     }
 
+    /**
+     * Updates the date parameter on the event, also the last field to be called
+     * so we can save the event after this method runs
+     *
+     * @param date
+     */
     @Override
     public void updateDate(Date date) {
         event = new Event();
         event.setDate(date);
-        getChildFragmentManager().beginTransaction()
+        saveEvent();
+
+        // switch back to the home fragment
+        mListener.onEventCreated();
+
+        // switch to the address fragment within this fragment
+        FragmentManager setupManager = getChildFragmentManager();
+        setupManager.beginTransaction()
                 .add(R.id.child_fragment_container, AddressFragment.newInstance())
-                .addToBackStack("Address")
                 .commit();
     }
 
-    public void confirmEvent() {
+    public void saveEvent() {
 
         event.saveInBackground(new SaveCallback() {
             @Override
@@ -143,8 +153,6 @@ DateFragment.OnFragmentInteractionListener {
     }
 
     public interface OnFragmentInteractionListener {
-        void addFragmentToStack(Fragment fragment);
-
-        void removeFragmentFromStack(Fragment fragment);
+        void onEventCreated();
     }
 }

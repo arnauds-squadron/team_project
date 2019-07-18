@@ -34,6 +34,29 @@ public class MainActivity extends AppCompatActivity implements
         viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager(),
                 MainActivity.this));
 
+        // Detect page switch and clear the back stack if the user switches to
+        // a different fragment so the back button can exit the app
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {}
+
+
+            @Override
+            public void onPageSelected(int i) {
+                if(i != 0) {
+                    LocalFragment localFragment = getLocalFragment();
+                    if (localFragment != null) {
+                        localFragment
+                                .getChildFragmentManager()
+                                .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    }
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {}
+        });
+
         // Give the TabLayout the ViewPager
         tabLayout.setupWithViewPager(viewPager);
 
@@ -59,16 +82,16 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onBackPressed() {
-        List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        Fragment newest = fragments.get(fragments.size() - 1);
 
-        if(!newest.getClass().equals(LocalFragment.class)) { // not in the local fragment
+        LocalFragment localFragment = getLocalFragment();
+
+        if(localFragment == null) { // no local fragment
             super.onBackPressed();
         } else {
-            // Should be LocalFragment
-            FragmentManager setupManager = newest.getChildFragmentManager();
+            FragmentManager setupManager = localFragment.getChildFragmentManager();
 
-            if (setupManager.getBackStackEntryCount() > 1) {
+            // 1 on the stack means just the address tab is showing
+            if (setupManager.getBackStackEntryCount() > 0) {
                 setupManager.popBackStackImmediate();
             } else {
                 finish();
@@ -77,13 +100,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void addFragmentToStack(Fragment fragment) {
-
-
+    public void onEventCreated() {
+        viewPager.setCurrentItem(1);
     }
 
-    @Override
-    public void removeFragmentFromStack(Fragment fragment) {
+    private LocalFragment getLocalFragment() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        LocalFragment localFragment = null;
 
+        for (Fragment fragment : fragments) {
+            if(fragment.getClass().equals(LocalFragment.class)) {
+                localFragment = (LocalFragment) fragment;
+            }
+        }
+        return localFragment;
     }
 }
