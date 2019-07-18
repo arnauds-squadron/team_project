@@ -12,7 +12,17 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.User;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,24 +72,40 @@ public class LocalFragment extends Fragment {
 
     @OnClick(R.id.btnConfirm)
     public void confirmEvent() {
-        String address = etEventAddress.getText().toString();
-        String food = etEventFoodType.getText().toString();
-        String time = etEventTime.getText().toString();
+        ParseUser user = ParseUser.getCurrentUser();
+        final String address = etEventAddress.getText().toString();
+        final String food = etEventFoodType.getText().toString();
+        final String time = etEventTime.getText().toString();
 
+        final Event event = new Event();
+//        //event.setAddress(address);
+        event.setHost(user);
+        event.setDate(new Date());
+        event.setCuisine(food);
+        //username.setUsername(user.getUsername());
+        event.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("LocalFragment", "create post success");
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
         // TODO: validate data
         // TODO: upload event to parse server
         // TODO: only return to home screen within onsuccess
 
         Log.i(TAG, "confirming");
-        if(getFragmentManager() != null) {
+        if (getFragmentManager() != null) {
             Log.i(TAG, "confirming not null");
 
             try {
-               TabLayout tabLayout = activity.findViewById(R.id.sliding_tabs);
-               tabLayout.getTabAt(1).select();
-               Toast.makeText(activity, "Event created", Toast.LENGTH_SHORT).show();
-            }
-            catch (NullPointerException e) {
+                TabLayout tabLayout = activity.findViewById(R.id.sliding_tabs);
+                tabLayout.getTabAt(1).select();
+                Toast.makeText(activity, "Event created", Toast.LENGTH_SHORT).show();
+            } catch (NullPointerException e) {
                 Log.e(TAG, "Activity, tab layout, or home tab is null");
                 Toast.makeText(activity, "Could not create event", Toast.LENGTH_SHORT).show();
             }

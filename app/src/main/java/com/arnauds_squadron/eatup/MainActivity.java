@@ -5,6 +5,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.arnauds_squadron.eatup.home.HomeAdapter;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
