@@ -32,7 +32,7 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
         if (position == 1)
             return HomeFragment.newInstance();
         if (position == 2)
-            return VisitorFragment.newInstance();
+            return LocationFragment.newInstance();
         return HomeFragment.newInstance();
     }
 

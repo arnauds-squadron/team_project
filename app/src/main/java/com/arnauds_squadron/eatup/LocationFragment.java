@@ -30,9 +30,6 @@ import com.google.android.gms.tasks.Task;
 
 public class LocationFragment extends Fragment {
     private TextView txtLatitude, txtLongitude, txtAddress;
-    // private AddressResultReceiver mResultReceiver;
-    // removed here because cause wrong code when implemented and
-    // its not necessary like the author says
 
     //Define fields for Google API Client
     private FusedLocationProviderClient mFusedLocationClient;
@@ -58,8 +55,6 @@ public class LocationFragment extends Fragment {
         txtLongitude = (TextView) view.findViewById(R.id.txtLongitude);
         txtAddress = (TextView) view.findViewById(R.id.txtAddress);
 
-        // mResultReceiver = new AddressResultReceiver(null);
-        // cemented as above explained
         try {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
             mFusedLocationClient.getLastLocation()
@@ -71,8 +66,6 @@ public class LocationFragment extends Fragment {
                                 // Logic to handle location object
                                 txtLatitude.setText(String.valueOf(location.getLatitude()));
                                 txtLongitude.setText(String.valueOf(location.getLongitude()));
-//                                if (mResultReceiver != null)
-//                                    txtAddress.setText(mResultReceiver.getAddress());
                             }
                         }
                     });
@@ -93,8 +86,6 @@ public class LocationFragment extends Fragment {
                         txtLongitude.setText(String.valueOf(location.getLongitude()));
                     }
                 }
-
-                ;
             };
         } catch (SecurityException ex) {
             ex.printStackTrace();
@@ -149,14 +140,14 @@ public class LocationFragment extends Fragment {
         if (shouldProvideRationale) {
             Log.i("LocationFragment", "Displaying permission rationale to provide additional context.");
 
-//            showSnackbar(R.string.permission_rationale, android.R.string.ok,
-//                    new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//                            // Request permission
-//                            startLocationPermissionRequest();
-//                        }
-//                    });
+            showSnackbar("request permission rationale", "ok, grant permission",
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Request permission
+                            startLocationPermissionRequest();
+                        }
+                    });
 
         } else {
             Log.i("LocationFragment", "Requesting permission");
@@ -184,31 +175,24 @@ public class LocationFragment extends Fragment {
                 getLastLocation();
             } else {
                 // Permission denied.
-
-                // Notify the user via a SnackBar that they have rejected a core permission for the
-                // app, which makes the Activity useless. In a real app, core permissions would
-                // typically be best requested during a welcome-screen flow.
-
-                // Additionally, it is important to remember that a permission might have been
-                // rejected without asking the user for permission (device policy or "Never ask
-                // again" prompts). Therefore, a user interface affordance is typically implemented
-                // when permissions are denied. Otherwise, your app could appear unresponsive to
-                // touches or interactions which have required permissions.
-//                showSnackbar(R.string.permission_denied_explanation, R.string.settings,
-//                        new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View view) {
-//                                // Build intent that displays the App settings screen.
-//                                Intent intent = new Intent();
-//                                intent.setAction(
-//                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-//                                Uri uri = Uri.fromParts("package",
-//                                        BuildConfig.APPLICATION_ID, null);
-//                                intent.setData(uri);
-//                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                startActivity(intent);
-//                            }
-//                        });
+                // Notify the user that GPS is necessary to use the current location component of the app.
+                // Permission might have been rejected without asking the user for permission
+                // device policy or "Never ask again" prompts).
+                showSnackbar("permission was denied", "go to settings",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Build intent that displays the App settings screen.
+                                Intent intent = new Intent();
+                                intent.setAction(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package",
+                                        BuildConfig.APPLICATION_ID, null);
+                                intent.setData(uri);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        });
             }
         }
     }
@@ -236,7 +220,12 @@ public class LocationFragment extends Fragment {
 
                         } else {
                             Log.w("LocationFragment", "getLastLocation:exception", task.getException());
-//                            showSnackbar(getString(R.string.no_location_detected));
+                            showSnackbar("no location detected", "something else", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    // do something
+                                }
+                            });
                         }
                     }
                 });
@@ -260,20 +249,20 @@ public class LocationFragment extends Fragment {
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
     }
 
-    // private void showSnackbar(final String text) {
-    //    if (canvasLayout != null) {
-    //        Snackbar.make(canvasLayout, text, Snackbar.LENGTH_LONG).show();
-    //    }
-    //}
-    // this also cause wrong code and as I see it dont is necessary
-    // because the same method which is really used
+//    private void showSnackbar(final int mainTextStringId, final int actionStringId,
+//                               View.OnClickListener listener) {
+//        Snackbar.make(getActivity().findViewById(android.R.id.content),
+//                getString(mainTextStringId),
+//                Snackbar.LENGTH_INDEFINITE)
+//                .setAction(getString(actionStringId), listener).show();
+//    }
 
-
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
+    // rewrite above method to avoid int errors
+    private void showSnackbar(String mainString, String actionString,
                               View.OnClickListener listener) {
         Snackbar.make(getActivity().findViewById(android.R.id.content),
-                getString(mainTextStringId),
+                mainString,
                 Snackbar.LENGTH_INDEFINITE)
-                .setAction(getString(actionStringId), listener).show();
+                .setAction(actionString, listener).show();
     }
 }
