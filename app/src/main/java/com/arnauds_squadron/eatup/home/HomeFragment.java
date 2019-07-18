@@ -4,23 +4,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.Home;
-import com.arnauds_squadron.eatup.visitor.BrowseEventAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +34,8 @@ public class HomeFragment extends Fragment {
 
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
+    @BindView(R.id.ivProfile)
+    ImageView ivProfile;
 
     public static HomeFragment newInstance() {
         Bundle args = new Bundle();

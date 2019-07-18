@@ -3,15 +3,22 @@ package com.arnauds_squadron.eatup.models;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
-@ParseClassName("Home")
-public class Home extends ParseObject {
+@ParseClassName("User")
+public class User extends ParseObject {
 
     private static final String KEY_PERSON = "Person";
     private static final String KEY_PLACE = "Place";
     private static final String KEY_DATE = "Date";
+    private static final String KEY_USER = "username";
 
-    public Home() {}
+    public User() {}
 
+    public void setUsername(String username) {
+        put(KEY_USER, username);
+    }
+    public String getUsername() {
+        return getString(KEY_USER);
+    }
     public void setPerson(String person) {
         put(KEY_PERSON, person);
     }

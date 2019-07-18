@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.User;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -77,11 +78,11 @@ public class LocalFragment extends Fragment {
         final String time = etEventTime.getText().toString();
 
         final Event event = new Event();
-        //event.setAddress(address);
-        //event.setHost(user);
+//        //event.setAddress(address);
+        event.setHost(user);
         event.setDate(new Date());
         event.setCuisine(food);
-
+        //username.setUsername(user.getUsername());
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
