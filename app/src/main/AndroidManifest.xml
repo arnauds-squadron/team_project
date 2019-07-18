@@ -15,7 +15,6 @@
         <activity android:name=".EventDetailsActivity"></activity>
         <activity android:name=".local.LocalConfirmationActivity" />
         <activity android:name=".visitor.VisitorSearchActivity" />
-        <activity android:name=".LocalActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
