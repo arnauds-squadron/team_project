@@ -2,15 +2,16 @@ package com.arnauds_squadron.eatup.visitor;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,18 +31,15 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.BuildConfig;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
+import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
@@ -81,6 +79,9 @@ public class VisitorFragment extends Fragment {
     private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
+    private AddressResultReceiver resultReceiver;
+    private String addressOutput;
+
     public static VisitorFragment newInstance() {
         Bundle args = new Bundle();
         VisitorFragment fragment = new VisitorFragment();
@@ -107,6 +108,7 @@ public class VisitorFragment extends Fragment {
         rvBrowse.setLayoutManager(gridLayoutManager);
         rvBrowse.setAdapter(postAdapter);
 
+        resultReceiver = new AddressResultReceiver(new Handler());
 
         // load data entries
 
@@ -127,10 +129,6 @@ public class VisitorFragment extends Fragment {
         locationRequest.setInterval(UPDATE_INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        if (txtAddress.getText().toString().equals(""))
-//            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        else
-//            locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         mLocationCallback = new LocationCallback() {
             @Override
@@ -140,6 +138,15 @@ public class VisitorFragment extends Fragment {
 //                    txtLatitude.setText(String.valueOf(location.getLatitude()));
 //                    txtLongitude.setText(String.valueOf(location.getLongitude()));
                     Log.d("LocationFragment", "location:" + location.getLongitude() + location.getLatitude());
+
+                    if (!Geocoder.isPresent()) {
+                        Toast.makeText(getActivity(),
+                                R.string.no_geocoder_available,
+                                Toast.LENGTH_LONG).show();
+                    }
+                    // Start service and update UI to reflect the new location
+                    startIntentService(location);
+                    Log.d("LocationFragment", "intent service started");
                 }
             }
         };
@@ -266,6 +273,15 @@ public class VisitorFragment extends Fragment {
                             Log.d("VisitorFragment", "location: " + lastLocation.getLatitude() + lastLocation.getLongitude());
 //                            txtLatitude.setText(String.valueOf(lastLocation.getLatitude()));
 //                            txtLongitude.setText(String.valueOf(lastLocation.getLongitude()));
+
+                            if (!Geocoder.isPresent()) {
+                                Toast.makeText(getActivity(),
+                                        R.string.no_geocoder_available,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                            // Start service and update UI to reflect the new location
+                            startIntentService(lastLocation);
+                            Log.d("VisitorFragment", "started intent service");
                         } else {
                             // TODO add edge cases for nonsuccessful calls to getLastLocation
                             startLocationUpdates();
@@ -314,6 +330,15 @@ public class VisitorFragment extends Fragment {
         unbinder.unbind();
     }
 
+    // start Intent to get address from lat/long coordinates
+    protected void startIntentService(Location newLocation) {
+        Log.d("LocationFragment", "string in the intent service");
+        Intent intent = new Intent(getContext(), FetchAddressIntentService.class);
+        intent.putExtra(Constants.RECEIVER, resultReceiver);
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, newLocation);
+        getActivity().startService(intent);
+    }
+
     // TODO fix query for loading the event into the recyclerview
 // methods to load posts into the recyclerview based on location
 //    protected void loadTopPosts(Date maxDate) {
@@ -357,4 +382,34 @@ public class VisitorFragment extends Fragment {
 //        }
 //    }
 
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            if (resultData == null) {
+                return;
+            }
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            addressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            if (addressOutput == null) {
+                addressOutput = "";
+            }
+
+            // TODO do something to display the address outputted
+            Log.d("VisitorFragment", "converted address: " + addressOutput);
+            tvCurrentLocation.setText(addressOutput);
+
+            // Show a toast message if an address was found.
+            if (resultCode == Constants.SUCCESS_RESULT) {
+                Toast.makeText(getActivity(), getString(R.string.address_found), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
 }

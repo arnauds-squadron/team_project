@@ -12,6 +12,7 @@
 
 
 
+
     <application
         android:name=".ParseApp"
         android:allowBackup="true"
@@ -24,6 +25,10 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+        <service
+            android:name=".utils.FetchAddressIntentService"
+            android:exported="false"/>
+
         <activity android:name=".home.HomeDetailsActivity"></activity>
         <activity android:name=".EventDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
