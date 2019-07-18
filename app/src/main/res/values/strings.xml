@@ -9,7 +9,6 @@
     <string name="browse_nearby">Browse nearby meals</string>
     <string name="current_location_title">Current location</string>
     <string name="advanced_search_title">Advanced search</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="intent_scheme">oauth</string>
+    <string name="intent_host">arnauds-squadron</string>
 </resources>
