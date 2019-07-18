@@ -99,7 +99,7 @@ public class VisitorFragment extends Fragment {
 
         // initialize location client and get current user location
         fusedLocationClient = getFusedLocationProviderClient(getActivity());
-        getCurrentLocation();
+//        getCurrentLocation();
 
         startLocationUpdates();
 
@@ -121,6 +121,7 @@ public class VisitorFragment extends Fragment {
     // TODO figure out whether this is also updating in the actual device. works on the emulator but not on device.
     // Trigger new location updates at interval
     protected void startLocationUpdates() {
+        Log.d("Start Location updates", "started");
 
         // Create the location request to start receiving updates
         mLocationRequest = new LocationRequest();
@@ -145,6 +146,7 @@ public class VisitorFragment extends Fragment {
             getFusedLocationProviderClient(getActivity()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
                         @Override
                         public void onLocationResult(LocationResult locationResult) {
+                            Log.d("Start Location updates", "started on location results");
                             // do work here
                             onLocationChanged(locationResult.getLastLocation());
                         }
@@ -159,6 +161,7 @@ public class VisitorFragment extends Fragment {
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
         Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Log.d("VisitorFragment", msg);
         // You can now create a LatLng Object for use with maps
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
     }
