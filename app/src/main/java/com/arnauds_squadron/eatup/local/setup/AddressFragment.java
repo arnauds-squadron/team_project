@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup.local.creation;
+package com.arnauds_squadron.eatup.local.setup;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.local.creation.AddressFragment;
-import com.arnauds_squadron.eatup.local.creation.DateFragment;
-import com.arnauds_squadron.eatup.local.creation.FoodTypeFragment;
+import com.arnauds_squadron.eatup.local.setup.AddressFragment;
+import com.arnauds_squadron.eatup.local.setup.DateFragment;
+import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
