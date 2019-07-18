@@ -98,7 +98,6 @@ public class LocationFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         if (!checkPermissions()) {
             startLocationUpdates();
             requestPermissions();
@@ -119,13 +118,13 @@ public class LocationFragment extends Fragment {
      */
     private boolean checkPermissions() {
         int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION);
+                Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
     private void startLocationPermissionRequest() {
         ActivityCompat.requestPermissions(getActivity(),
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
 
@@ -133,7 +132,7 @@ public class LocationFragment extends Fragment {
     private void requestPermissions() {
         boolean shouldProvideRationale =
                 ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION);
+                        Manifest.permission.ACCESS_FINE_LOCATION);
 
         // Provide an additional rationale to the user. This would happen if the user denied the
         // request previously, but didn't check the "Don't ask again" checkbox.
@@ -206,29 +205,32 @@ public class LocationFragment extends Fragment {
      * <p>
      * Note: this method should be called after location permission has been granted.
      */
-    @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
-        mFusedLocationClient.getLastLocation()
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            lastLocation = task.getResult();
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS_REQUEST_CODE);
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                lastLocation = task.getResult();
 
-                            txtLatitude.setText(String.valueOf(lastLocation.getLatitude()));
-                            txtLongitude.setText(String.valueOf(lastLocation.getLongitude()));
+                                txtLatitude.setText(String.valueOf(lastLocation.getLatitude()));
+                                txtLongitude.setText(String.valueOf(lastLocation.getLongitude()));
 
-                        } else {
-                            Log.w("LocationFragment", "getLastLocation:exception", task.getException());
-                            showSnackbar("no location detected", "something else", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    // do something
-                                }
-                            });
+                            } else {
+                                Log.w("LocationFragment", "getLastLocation:exception", task.getException());
+                                showSnackbar("no location detected", "something else", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        // do something
+                                    }
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+        }
     }
 
     private void stopLocationUpdates() {
@@ -237,16 +239,10 @@ public class LocationFragment extends Fragment {
 
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS_REQUEST_CODE);
+        } else {
+            mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
         }
-        mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
     }
 
 //    private void showSnackbar(final int mainTextStringId, final int actionStringId,
