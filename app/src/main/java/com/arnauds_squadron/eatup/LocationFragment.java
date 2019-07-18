@@ -110,7 +110,7 @@ public class LocationFragment extends Fragment {
     }
 
     private void startLocationPermissionRequest() {
-        ActivityCompat.requestPermissions(getActivity(),
+        requestPermissions(
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
@@ -118,7 +118,7 @@ public class LocationFragment extends Fragment {
     // TODO account for case when device policy or previous settings set permission
     private void requestPermissions() {
         boolean shouldProvideRationale =
-                ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                shouldShowRequestPermissionRationale(
                         Manifest.permission.ACCESS_FINE_LOCATION);
 
         // Provide an additional rationale to the user. This would happen if the user denied the
@@ -159,13 +159,11 @@ public class LocationFragment extends Fragment {
                 getLastLocation();
                 startLocationUpdates();
             } else {
-                Log.i("LocationFragment", "User permission was denied");
-                Toast.makeText(getActivity(), "Test text", Toast.LENGTH_SHORT).show();
                 // Permission denied.
                 // Notify the user that GPS is necessary to use the current location component of the app.
                 // Permission might have been rejected without asking the user for permission
                 // device policy or "Never ask again" prompts).
-                showSnackbar("Permission was denied", "Go to settings",
+                showSnackbar("EatUp needs your current location to find hosts near you.", "Settings",
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -204,15 +202,16 @@ public class LocationFragment extends Fragment {
                             txtLatitude.setText(String.valueOf(lastLocation.getLatitude()));
                             txtLongitude.setText(String.valueOf(lastLocation.getLongitude()));
                         } else {
-                            // TODO fix this, this isn't the best solution
-                            Log.d("LocationFragment", "getLastLocation:exception", task.getException());
-                            showSnackbar("Could not obtain precise location.", "Do something.", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    startLocationUpdates();
-                                    Log.d("Do something clicked", "start location updates");
-                                }
-                            });
+                            // TODO add edge cases for nonsuccessful calls to getLastLocation
+                            startLocationUpdates();
+//                            Log.d("LocationFragment", "getLastLocation:exception", task.getException());
+//                            showSnackbar("Could not obtain precise location.", "Try again", new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    startLocationUpdates();
+//                                    Log.d("Do something clicked", "start location updates");
+//                                }
+//                            });
                         }
                     }
                 });
