@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
+import com.google.android.libraries.places.api.Places;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @BindView(R.id.tab_bar)
     TabLayout tabLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements
         for(int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(icons[i]);
         }
+
+        // Setup autocomplete
+        Places.initialize(getApplicationContext(), getString(R.string.google_places_key));
     }
 
     /**

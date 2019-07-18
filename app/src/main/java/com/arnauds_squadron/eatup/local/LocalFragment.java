@@ -14,9 +14,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.local.creation.AddressFragment;
-import com.arnauds_squadron.eatup.local.creation.FoodTypeFragment;
+import com.arnauds_squadron.eatup.local.creation.address.AddressFragment;
 import com.arnauds_squadron.eatup.local.creation.DateFragment;
+import com.arnauds_squadron.eatup.local.creation.FoodTypeFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -91,7 +91,6 @@ public class LocalFragment extends Fragment implements
 
     @Override
     public void updateFoodType(String foodType) {
-        event = new Event();
         event.setCuisine(foodType);
         getChildFragmentManager().beginTransaction()
                 .add(R.id.child_fragment_container, DateFragment.newInstance())
@@ -107,7 +106,6 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void updateDate(Date date) {
-        event = new Event();
         event.setDate(date);
         saveEvent();
 
@@ -121,8 +119,7 @@ public class LocalFragment extends Fragment implements
                 .commit();
     }
 
-    public void saveEvent() {
-
+    private void saveEvent() {
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -137,10 +134,7 @@ public class LocalFragment extends Fragment implements
         // TODO: upload event to parse server
         // TODO: only return to home screen within onsuccess
 
-        Log.i(TAG, "confirming");
         if (getFragmentManager() != null) {
-            Log.i(TAG, "confirming not null");
-
             try {
                 TabLayout tabLayout = getActivity().findViewById(R.id.tab_bar);
                 tabLayout.getTabAt(1).select();
