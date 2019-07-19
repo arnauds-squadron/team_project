@@ -96,7 +96,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
 
-    @OnClick(R.id.tvDisplayName)
+    @OnClick(R.id.tvHostName)
     public void viewUserProfile() {
         Intent i = new Intent(EventDetailsActivity.this, ProfileActivity.class);
         i.putExtra("user", currentEvent.getHost());

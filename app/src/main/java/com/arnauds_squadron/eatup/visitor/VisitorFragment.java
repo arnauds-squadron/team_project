@@ -171,9 +171,11 @@ public class VisitorFragment extends Fragment {
 
                     } else {
                         // Start geocoder service and update UI to reflect the new address
-                        startIntentService(lastLocation);
+                        startIntentService(location);
                     }
-                    tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+//                    tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
+                    tvCurrentLocation.setTag(R.id.latitude, location.getLatitude());
+                    tvCurrentLocation.setTag(R.id.longitude, location.getLongitude());
                 }
             }
         };
@@ -195,9 +197,9 @@ public class VisitorFragment extends Fragment {
     @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1, R.id.tvPrevLocation2})
     public void searchLocation(TextView tvLocation) {
         // TODO search the event database by current location. currently sends the lat/long data to SearchActivity
-        Toast.makeText(getActivity(), (String) tvLocation.getTag(), Toast.LENGTH_SHORT).show();
         Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
-        i.putExtra("coordinates", (String) tvLocation.getTag());
+        i.putExtra("latitude", (Double) tvLocation.getTag(R.id.latitude));
+        i.putExtra("longitude", (Double) tvLocation.getTag(R.id.longitude));
         startActivity(i);
     }
 
@@ -380,7 +382,9 @@ public class VisitorFragment extends Fragment {
                                 // Start geocoder service and update UI to reflect the new address
                                 startIntentService(lastLocation);
                             }
-                            tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+//                            tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+                            tvCurrentLocation.setTag(R.id.latitude, lastLocation.getLatitude());
+                            tvCurrentLocation.setTag(R.id.longitude, lastLocation.getLongitude());
                         } else {
                             // TODO add edge cases for nonsuccessful calls to getLastLocation
                             startLocationUpdates();
@@ -431,7 +435,6 @@ public class VisitorFragment extends Fragment {
 
     // start Intent to get address from lat/long coordinates
     protected void startIntentService(Location newLocation) {
-        Log.d("LocationFragment", "string in the intent service");
         Intent intent = new Intent(getContext(), FetchAddressIntentService.class);
         intent.putExtra(Constants.RECEIVER, resultReceiver);
         intent.putExtra(Constants.LOCATION_DATA_EXTRA, newLocation);

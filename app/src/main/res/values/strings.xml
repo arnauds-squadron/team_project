@@ -33,4 +33,8 @@
     <string name="event_creation_start_new_event">Create a new event</string>
     <string name="search_results_title">Search results</string>
     <string name="search_again">Search again</string>
+
+    <!--latitude/longitude tags-->
+    <item type="id" name="latitude" />
+    <item type="id" name="longitude" />
 </resources>

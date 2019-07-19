@@ -24,11 +24,13 @@ import com.bumptech.glide.request.RequestOptions;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,6 +44,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
     private EndlessRecyclerViewScrollListener scrollListener;
     private ProgressBar progressBar;
     private ParseUser user;
+    private final static Double DEFAULT_COORD = 0.0;
 
     @BindView(R.id.rvSearchResults)
     RecyclerView rvEvents;
@@ -82,8 +85,10 @@ public class VisitorSearchActivity extends AppCompatActivity {
         }
         // otherwise called by a click on the location in VisitorFragment
         else {
-            String query = intent.getStringExtra("coordinates");
-            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+            Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
+            Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
+            ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
+            searchByDistance(location);
             // TODO implement search functionality
             // doMySearch(query);
         }
@@ -102,7 +107,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
         rvEvents.addOnScrollListener(scrollListener);
 
         // TODO add the sort functionality by distance (can later add more "sort by criteria")
-        loadTopEvents(new Date(0));
+        // loadTopEvents(new Date(0));
 
         // set up refresh listener that triggers new data loading
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -120,7 +125,30 @@ public class VisitorSearchActivity extends AppCompatActivity {
 
     }
 
-    // methods to load posts into the recyclerview based on location
+    private void searchByDistance(ParseGeoPoint geoPoint) {
+        Toast.makeText(this, "geoPoint successfully created", Toast.LENGTH_SHORT).show();
+        final Event.Query eventsQuery = new Event.Query();
+        eventsQuery.getClosest(geoPoint).getTop().withHost();
+
+        eventsQuery.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < objects.size(); ++i) {
+                        mEvents.add(objects.get(i));
+                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                        // on successful reload, signal that refresh has completed
+                        swipeContainer.setRefreshing(false);
+                    }
+                } else {
+                    e.printStackTrace();
+                }
+//                progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+                                  // methods to load posts into the recyclerview based on location
     protected void loadTopEvents(Date maxDate) {
 //        progressBar.setVisibility(View.VISIBLE);
         final Event.Query eventsQuery = new Event.Query();
