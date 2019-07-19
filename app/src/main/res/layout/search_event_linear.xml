@@ -7,12 +7,12 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/ivProfileImage"
-        android:layout_width="100dp"
+        android:id="@+id/ivEventImage"
+        android:layout_width="150dp"
         android:layout_height="100dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:color/darker_gray" />
@@ -22,50 +22,67 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:text="TextView"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/detailview_event_title"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
-        tools:layout_editor_absoluteY="8dp" />
+        app:layout_constraintStart_toEndOf="@+id/ivEventImage"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <RatingBar
         android:id="@+id/hostRating"
-        android:layout_width="100dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
-        tools:layout_editor_absoluteY="27dp" />
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="81dp"
+        android:layout_height="17dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="8dp"
+        android:numStars="5"
+        android:stepSize="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvHostName"
+        app:layout_constraintTop_toBottomOf="@+id/tvEventName" />
 
     <TextView
         android:id="@+id/tvCuisine"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:text="TextView"
-        app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
-        tools:layout_editor_absoluteY="57dp" />
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/detailview_cuisine_name"
+        app:layout_constraintStart_toEndOf="@+id/ivEventImage"
+        app:layout_constraintTop_toBottomOf="@+id/hostRating" />
 
     <TextView
         android:id="@+id/tvDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:text="TextView"
-        app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
-        tools:layout_editor_absoluteY="89dp" />
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/detailview_distance"
+        app:layout_constraintStart_toEndOf="@+id/ivEventImage"
+        app:layout_constraintTop_toBottomOf="@+id/tvCuisine" />
 
     <Button
         android:id="@+id/btBook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:text="@string/btBook"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="@string/detailview_bt_request"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvDistance"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvHostName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:text="@string/detailview_host_name"
+        app:layout_constraintStart_toEndOf="@+id/ivEventImage"
+        tools:layout_editor_absoluteY="39dp" />
 
 </android.support.constraint.ConstraintLayout>

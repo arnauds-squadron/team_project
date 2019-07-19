@@ -37,9 +37,6 @@ public class VisitorSearchActivity extends AppCompatActivity {
     private EndlessRecyclerViewScrollListener scrollListener;
     private ProgressBar progressBar;
     private ParseUser user;
-    private TextView tvUsername;
-    private ImageView ivProfileImage;
-    private final String KEY_PROFILE_IMAGE = "profileImage";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,16 +56,6 @@ public class VisitorSearchActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvEvents.setLayoutManager(linearLayoutManager);
         rvEvents.setAdapter(eventAdapter);
-
-        user = getIntent().getParcelableExtra("user");
-        tvUsername.setText(user.getUsername());
-        ParseFile profileImage = user.getParseFile(KEY_PROFILE_IMAGE);
-        if (profileImage != null) {
-            Glide.with(getApplicationContext())
-                    .load(profileImage.getUrl())
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(ivProfileImage);
-        }
 
         loadTopEvents(user, new Date(0));
 
