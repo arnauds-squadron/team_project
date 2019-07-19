@@ -113,7 +113,7 @@ public class Event extends ParseObject {
 
     // TODO how to access conversation/do we actually need to use the create/update at methods
 
-    // inner class to query post model
+    // inner class to query event model
     public static class Query extends ParseQuery<Event> {
         //
         public Query() {
@@ -133,8 +133,8 @@ public class Event extends ParseObject {
             return this;
         }
 
-        public Query withUser() {
-            include("user");
+        public Query withHost() {
+            include("host");
             return this;
         }
     }

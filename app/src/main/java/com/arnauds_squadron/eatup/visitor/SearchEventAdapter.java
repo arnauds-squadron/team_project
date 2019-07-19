@@ -63,7 +63,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         public ImageView ivEventImage;
         @BindView(R.id.tvEventName)
         public TextView tvEventName;
-        @BindView(R.id.ratingBar)
+        @BindView(R.id.hostRating)
         public RatingBar ratingBar;
         @BindView(R.id.tvCuisine)
         public TextView tvCuisine;

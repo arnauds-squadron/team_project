@@ -16,6 +16,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.User;
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonArray;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
@@ -38,8 +39,6 @@ import okhttp3.Response;
 public class HomeDetailsActivity extends AppCompatActivity {
 
     Event event;
-    Context context;
-    User user;
     @BindView(R.id.ivProfile)
     ParseImageView ivProfile;
     @BindView(R.id.cbRestaurant)
@@ -68,16 +67,11 @@ public class HomeDetailsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         event = Parcels.unwrap(getIntent().getParcelableExtra(Event.class.getSimpleName()));
 
-//        String secretValue = getString(R.string.parse_application_id);
         String secretKey = getString(R.string.yelp_api_key);
-
         final OkHttpClient client = new OkHttpClient();
-        String accessToken=null;
-
         final Request request = new Request.Builder()
-                // todo when we get the event.getAddress working
-                //.url("https://api.yelp.com/v3/businesses/search?term=" + event.getCuisine() + "&location=" + event.getAddress() + "&limit=1&sort_by=rating&price=" + 1 +"")
-                .url("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco")
+                .url("https://api.yelp.com/v3/businesses/search?term=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
+                //.url("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco")
                 .addHeader("Authorization", "Bearer " + secretKey)
                 .build();
         Thread thread = new Thread(new Runnable() {
@@ -85,7 +79,10 @@ public class HomeDetailsActivity extends AppCompatActivity {
             public void run() {
             try {
                 Response response = client.newCall(request).execute();
-                final JSONObject jsonObject = new JSONObject(response.body().string().trim());
+                JSONObject data = new JSONObject(response.body().string().trim());
+                JSONArray business = data.getJSONArray("businesses");
+                final JSONObject jsonObject = business.getJSONObject(0);
+
                 //JSONArray myResponse = (JSONArray)jsonObject.get("id");
                 final String imageURL = jsonObject.getString("image_url");
                 final String url = jsonObject.getString("url");
@@ -93,7 +90,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            tvYelp.setText(jsonObject.getString("alias"));
+                            tvYelp.setText(jsonObject.getString("name"));
                           Glide.with(HomeDetailsActivity.this)
                                  .load(imageURL)
                                  .override(100,100)
@@ -104,6 +101,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(url));
                                     startActivity(i);
+                                    finish();
                                 }
                             });
                         } catch (JSONException e) {

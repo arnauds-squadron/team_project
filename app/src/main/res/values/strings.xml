@@ -17,7 +17,16 @@
     <string name="no_address_found">Sorry, no address found</string>
     <string name="address_found">Found address successfully!</string>
     <string name="no_geocoder_available">No geocoder available</string>
-    <string name="create_event_text">Create Event</string>
-    <string name="next_button_text">Next</string>
-    <string name="food_type_hint">Cuisine</string>
+    <string name="event_creation_create_event_text">Create Event</string>
+    <string name="event_creation_next_button_text">Next</string>
+    <string name="event_creation_food_type_hint">Cuisine</string>
+    <string name="detailview_event_title">Event Title</string>
+    <string name="detailview_cuisine_name">Cuisine</string>
+    <string name="detailview_distance">Distance</string>
+    <string name="detailview_bt_request">RSVP</string>
+    <string name="detailview_host_bio_title">Who\'s hosting</string>
+    <string name="detailview_host_name">Host name</string>
+    <string name="detailview_description_title">About</string>
+    <string name="detailview_description">Bio content</string>
+    <string name="detailview_book_prompt">Like what you see?</string>
 </resources>
