@@ -11,8 +11,15 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.parse.ParseGeoPoint;
@@ -27,16 +34,26 @@ import butterknife.OnClick;
  * Use the {@link AddressFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddressFragment extends Fragment {
+public class AddressFragment extends Fragment implements OnMapReadyCallback {
 
     private final static String TAG = "AddressFragment";
 
-    // The place that the user selects after searching for its address
-    private Place selectedPlace;
+    // 1-19
+    private final static Float ZOOM_LEVEL = 15f;
 
     // The listener that communicates to the LocalFragment to update the address when
     // the user hits the next button
     private OnFragmentInteractionListener mListener;
+
+    private GoogleMap mMap;
+    private SupportMapFragment mapFragment;
+
+    // Client to get the details of the selected place
+    private PlacesClient placesClient;
+
+    // The place that the user selects after searching for its address
+    private Place selectedPlace;
+
 
     public static AddressFragment newInstance() {
         Bundle args = new Bundle();
@@ -56,8 +73,24 @@ public class AddressFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_address, container, false);
         ButterKnife.bind(this, view);
+
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         setupAutoCompleteFragment();
+
+        initializePlaces();
+        placesClient = Places.createClient(getActivity());
+
+        mapFragment.getMapAsync(this);
+        setupAutoCompleteFragment();
+
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mMap != null)
+            mMap.clear();
     }
 
     /**
@@ -81,6 +114,24 @@ public class AddressFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        if(selectedPlace == null) {
+            // TODO: move map to current location
+            // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user.location.latlng, 1));
+        } else {
+            mMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(selectedPlace.getLatLng(), ZOOM_LEVEL));
+
+            mMap.addMarker(new MarkerOptions()
+                    .position(selectedPlace.getLatLng())
+                    .title(selectedPlace.getName())
+                    .snippet("snippet")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        }
+    }
+
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         if (selectedPlace == null) {
@@ -90,6 +141,13 @@ public class AddressFragment extends Fragment {
             double longitude = selectedPlace.getLatLng().longitude;
             mListener.updateAddress(new ParseGeoPoint(latitude,longitude));
         }
+    }
+
+    /**
+     * Initalizes the places SDK within the main activity
+     */
+    private void initializePlaces() {
+        Places.initialize(getActivity(), getString(R.string.google_api_key));
     }
 
     private void setupAutoCompleteFragment() {
@@ -109,6 +167,7 @@ public class AddressFragment extends Fragment {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 selectedPlace = place;
+                mapFragment.getMapAsync(AddressFragment.this);
             }
 
             @Override
