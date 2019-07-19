@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.tab_bar)
     TabLayout tabLayout;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,20 +86,23 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onBackPressed() {
-
         LocalFragment localFragment = getLocalFragment();
 
         if(localFragment == null) { // no local fragment
             super.onBackPressed();
         } else {
-            FragmentManager setupManager = localFragment.getChildFragmentManager();
-
-            // 1 on the stack means just the address tab is showing
-            if (setupManager.getBackStackEntryCount() > 0) {
-                setupManager.popBackStackImmediate();
-            } else {
+            if(localFragment.getViewPager().getCurrentItem() > 0)
+                localFragment.retreatViewPager();
+            else
                 finish();
-            }
+//            FragmentManager setupManager = localFragment.getChildFragmentManager();
+//
+//            // 1 on the stack means just the address tab is showing
+//            if (setupManager.getBackStackEntryCount() > 0) {
+//                setupManager.popBackStackImmediate();
+//            } else {
+//                finish();
+//            }
         }
     }
 

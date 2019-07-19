@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +16,15 @@ import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
+import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
 import java.util.Date;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -36,6 +38,9 @@ public class LocalFragment extends Fragment implements
         DateFragment.OnFragmentInteractionListener {
 
     private final static String TAG = "LocalFragment";
+
+    @BindView(R.id.viewPager)
+    NoSwipingPagerAdapter viewPager;
 
     // Listener that communicates with the parent activity to switch back to the HomeFragment
     // when the event is finally created
@@ -56,14 +61,11 @@ public class LocalFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_local, container, false);
         ButterKnife.bind(this, view);
-        return view;
-    }
 
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        getChildFragmentManager().beginTransaction()
-                .add(R.id.child_fragment_container, AddressFragment.newInstance())
-                .commit();
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        viewPager.setAdapter(new SetupFragmentPagerAdapter(getChildFragmentManager()));
+
+        return view;
     }
 
     @Override
@@ -89,10 +91,7 @@ public class LocalFragment extends Fragment implements
     public void updateAddress(ParseGeoPoint address) {
         event = new Event();
         event.setAddress(address);
-        getChildFragmentManager().beginTransaction()
-                .add(R.id.child_fragment_container, FoodTypeFragment.newInstance())
-                .addToBackStack("Food type")
-                .commit();
+        advanceViewPager();
     }
 
     /**
@@ -101,10 +100,7 @@ public class LocalFragment extends Fragment implements
     @Override
     public void updateFoodType(String foodType) {
         event.setCuisine(foodType);
-        getChildFragmentManager().beginTransaction()
-                .add(R.id.child_fragment_container, DateFragment.newInstance())
-                .addToBackStack("Time")
-                .commit();
+        advanceViewPager();
     }
 
     /**
@@ -119,11 +115,7 @@ public class LocalFragment extends Fragment implements
         // switch back to the home fragment
         mListener.onEventCreated();
 
-        // switch to the address fragment to restart the setup process
-        FragmentManager setupManager = getChildFragmentManager();
-        setupManager.beginTransaction()
-                .add(R.id.child_fragment_container, AddressFragment.newInstance())
-                .commit();
+        advanceViewPager();
     }
 
     private void saveEvent() {
@@ -152,6 +144,28 @@ public class LocalFragment extends Fragment implements
             }
         }
     }
+
+    /**
+     * Moves the pager one fragment backwards
+     */
+    public void retreatViewPager() {
+        if (viewPager.getCurrentItem() == 0)
+            throw new IllegalArgumentException("Cannot retreat view pager on the first fragment!");
+
+        viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+    }
+
+    public NoSwipingPagerAdapter getViewPager() {
+        return viewPager;
+    }
+
+    /**
+     * Moves the pager one fragment forward
+     */
+    private void advanceViewPager() {
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+    }
+
 
     public interface OnFragmentInteractionListener {
         void onEventCreated();
