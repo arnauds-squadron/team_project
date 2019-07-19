@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,9 +50,11 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -69,6 +72,7 @@ public class VisitorFragment extends Fragment {
     SearchView searchView;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
+
     private Unbinder unbinder;
     private EndlessRecyclerViewScrollListener scrollListener;
     private BrowseEventAdapter eventAdapter;
@@ -143,19 +147,42 @@ public class VisitorFragment extends Fragment {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
-                    Log.d("LocationFragment", "location:" + location.getLongitude() + location.getLatitude());
 
+                    // TODO - tag current location with coordinates? or just store this information in the Parse database
+
+                    // geocoder for translating coordinates to address
                     if (!Geocoder.isPresent()) {
                         Toast.makeText(getActivity(),
                                 R.string.no_geocoder_available,
                                 Toast.LENGTH_LONG).show();
+                        tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+                    } else {
+                        // Start geocoder service and update UI to reflect the new address
+                        Log.d("VisitorFragmentTesting", String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+                        startIntentService(lastLocation);
+                        Log.d("VisitorFragment", "started intent service");
                     }
-                    // Start service and update UI to reflect the new location
-                    startIntentService(location);
-                    Log.d("LocationFragment", "intent service started");
                 }
             }
         };
+    }
+
+    @OnClick(R.id.tvCurrentLocation)
+    public void searchCurrentLocation(TextView tvCurrentLocation) {
+        // TODO search the event database by current location
+        Toast.makeText(getActivity(), "Execute search by current location", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.tvPrevLocation1)
+    public void searchPrevLocation1(TextView tvPrevLocation1) {
+        // TODO search the event database by prev location 1
+        Toast.makeText(getActivity(), "Execute search by previous location 1", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.tvPrevLocation2)
+    public void searchPrevLocation2(TextView tvPrevLocation2) {
+        // TODO search the event database by prev location 2
+        Toast.makeText(getActivity(), "Execute search by previous location 2", Toast.LENGTH_SHORT).show();
     }
 
     // methods to load posts into the recyclerview based on location
@@ -300,7 +327,6 @@ public class VisitorFragment extends Fragment {
         }
     }
 
-
     /**
      * Provides a simple way of getting a device's location and is well suited for
      * applications that do not require a fine-grained location and that do not need location
@@ -317,16 +343,21 @@ public class VisitorFragment extends Fragment {
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             lastLocation = task.getResult();
-                            Log.d("VisitorFragment", "location: " + lastLocation.getLatitude() + lastLocation.getLongitude());
 
+                            // TODO - tag current location with coordinates? or just store this information in the Parse database
+
+                            // geocoder for translating coordinates to address
                             if (!Geocoder.isPresent()) {
                                 Toast.makeText(getActivity(),
                                         R.string.no_geocoder_available,
                                         Toast.LENGTH_LONG).show();
+                                tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+                            } else {
+                                // Start geocoder service and update UI to reflect the new address
+                                Log.d("VisitorFragmentTesting", String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+                                startIntentService(lastLocation);
+                                Log.d("VisitorFragment", "started intent service");
                             }
-                            // Start service and update UI to reflect the new location
-                            startIntentService(lastLocation);
-                            Log.d("VisitorFragment", "started intent service");
                         } else {
                             // TODO add edge cases for nonsuccessful calls to getLastLocation
                             startLocationUpdates();
