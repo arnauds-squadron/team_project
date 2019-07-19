@@ -3,6 +3,7 @@ package com.arnauds_squadron.eatup.local.setup;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.utils.UIHelper;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -68,9 +70,17 @@ public class DateFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if (isVisibleToUser)
-            // TODO: delay dialog so keyboard is hidden
-            showDatePickerDialog();
+        if (isVisibleToUser) {
+            UIHelper.hideKeyboard(getActivity(), getView());
+            // delay ui thread to show date after keyboard has disappeared
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showDatePickerDialog();
+                }
+            }, 250);
+        }
     }
 
     /**
