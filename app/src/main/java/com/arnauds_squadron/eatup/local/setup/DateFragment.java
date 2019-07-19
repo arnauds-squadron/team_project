@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.utils.UIHelper;
 
 import java.util.Calendar;
@@ -225,18 +225,13 @@ public class DateFragment extends Fragment {
         if (!dateSet)
             tvSelectedDate.setText(getString(R.string.event_creation_date_not_selected));
         else
-            tvSelectedDate.setText(DateFormat.format("MMM dd, yyyy", selectedTime).toString());
+            tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(selectedTime.getTime()));
 
-        if (!timeSet) {
+        if (!timeSet)
             tvSelectedTime.setText(getString(R.string.event_creation_time_not_selected));
-        } else {
-            boolean uses24Hour = android.text.format.DateFormat.is24HourFormat(getActivity());
-            String time = uses24Hour
-                    ? DateFormat.format("HH:mm", selectedTime).toString()
-                    : DateFormat.format("hh:mm a", selectedTime).toString();
+        else
+            tvSelectedTime.setText(FormatHelper.formatTime(selectedTime.getTime(), getActivity()));
 
-            tvSelectedTime.setText(time);
-        }
         calendar.setVisibility(View.VISIBLE);
         clock.setVisibility(View.VISIBLE);
     }
