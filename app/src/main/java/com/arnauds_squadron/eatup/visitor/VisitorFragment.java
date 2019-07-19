@@ -177,15 +177,13 @@ public class VisitorFragment extends Fragment {
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-        // allow search bar to remain in focus while typing
-//        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-//        searchView.setFocusable(true);
-//        searchView.requestFocus();
     }
+
+
 
     @OnClick(R.id.tvCurrentLocation)
     public void searchCurrentLocation(TextView tvCurrentLocation) {
-        // TODO search the event database by current location
+        // TODO search the event database by current locationgi
         Toast.makeText(getActivity(), "Execute search by current location", Toast.LENGTH_SHORT).show();
     }
 
