@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.BuildConfig;
+import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
@@ -47,6 +48,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +77,11 @@ public class VisitorFragment extends Fragment {
     SearchView searchView;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
+    @BindView(R.id.tvPrevLocation1)
+    TextView tvPrevLocation1;
+    @BindView(R.id.tvPrevLocation2)
+    TextView tvPrevLocation2;
+
 
     private Unbinder unbinder;
     private EndlessRecyclerViewScrollListener scrollListener;
@@ -161,12 +168,12 @@ public class VisitorFragment extends Fragment {
                                 R.string.no_geocoder_available,
                                 Toast.LENGTH_LONG).show();
                         tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
+
                     } else {
                         // Start geocoder service and update UI to reflect the new address
-                        Log.d("VisitorFragmentTesting", String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
                         startIntentService(lastLocation);
-                        Log.d("VisitorFragment", "started intent service");
                     }
+                    tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
                 }
             }
         };
@@ -177,28 +184,29 @@ public class VisitorFragment extends Fragment {
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-        // allow search bar to remain in focus while typing
-//        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-//        searchView.setFocusable(true);
-//        searchView.requestFocus();
+
+        // TODO tag previous locations with latitude and longitude. default (0, 0)
+        tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
+        tvPrevLocation2.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
     }
 
-    @OnClick(R.id.tvCurrentLocation)
-    public void searchCurrentLocation(TextView tvCurrentLocation) {
-        // TODO search the event database by current location
-        Toast.makeText(getActivity(), "Execute search by current location", Toast.LENGTH_SHORT).show();
+
+
+    @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1, R.id.tvPrevLocation2})
+    public void searchLocation(TextView tvLocation) {
+        // TODO search the event database by current location. currently sends the lat/long data to SearchActivity
+        Toast.makeText(getActivity(), (String) tvLocation.getTag(), Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
+        i.putExtra("coordinates", (String) tvLocation.getTag());
+        startActivity(i);
     }
 
-    @OnClick(R.id.tvPrevLocation1)
-    public void searchPrevLocation1(TextView tvPrevLocation1) {
-        // TODO search the event database by prev location 1
-        Toast.makeText(getActivity(), "Execute search by previous location 1", Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.tvPrevLocation2)
-    public void searchPrevLocation2(TextView tvPrevLocation2) {
-        // TODO search the event database by prev location 2
-        Toast.makeText(getActivity(), "Execute search by previous location 2", Toast.LENGTH_SHORT).show();
+    @OnClick(R.id.tvDisplayName)
+    public void viewUserProfile() {
+        Intent i = new Intent(getActivity(), ProfileActivity.class);
+//        ParseUser user = ParseUser.getCurrentUser();
+//        i.putExtra("user", user);
+        getActivity().startActivity(i);
     }
 
     // methods to load posts into the recyclerview based on location
@@ -370,10 +378,9 @@ public class VisitorFragment extends Fragment {
                                 tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
                             } else {
                                 // Start geocoder service and update UI to reflect the new address
-                                Log.d("VisitorFragmentTesting", String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
                                 startIntentService(lastLocation);
-                                Log.d("VisitorFragment", "started intent service");
                             }
+                            tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
                         } else {
                             // TODO add edge cases for nonsuccessful calls to getLastLocation
                             startLocationUpdates();

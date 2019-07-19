@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -44,6 +45,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     Button btRequest;
 
     private String eventId;
+    private Event currentEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class EventDetailsActivity extends AppCompatActivity {
             @Override
             public void done(final Event event, ParseException e) {
                 if (e == null) {
+                    currentEvent = event;
                     tvEventTitle.setText(event.getTitle());
                     tvCuisine.setText(event.getCuisine());
                     // TODO add calculation for distance from the user
@@ -90,6 +93,14 @@ public class EventDetailsActivity extends AppCompatActivity {
     public void eventRSVP(Button btRequest) {
         // TODO send request to Parse server to RSVP to the event
         Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
+    }
+
+
+    @OnClick(R.id.tvDisplayName)
+    public void viewUserProfile() {
+        Intent i = new Intent(EventDetailsActivity.this, ProfileActivity.class);
+        i.putExtra("user", currentEvent.getHost());
+        startActivity(i);
     }
 
 

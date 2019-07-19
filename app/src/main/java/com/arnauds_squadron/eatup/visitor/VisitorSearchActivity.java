@@ -22,10 +22,10 @@ import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,78 +80,85 @@ public class VisitorSearchActivity extends AppCompatActivity {
             // TODO implement search functionality
             // doMySearch(query);
         }
+        // otherwise called by a click on the location in VisitorFragment
+        else {
+            String query = intent.getStringExtra("coordinates");
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+            // TODO implement search functionality
+            // doMySearch(query);
+        }
 
+        // load data entries
+        // retain instance so can call "resetStates" for fresh searches
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Date maxEventId = getMaxDate();
+                Log.d("DATE", maxEventId.toString());
+                loadTopEvents(getMaxDate());
+            }
+        };
+        // add endless scroll listener to RecyclerView and load items
+        rvEvents.addOnScrollListener(scrollListener);
+
+        // TODO add the sort functionality by distance (can later add more "sort by criteria")
+        loadTopEvents(new Date(0));
+
+        // set up refresh listener that triggers new data loading
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadTopEvents(new Date(0));
+            }
+        });
+        // configure refreshing colors
+        swipeContainer.setColorSchemeColors(getResources().getColor(android.R.color.holo_blue_bright),
+                getResources().getColor(android.R.color.holo_green_light),
+                getResources().getColor(android.R.color.holo_orange_light),
+                getResources().getColor(android.R.color.holo_red_light));
 
     }
 
-        // TODO load search results into the recyclerview
-//        loadTopEvents(user, new Date(0));
-//
-//        // retain instance so can call "resetStates" for fresh searches
-//        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                Date maxPostId = getMaxDate();
-//                Log.d("DATE", maxPostId.toString());
-//                loadTopEvents(user, getMaxDate());
-//            }
-//        };
-//        // add endless scroll listener to RecyclerView
-//        rvEvents.addOnScrollListener(scrollListener);
-//
-//        // set up refresh listener that triggers new data loading
-//        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-//        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                loadTopEvents(user, new Date(0));
-//            }
-//        });
-//        // configure refreshing colors
-//        swipeContainer.setColorSchemeColors(getResources().getColor(android.R.color.holo_blue_bright),
-//                getResources().getColor(android.R.color.holo_green_light),
-//                getResources().getColor(android.R.color.holo_orange_light),
-//                getResources().getColor(android.R.color.holo_red_light));
-
-//    private void loadTopEvents(ParseUser user, Date maxDate) {
+    // methods to load posts into the recyclerview based on location
+    protected void loadTopEvents(Date maxDate) {
 //        progressBar.setVisibility(View.VISIBLE);
-//        final Event.Query eventsQuery = new Event.Query();
-//        // if opening app for the first time, get top 20 and clear old items
-//        // otherwise, query for events older than the oldest
-//        // TODO fix query for loading the event into the recyclerview
-//        if (maxDate.equals(new Date(0))) {
-//            eventAdapter.clear();
-//            eventsQuery.getTop().withHost().whereEqualTo(Event.KEY_HOST, user);
-//        } else {
-//            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo(Event.KEY_HOST, user);
-//        }
-//
-//        eventsQuery.findInBackground(new FindCallback<Event>() {
-//            @Override
-//            public void done(List<Event> objects, com.parse.ParseException e) {
-//                if (e == null) {
-//                    for (int i = 0; i < objects.size(); ++i) {
-//                        mEvents.add(objects.get(i));
-//                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
-//                        // on successful reload, signal that refresh has completed
-//                        swipeContainer.setRefreshing(false);
-//                    }
-//                } else {
-//                    e.printStackTrace();
-//                }
+        final Event.Query eventsQuery = new Event.Query();
+        // if opening app for the first time, get top 20 and clear old items
+        // otherwise, query for posts older than the oldest
+        if (maxDate.equals(new Date(0))) {
+            eventAdapter.clear();
+            eventsQuery.getTop().withHost();
+        } else {
+            eventsQuery.getOlder(maxDate).getTop().withHost();
+        }
+
+        eventsQuery.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < objects.size(); ++i) {
+                        mEvents.add(objects.get(i));
+                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                        // on successful reload, signal that refresh has completed
+                        swipeContainer.setRefreshing(false);
+                    }
+                } else {
+                    e.printStackTrace();
+                }
 //                progressBar.setVisibility(View.INVISIBLE);
-//            }
-//        });
-//    }
-//
-//    // get date of oldest event
-//    private Date getMaxDate() {
-//        int eventsSize = mEvents.size();
-//        if (eventsSize == 0) {
-//            return (new Date(0));
-//        } else {
-//            Event oldest = mEvents.get(mEvents.size() - 1);
-//            return oldest.getCreatedAt();
-//        }
-//    }
+            }
+        });
+    }
+
+    // get date of oldest post
+    protected Date getMaxDate() {
+        int postsSize = mEvents.size();
+        if (postsSize == 0) {
+            return (new Date(0));
+        } else {
+            Event oldest = mEvents.get(mEvents.size() - 1);
+            return oldest.getCreatedAt();
+        }
+    }
 }

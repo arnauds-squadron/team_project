@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.User;
@@ -131,6 +132,14 @@ public class HomeDetailsActivity extends AppCompatActivity {
         if(event.getHost() != null) {
             try {
                 tvPerson.setText(event.getHost().fetchIfNeeded().getUsername());
+                tvPerson.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(HomeDetailsActivity.this, ProfileActivity.class);
+//                        i.putExtra(Event.class.getSimpleName(), parcels)
+                        startActivity(i);
+                    }
+                });
             } catch (ParseException e) {
                 e.printStackTrace();
             }
