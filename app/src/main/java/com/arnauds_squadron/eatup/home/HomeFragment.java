@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,7 +32,8 @@ public class HomeFragment extends Fragment {
 
     private HomeAdapter homeAdapter;
     ArrayList<Event> agenda;
-
+    @BindView(R.id.swipeContainer)
+    private SwipeRefreshLayout swipeContainer;
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
     @BindView(R.id.ivProfile)
@@ -57,6 +59,20 @@ public class HomeFragment extends Fragment {
         rvAgenda.setLayoutManager(new LinearLayoutManager(getContext()));
         homeAdapter = new HomeAdapter(agenda);
         rvAgenda.setAdapter(homeAdapter);
+
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                fetchTimelineAsync();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
         query.orderByDescending("createdAt");
@@ -86,5 +102,26 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
+    }
+    public void fetchTimelineAsync() {
+        agenda.clear();
+        final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
+        query.orderByDescending("createdAt");
+        query.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < objects.size(); i++) {
+                        Event event = objects.get(i);
+                        agenda.add(event);
+                        homeAdapter.notifyItemInserted(agenda.size() - 1);
+                    }
+                    swipeContainer.setRefreshing(false);
+
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
