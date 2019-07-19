@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup.local.creation;
+package com.arnauds_squadron.eatup.local.setup;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,25 +10,27 @@ import android.widget.EditText;
 
 import com.arnauds_squadron.eatup.R;
 
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link FoodTypeFragment#newInstance} factory method to
+ * Use the {@link DateFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FoodTypeFragment extends Fragment {
+public class DateFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    @BindView(R.id.etEventFoodType)
-    EditText etEventFoodType;
+    @BindView(R.id.etEventTime)
+    EditText etEventTime;
 
-    public static FoodTypeFragment newInstance() {
+    public static DateFragment newInstance() {
         Bundle args = new Bundle();
-        FoodTypeFragment fragment = new FoodTypeFragment();
+        DateFragment fragment = new DateFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,7 +44,7 @@ public class FoodTypeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_food_type, container, false);
+        View view = inflater.inflate(R.layout.fragment_date, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -68,10 +70,9 @@ public class FoodTypeFragment extends Fragment {
         mListener = null;
     }
 
-    @OnClick(R.id.btnNext)
+    @OnClick(R.id.btnCreateEvent)
     public void goToNextFragment() {
-        String foodType = etEventFoodType.getText().toString();
-        mListener.updateFoodType(foodType);
+        mListener.updateDate(new Date());
     }
 
     public interface OnFragmentInteractionListener {
@@ -79,6 +80,6 @@ public class FoodTypeFragment extends Fragment {
          * When called by the parent fragment, it should switch to the next fragment in the
          * setup queue
          */
-        void updateFoodType(String foodType);
+        void updateDate(Date date);
     }
 }

@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +13,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.local.creation.address.AddressFragment;
-import com.arnauds_squadron.eatup.local.creation.DateFragment;
-import com.arnauds_squadron.eatup.local.creation.FoodTypeFragment;
+import com.arnauds_squadron.eatup.local.setup.AddressFragment;
+import com.arnauds_squadron.eatup.local.setup.DateFragment;
+import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -38,7 +37,11 @@ public class LocalFragment extends Fragment implements
 
     private final static String TAG = "LocalFragment";
 
+    // Listener that communicates with the parent activity to switch back to the HomeFragment
+    // when the event is finally created
     private OnFragmentInteractionListener mListener;
+
+    // The local event variable that is updated as the user creates their event
     private Event event;
 
     public static LocalFragment newInstance() {
@@ -58,9 +61,9 @@ public class LocalFragment extends Fragment implements
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        Fragment childFragment = new AddressFragment();
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.add(R.id.child_fragment_container, childFragment).commit();
+        getChildFragmentManager().beginTransaction()
+                .add(R.id.child_fragment_container, AddressFragment.newInstance())
+                .commit();
     }
 
     @Override
@@ -79,6 +82,9 @@ public class LocalFragment extends Fragment implements
         mListener = null;
     }
 
+    /**
+     * Updates the address of the local event with the ParseGeoPoint of the address of the event
+     */
     @Override
     public void updateAddress(ParseGeoPoint address) {
         event = new Event();
@@ -89,6 +95,9 @@ public class LocalFragment extends Fragment implements
                 .commit();
     }
 
+    /**
+     * Updates the food type parameter of this fragment's event variable
+     */
     @Override
     public void updateFoodType(String foodType) {
         event.setCuisine(foodType);
@@ -101,8 +110,6 @@ public class LocalFragment extends Fragment implements
     /**
      * Updates the date parameter on the event, also the last field to be called
      * so we can save the event after this method runs
-     *
-     * @param date
      */
     @Override
     public void updateDate(Date date) {
@@ -112,7 +119,7 @@ public class LocalFragment extends Fragment implements
         // switch back to the home fragment
         mListener.onEventCreated();
 
-        // switch to the address fragment within this fragment
+        // switch to the address fragment to restart the setup process
         FragmentManager setupManager = getChildFragmentManager();
         setupManager.beginTransaction()
                 .add(R.id.child_fragment_container, AddressFragment.newInstance())
