@@ -79,6 +79,7 @@ public class FoodTypeFragment extends Fragment {
 
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
+        // TODO: validate food type, no bad words?
         String foodType = tvEventFoodType.getText().toString();
         mListener.updateFoodType(foodType);
     }

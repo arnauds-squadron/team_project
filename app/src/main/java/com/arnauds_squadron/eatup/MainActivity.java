@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements
         if(localFragment == null) { // no local fragment
             super.onBackPressed();
         } else {
-            if(localFragment.getViewPager().getCurrentItem() > 0)
+            if(localFragment.getSetupViewPager().getCurrentItem() > 0)
                 localFragment.retreatViewPager();
             else
                 finish();
