@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">EatUp</string>
-    <string name="visitor_search_hint">What\'s on the menu for today?</string>
+    <string name="visitor_search_hint">Search by location, food type, or user</string>
     <string name="btAccept">Accept</string>
     <string name="btDeny">Deny</string>
     <string name="tvApproveTitle">Approve this request?</string>
