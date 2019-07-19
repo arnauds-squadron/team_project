@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+**/*/res/values/secrets.xml
+=======
 o# Built application files
 *.apk
 *.ap_
@@ -83,3 +86,4 @@ lint/tmp/
 # lint/reports/
 
 .DS_Store
+>>>>>>> 2c0a1755599ef62b197d327d6600ea01cc6c9c3b
