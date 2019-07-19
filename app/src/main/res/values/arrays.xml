@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="food_types">
+        <item>Mexican</item>
+        <item>Italian</item>
+        <item>Korean</item>
+        <item>Tacos</item>
+        <item>Nachos</item>
+        <item>Burritos</item>
+        <item>Brazilian</item>
+        <item>Pasta</item>
+    </array>
+</resources>

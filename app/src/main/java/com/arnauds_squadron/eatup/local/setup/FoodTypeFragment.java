@@ -6,7 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import com.arnauds_squadron.eatup.R;
 
@@ -23,8 +24,8 @@ public class FoodTypeFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    @BindView(R.id.etEventFoodType)
-    EditText etEventFoodType;
+    @BindView(R.id.tvEventFoodType)
+    AutoCompleteTextView tvEventFoodType;
 
     public static FoodTypeFragment newInstance() {
         Bundle args = new Bundle();
@@ -44,6 +45,14 @@ public class FoodTypeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_food_type, container, false);
         ButterKnife.bind(this, view);
+
+        // TODO: move array of food types to a server
+        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.food_types));
+
+        tvEventFoodType.setAdapter(adapter);
+        tvEventFoodType.setThreshold(1); //start searching from 1 character
         return view;
     }
 
@@ -70,7 +79,7 @@ public class FoodTypeFragment extends Fragment {
 
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
-        String foodType = etEventFoodType.getText().toString();
+        String foodType = tvEventFoodType.getText().toString();
         mListener.updateFoodType(foodType);
     }
 
