@@ -3,7 +3,6 @@ package com.arnauds_squadron.eatup.local;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,7 +39,7 @@ public class LocalFragment extends Fragment implements
     private final static String TAG = "LocalFragment";
 
     @BindView(R.id.viewPager)
-    NoSwipingPagerAdapter viewPager;
+    NoSwipingPagerAdapter setupViewPager;
 
     // Listener that communicates with the parent activity to switch back to the HomeFragment
     // when the event is finally created
@@ -61,10 +60,8 @@ public class LocalFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_local, container, false);
         ButterKnife.bind(this, view);
-
-        // Get the ViewPager and set it's PagerAdapter so that it can display items
-        viewPager.setAdapter(new SetupFragmentPagerAdapter(getChildFragmentManager()));
-
+        // Set the viewpager's adapter so that it can display the setup fragments
+        setupViewPager.setAdapter(new SetupFragmentPagerAdapter(getChildFragmentManager()));
         return view;
     }
 
@@ -111,11 +108,6 @@ public class LocalFragment extends Fragment implements
     public void updateDate(Date date) {
         event.setDate(date);
         saveEvent();
-
-        // switch back to the home fragment
-        mListener.onEventCreated();
-
-        advanceViewPager();
     }
 
     private void saveEvent() {
@@ -123,47 +115,40 @@ public class LocalFragment extends Fragment implements
             @Override
             public void done(ParseException e) {
                 if (e == null) {
+                    Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_SHORT).show();
                     Log.d("LocalFragment", "create post success");
+                    // switch back to the home fragment
+                    mListener.onEventCreated();
+                    // move viewpager to the first setup fragment
+                    advanceViewPager();
                 } else {
+                    Toast.makeText(getActivity(), "Could not create post",
+                            Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
         });
-        // TODO: validate data
-        // TODO: upload event to parse server
-        // TODO: only return to home screen within onsuccess
-
-        if (getFragmentManager() != null) {
-            try {
-                TabLayout tabLayout = getActivity().findViewById(R.id.tab_bar);
-                tabLayout.getTabAt(1).select();
-                Toast.makeText(getActivity(), "Event created", Toast.LENGTH_SHORT).show();
-            } catch (NullPointerException e) {
-                Log.e(TAG, "Activity, tab layout, or home tab is null");
-                Toast.makeText(getActivity(), "Could not create event", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     /**
      * Moves the pager one fragment backwards
      */
     public void retreatViewPager() {
-        if (viewPager.getCurrentItem() == 0)
+        if (setupViewPager.getCurrentItem() == 0)
             throw new IllegalArgumentException("Cannot retreat view pager on the first fragment!");
 
-        viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+        setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() - 1);
     }
 
-    public NoSwipingPagerAdapter getViewPager() {
-        return viewPager;
+    public NoSwipingPagerAdapter getSetupViewPager() {
+        return setupViewPager;
     }
 
     /**
      * Moves the pager one fragment forward
      */
     private void advanceViewPager() {
-        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+        setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() + 1);
     }
 
 
