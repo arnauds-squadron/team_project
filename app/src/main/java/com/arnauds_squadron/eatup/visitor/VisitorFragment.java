@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.BuildConfig;
+import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
@@ -47,6 +48,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -197,6 +199,14 @@ public class VisitorFragment extends Fragment {
         Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
         i.putExtra("coordinates", (String) tvLocation.getTag());
         startActivity(i);
+    }
+
+    @OnClick(R.id.tvDisplayName)
+    public void viewUserProfile() {
+        Intent i = new Intent(getActivity(), ProfileActivity.class);
+//        ParseUser user = ParseUser.getCurrentUser();
+//        i.putExtra("user", user);
+        getActivity().startActivity(i);
     }
 
     // methods to load posts into the recyclerview based on location
