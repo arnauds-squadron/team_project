@@ -19,7 +19,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
+import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,8 +44,12 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -104,6 +111,8 @@ public class VisitorFragment extends Fragment {
         // construct adapter from data source
         postAdapter = new BrowseEventAdapter(getContext(), mEvents);
         // RecyclerView setup
+        SnapHelper pagerSnapHelper = new PagerSnapHelper();
+        pagerSnapHelper.attachToRecyclerView(rvBrowse);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false);
         rvBrowse.setLayoutManager(gridLayoutManager);
         rvBrowse.setAdapter(postAdapter);
@@ -113,7 +122,7 @@ public class VisitorFragment extends Fragment {
         // load data entries
 
         // retain instance so can call "resetStates" for fresh searches
-//        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+//        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
 //            @Override
 //            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
 //                Date maxPostId = getMaxDate();
@@ -134,9 +143,6 @@ public class VisitorFragment extends Fragment {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
-                    // Update UI with location data
-//                    txtLatitude.setText(String.valueOf(location.getLatitude()));
-//                    txtLongitude.setText(String.valueOf(location.getLongitude()));
                     Log.d("LocationFragment", "location:" + location.getLongitude() + location.getLatitude());
 
                     if (!Geocoder.isPresent()) {
@@ -150,6 +156,24 @@ public class VisitorFragment extends Fragment {
                 }
             }
         };
+
+        final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
+        query.orderByDescending("createdAt");
+        query.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < objects.size(); i++) {
+                        Event event = objects.get(i);
+                        mEvents.add(event);
+                        postAdapter.notifyItemInserted(mEvents.size() - 1);
+                    }
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
 
@@ -271,8 +295,6 @@ public class VisitorFragment extends Fragment {
                         if (task.isSuccessful() && task.getResult() != null) {
                             lastLocation = task.getResult();
                             Log.d("VisitorFragment", "location: " + lastLocation.getLatitude() + lastLocation.getLongitude());
-//                            txtLatitude.setText(String.valueOf(lastLocation.getLatitude()));
-//                            txtLongitude.setText(String.valueOf(lastLocation.getLongitude()));
 
                             if (!Geocoder.isPresent()) {
                                 Toast.makeText(getActivity(),
@@ -339,7 +361,8 @@ public class VisitorFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-    // TODO fix query for loading the event into the recyclerview
+    // TODO fix query for loading the event into the recyclerview for endless scroll
+
 // methods to load posts into the recyclerview based on location
 //    protected void loadTopPosts(Date maxDate) {
 //        progressBar.setVisibility(View.VISIBLE);
@@ -401,13 +424,9 @@ public class VisitorFragment extends Fragment {
                 addressOutput = "";
             }
 
-            // TODO do something to display the address outputted
-            Log.d("VisitorFragment", "converted address: " + addressOutput);
-            tvCurrentLocation.setText(addressOutput);
-
-            // Show a toast message if an address was found.
+            // display current address to user if found.
             if (resultCode == Constants.SUCCESS_RESULT) {
-                Toast.makeText(getActivity(), getString(R.string.address_found), Toast.LENGTH_SHORT).show();
+                tvCurrentLocation.setText(addressOutput);
             }
 
         }

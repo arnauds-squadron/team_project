@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // Setup autocomplete
-        Places.initialize(getApplicationContext(), getString(R.string.google_places_key));
+        Places.initialize(getApplicationContext(), getString(R.string.google_api_key));
     }
 
     /**
