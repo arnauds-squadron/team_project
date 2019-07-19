@@ -10,25 +10,27 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Event;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Fragment that asks the user to input the cuisine of the restaurant they are visiting or of the
- * food they are cooking.
+ * Fragment that displays all the selected fields and will create the event when confirmed
  */
-public class FoodTypeFragment extends Fragment {
+public class ReviewFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
     @BindView(R.id.tvEventFoodType)
     AutoCompleteTextView tvEventFoodType;
 
-    public static FoodTypeFragment newInstance() {
+    private Event event;
+
+    public static ReviewFragment newInstance() {
         Bundle args = new Bundle();
-        FoodTypeFragment fragment = new FoodTypeFragment();
+        ReviewFragment fragment = new ReviewFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,7 +44,7 @@ public class FoodTypeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_event_food_type, container, false);
+        View view = inflater.inflate(R.layout.fragment_event_review, container, false);
         ButterKnife.bind(this, view);
 
         // TODO: move array of food types to a server
@@ -55,11 +57,26 @@ public class FoodTypeFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Method to create the date picker only when the date fragment is actually visible
+     * to the users
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+            event = mListener.getCurrentEvent();
+            initializeViews();
+        }
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
+
 
     /**
      * Called in onCreate to bind the this child fragment to its parent, so the listener
@@ -76,18 +93,26 @@ public class FoodTypeFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.btnNext)
-    public void goToNextFragment() {
-        // TODO: validate food type, no bad words?
-        String foodType = tvEventFoodType.getText().toString();
-        mListener.updateFoodType(foodType);
+    @OnClick(R.id.btnCreateEvent)
+    public void createEvent() {
+        mListener.createEvent();
+    }
+
+    /**
+     * Initalize all the textviews and details of the current event
+     */
+    private void initializeViews() {
     }
 
     public interface OnFragmentInteractionListener {
         /**
-         * When called by the parent fragment, it should switch to the next fragment in the
-         * setup queue
+         * Gets the created event from the parent fragment
          */
-        void updateFoodType(String foodType);
+        Event getCurrentEvent();
+
+        /**
+         * Method that triggers the event creation method in the parent fragment
+         */
+        void createEvent();
     }
 }

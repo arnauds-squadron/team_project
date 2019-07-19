@@ -7,15 +7,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
+import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 
 /**
  * Pager Adapter to handle all the setup fragments we need to create an event
  */
 public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
-    final int PAGE_COUNT = 3;
-
-    // TODO: possibly remove?
-    private String tabTitles[] = new String[] { "Tab1", "Tab2", "Tab3" };
+    private final int PAGE_COUNT = 4;
 
     public SetupFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -34,6 +32,8 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
             return FoodTypeFragment.newInstance();
         if (position == 2)
             return DateFragment.newInstance();
+        if (position == 3)
+            return ReviewFragment.newInstance();
         return AddressFragment.newInstance();
     }
 }

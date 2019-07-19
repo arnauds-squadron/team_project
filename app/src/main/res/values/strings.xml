@@ -17,4 +17,7 @@
     <string name="no_address_found">Sorry, no address found</string>
     <string name="address_found">Found address successfully!</string>
     <string name="no_geocoder_available">No geocoder available</string>
+    <string name="create_event_text">Create Event</string>
+    <string name="next_button_text">Next</string>
+    <string name="food_type_hint">Cuisine</string>
 </resources>
