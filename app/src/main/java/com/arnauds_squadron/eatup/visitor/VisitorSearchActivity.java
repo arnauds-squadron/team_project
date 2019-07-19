@@ -107,9 +107,9 @@ public class VisitorSearchActivity extends AppCompatActivity {
         // TODO fix query for loading the event into the recyclerview
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withUser().whereEqualTo(Event.KEY_HOST, user);
+            eventsQuery.getTop().withHost().whereEqualTo(Event.KEY_HOST, user);
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withUser().whereEqualTo(Event.KEY_HOST, user);
+            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo(Event.KEY_HOST, user);
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {

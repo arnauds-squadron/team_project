@@ -25,7 +25,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +44,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,8 +61,8 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class VisitorFragment extends Fragment {
 
-    @BindView(R.id.tvUserName)
-    TextView tvUserName;
+    @BindView(R.id.tvDisplayName)
+    TextView tvDisplayName;
     @BindView(R.id.tvBrowseTitle)
     TextView tvBrowseTitle;
     @BindView(R.id.rvBrowse)
@@ -109,6 +108,8 @@ public class VisitorFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // TODO uncomment so can set name of current user
+        // tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
         // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source
@@ -155,10 +156,10 @@ public class VisitorFragment extends Fragment {
                         Toast.makeText(getActivity(),
                                 R.string.no_geocoder_available,
                                 Toast.LENGTH_LONG).show();
-                        tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+                        tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
                     } else {
                         // Start geocoder service and update UI to reflect the new address
-                        Log.d("VisitorFragmentTesting", String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
+                        Log.d("VisitorFragmentTesting", String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
                         startIntentService(lastLocation);
                         Log.d("VisitorFragment", "started intent service");
                     }
@@ -193,9 +194,9 @@ public class VisitorFragment extends Fragment {
         // otherwise, query for posts older than the oldest
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withUser();
+            eventsQuery.getTop().withHost();
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withUser();
+            eventsQuery.getOlder(maxDate).getTop().withHost();
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {

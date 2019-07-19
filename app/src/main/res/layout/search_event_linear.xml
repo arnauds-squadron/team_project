@@ -29,7 +29,7 @@
         tools:layout_editor_absoluteY="8dp" />
 
     <RatingBar
-        android:id="@+id/ratingBar"
+        android:id="@+id/hostRating"
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_marginStart="8dp"

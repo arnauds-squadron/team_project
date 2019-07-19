@@ -133,8 +133,8 @@ public class Event extends ParseObject {
             return this;
         }
 
-        public Query withUser() {
-            include("user");
+        public Query withHost() {
+            include("host");
             return this;
         }
     }
