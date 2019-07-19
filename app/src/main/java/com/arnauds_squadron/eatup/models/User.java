@@ -1,6 +1,7 @@
 package com.arnauds_squadron.eatup.models;
 
 import com.parse.ParseClassName;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 @ParseClassName("User")
@@ -11,9 +12,16 @@ public class User extends ParseObject {
     private static final String KEY_DATE = "Date";
     private static final String KEY_USER = "username";
     private static final String KEY_RATING = "averageRating";
+    private static final String KEY_PROFILE = "profilePicture";
 
     public User() {}
 
+    public void setProfilePicture(ParseFile profilePicture) {
+        put(KEY_PROFILE, profilePicture);
+    }
+    public ParseFile getProfilePicture() {
+        return getParseFile(KEY_PROFILE);
+    }
     public void setUsername(String username) {
         put(KEY_USER, username);
     }
