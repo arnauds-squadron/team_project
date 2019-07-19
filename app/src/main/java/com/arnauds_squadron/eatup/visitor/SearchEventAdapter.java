@@ -105,7 +105,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             int position = getAdapterPosition();
             // ensure position valid (exists in view)
             if (position != RecyclerView.NO_POSITION) {
-                Log.d("eventAdapter", "View event Details");
+                Log.d("eventAdapter", "View event details");
                 Event event = events.get(position);
 
                 Intent intent = new Intent(context, EventDetailsActivity.class);

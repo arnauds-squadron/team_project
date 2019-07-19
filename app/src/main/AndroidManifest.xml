@@ -34,13 +34,21 @@
         <activity android:name=".home.HomeDetailsActivity" />
         <activity android:name=".EventDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
-        <activity android:name=".visitor.VisitorSearchActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".visitor.VisitorSearchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="android.app.default_searchable"
+                android:value=".visitor.VisitorSearchActivity" />
         </activity>
     </application>
 
