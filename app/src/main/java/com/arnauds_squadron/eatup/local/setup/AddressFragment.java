@@ -19,7 +19,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.parse.ParseGeoPoint;
@@ -30,9 +29,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddressFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment that asks the user to input an address of the event. Displays the selected address
+ * on the map fragment
  */
 public class AddressFragment extends Fragment implements OnMapReadyCallback {
 
@@ -47,9 +45,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
-
-    // Client to get the details of the selected place
-    private PlacesClient placesClient;
 
     // The place that the user selects after searching for its address
     private Place selectedPlace;
@@ -71,17 +66,14 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_address, container, false);
+        View view = inflater.inflate(R.layout.fragment_event_address, container, false);
         ButterKnife.bind(this, view);
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         setupAutoCompleteFragment();
-
-        initializePlaces();
-        placesClient = Places.createClient(getActivity());
-
-        mapFragment.getMapAsync(this);
-        setupAutoCompleteFragment();
+        initializePlaces(); // initialize the places sdk
+        mapFragment.getMapAsync(this); // update the map
+        setupAutoCompleteFragment(); // set up the auto
 
         return view;
     }
@@ -93,27 +85,16 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
             mMap.clear();
     }
 
-    /**
-     * Called in onCreate to bind the this child fragment to its parent, so the listener
-     * can be used
-     * @param fragment The parent fragment
-     */
-    public void onAttachToParentFragment(Fragment fragment)
-    {
-        try {
-            mListener = (OnFragmentInteractionListener) fragment;
-        }
-        catch (ClassCastException e) {
-            throw new ClassCastException(fragment.toString() + " must implement the interface");
-        }
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
 
+    /**
+     * Called whenever getMapAsync() is called, and sets up the map
+     * @param googleMap The map obtained from the maps API
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -132,6 +113,21 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Called in onCreate to bind the this child fragment to its parent, so the listener
+     * can be used
+     * @param fragment The parent fragment
+     */
+    public void onAttachToParentFragment(Fragment fragment)
+    {
+        try {
+            mListener = (OnFragmentInteractionListener) fragment;
+        }
+        catch (ClassCastException e) {
+            throw new ClassCastException(fragment.toString() + " must implement the interface");
+        }
+    }
+
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         if (selectedPlace == null) {
@@ -139,7 +135,7 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         } else {
             double latitude = selectedPlace.getLatLng().latitude;
             double longitude = selectedPlace.getLatLng().longitude;
-            mListener.updateAddress(new ParseGeoPoint(latitude,longitude));
+            mListener.updateAddress(new ParseGeoPoint(latitude, longitude));
         }
     }
 
@@ -150,16 +146,22 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         Places.initialize(getActivity(), getString(R.string.google_api_key));
     }
 
+    /**
+     * Sets up the autocomplete fragment with the address hint, and sets the OnPlaceSelectedListener
+     * that will update the selectedPlace object and the map fragment
+     */
     private void setupAutoCompleteFragment() {
         if (!Places.isInitialized()) {
             Log.e(TAG, "Places should be initialized already");
+            initializePlaces();
         }
 
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         autocompleteFragment.setHint("Address");
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID,
+        autocompleteFragment.setPlaceFields(Arrays.asList(
+                Place.Field.ID,
                 Place.Field.NAME,
                 Place.Field.LAT_LNG));
 

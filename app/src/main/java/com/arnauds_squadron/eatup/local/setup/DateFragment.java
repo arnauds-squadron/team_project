@@ -1,32 +1,45 @@
 package com.arnauds_squadron.eatup.local.setup;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.utils.UIHelper;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link DateFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment that asks the user to input the date and time of their event through a series of
+ * input dialogs.
  */
 public class DateFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    @BindView(R.id.etEventTime)
-    EditText etEventTime;
+    @BindView(R.id.tvSelectedDate)
+    TextView tvSelectedDate;
+
+    @BindView(R.id.tvSelectedTime)
+    TextView tvSelectedTime;
+
+    // Calendar object that holds the date and time that the user selects
+    private Calendar selectedTime;
 
     public static DateFragment newInstance() {
         Bundle args = new Bundle();
@@ -44,9 +57,83 @@ public class DateFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_date, container, false);
+        View view = inflater.inflate(R.layout.fragment_event_date, container, false);
         ButterKnife.bind(this, view);
         return view;
+    }
+
+    /**
+     * Method to create the date picker only when the date fragment is actually visible
+     * to the users
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+            UIHelper.hideKeyboard(getActivity(), getView());
+            // delay ui thread to show date after keyboard has disappeared
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showDatePickerDialog();
+                }
+            }, 250);
+        }
+    }
+
+    /**
+     * Creates the DatePickerDialog programmatically and initializes it with the current date
+     */
+    private void showDatePickerDialog() {
+        selectedTime = Calendar.getInstance();
+        int currentYear = selectedTime.get(Calendar.YEAR);
+        int currentMonth = selectedTime.get(Calendar.MONTH);
+        int currentDay = selectedTime.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePicker = new DatePickerDialog( getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                selectedTime.set(Calendar.YEAR, year);
+                selectedTime.set(Calendar.MONTH, month);
+                selectedTime.set(Calendar.DAY_OF_MONTH, day);
+
+                String dateText = month + "/" + day + "/" + year;
+                tvSelectedDate.setText(dateText);
+                showTimePickerDialog();
+            }
+        }, currentYear, currentMonth, currentDay);
+
+        datePicker.show();
+    }
+
+    /**
+     * Creates the TimePickerDialog programmatically after the DatePickerDialog has finished,
+     * and initializes it with the current time
+     */
+    private void showTimePickerDialog() {
+        int currentHour = selectedTime.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = selectedTime.get(Calendar.MINUTE);
+
+        TimePickerDialog timePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hour, int minute) {
+                selectedTime.add(Calendar.HOUR, hour);
+                selectedTime.add(Calendar.MINUTE, minute);
+
+                String timeText = hour + ":" + String.format(Locale.ENGLISH, "%02d", minute);
+                tvSelectedTime.setText(timeText);
+            }
+        }, currentHour, currentMinute, true);
+
+        timePicker.show();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     /**
@@ -64,15 +151,10 @@ public class DateFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @OnClick(R.id.btnCreateEvent)
+    @OnClick(R.id.btnNext)
     public void goToNextFragment() {
-        mListener.updateDate(new Date());
+        // TODO: require date and time
+        mListener.updateDate(selectedTime.getTime());
     }
 
     public interface OnFragmentInteractionListener {
