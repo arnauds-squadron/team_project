@@ -3,7 +3,6 @@ package com.arnauds_squadron.eatup;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -39,26 +38,25 @@ public class MainActivity extends AppCompatActivity implements
         // a different fragment so the back button can exit the app
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int i, float v, int i1) {}
-
+            public void onPageScrolled(int i, float v, int i1) {
+            }
 
             @Override
-            public void onPageSelected(int i) {
-                if(i != 0) {
+            public void onPageSelected(int index) {
+                if (index != 0) { // switched to a fragment other than the local fragment
                     LocalFragment localFragment = getLocalFragment();
                     if (localFragment != null) {
-                        localFragment
-                                .getChildFragmentManager()
-                                .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        localFragment.resetSetupViewPager();
                     }
                 }
             }
 
             @Override
-            public void onPageScrollStateChanged(int i) {}
+            public void onPageScrollStateChanged(int i) {
+            }
         });
 
-        // Give the TabLayout the ViewPager
+        // Give the TabLayout the ViewPage
         tabLayout.setupWithViewPager(viewPager);
 
         // Set home fragment as the first screen
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements
                 R.drawable.visitor_meal_tab,
         };
 
-        for(int i = 0; i < tabLayout.getTabCount(); i++) {
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(icons[i]);
         }
 
@@ -88,13 +86,10 @@ public class MainActivity extends AppCompatActivity implements
     public void onBackPressed() {
         LocalFragment localFragment = getLocalFragment();
 
-        if(localFragment == null) { // no local fragment
+        if (localFragment == null) { // no local fragment
             super.onBackPressed();
-        } else {
-            if(localFragment.getSetupViewPager().getCurrentItem() > 0)
-                localFragment.retreatViewPager();
-            else
-                finish();
+        } else if (!localFragment.retreatViewPager()) {
+            finish();
         }
     }
 
@@ -108,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
         LocalFragment localFragment = null;
 
         for (Fragment fragment : fragments) {
-            if(fragment.getClass().equals(LocalFragment.class)) {
+            if (fragment.getClass().equals(LocalFragment.class)) {
                 localFragment = (LocalFragment) fragment;
             }
         }

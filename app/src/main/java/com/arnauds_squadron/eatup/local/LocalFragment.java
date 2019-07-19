@@ -167,17 +167,25 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
-     * Moves the pager one fragment backwards
+     * Method to be called by the parent activity to handle back presses. Moves the pager one
+     * fragment backwards
+     * @return true if the view pager was moved backwards, false if we were already on the first
+     * item
      */
-    public void retreatViewPager() {
-        if (setupViewPager.getCurrentItem() == 0)
-            throw new IllegalArgumentException("Cannot retreat view pager on the first fragment!");
-
-        setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() - 1);
+    public boolean retreatViewPager() {
+        if (setupViewPager.getCurrentItem() == 0) {
+            return false;
+        } else {
+            setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() - 1);
+            return true;
+        }
     }
 
-    public NoSwipingPagerAdapter getSetupViewPager() {
-        return setupViewPager;
+    /**
+     * Method to be called by the parent activity to reset the setup viewpager to the start fragment
+     */
+    public void resetSetupViewPager() {
+        setupViewPager.setCurrentItem(0);
     }
 
     /**

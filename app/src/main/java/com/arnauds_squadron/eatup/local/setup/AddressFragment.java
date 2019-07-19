@@ -33,7 +33,6 @@ import butterknife.OnClick;
  * on the map fragment
  */
 public class AddressFragment extends Fragment implements OnMapReadyCallback {
-
     private final static String TAG = "AddressFragment";
 
     // 1-19
