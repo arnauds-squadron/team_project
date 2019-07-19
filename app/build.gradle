@@ -7,6 +7,7 @@ android {
         applicationId "com.arnauds_squadron.eatup"
         minSdkVersion 16
         targetSdkVersion 28
+        vectorDrawables.useSupportLibrary = true
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -49,6 +50,8 @@ dependencies {
     //http request
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 
+    // Places API for autocompletion
+    implementation 'com.google.android.libraries.places:places:1.1.0'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'com.google.android.gms:play-services-maps:11.8.0'
 }

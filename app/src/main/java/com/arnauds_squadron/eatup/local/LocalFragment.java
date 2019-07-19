@@ -1,6 +1,6 @@
 package com.arnauds_squadron.eatup.local;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -9,44 +9,45 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.local.setup.AddressFragment;
+import com.arnauds_squadron.eatup.local.setup.DateFragment;
+import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.User;
+import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
+import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
 import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
+import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
 import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LocalFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LocalFragment extends Fragment {
+public class LocalFragment extends Fragment implements
+        AddressFragment.OnFragmentInteractionListener,
+        FoodTypeFragment.OnFragmentInteractionListener,
+        DateFragment.OnFragmentInteractionListener {
 
     private final static String TAG = "LocalFragment";
 
-    @BindView(R.id.etEventAddress)
-    EditText etEventAddress;
+    @BindView(R.id.viewPager)
+    NoSwipingPagerAdapter viewPager;
 
-    @BindView(R.id.etEventFoodType)
-    EditText etEventFoodType;
+    // Listener that communicates with the parent activity to switch back to the HomeFragment
+    // when the event is finally created
+    private OnFragmentInteractionListener mListener;
 
-    @BindView(R.id.etEventTime)
-    EditText etEventTime;
-
-    private Activity activity;
+    // The local event variable that is updated as the user creates their event
+    private Event event;
 
     public static LocalFragment newInstance() {
         Bundle args = new Bundle();
@@ -56,33 +57,68 @@ public class LocalFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_local, container, false);
-        // Binds the views with butterknife
         ButterKnife.bind(this, view);
-        activity = getActivity();
+
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        viewPager.setAdapter(new SetupFragmentPagerAdapter(getChildFragmentManager()));
+
         return view;
     }
 
-    @OnClick(R.id.btnConfirm)
-    public void confirmEvent() {
-        ParseUser user = ParseUser.getCurrentUser();
-        final String address = etEventAddress.getText().toString();
-        final String food = etEventFoodType.getText().toString();
-        final String time = etEventTime.getText().toString();
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (OnFragmentInteractionListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement the interface");
+        }
+    }
 
-        final Event event = new Event();
-//        //event.setAddress(address);
-        event.setHost(user);
-        event.setDate(new Date());
-        event.setCuisine(food);
-        //username.setUsername(user.getUsername());
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * Updates the address of the local event with the ParseGeoPoint of the address of the event
+     */
+    @Override
+    public void updateAddress(ParseGeoPoint address) {
+        event = new Event();
+        event.setAddress(address);
+        advanceViewPager();
+    }
+
+    /**
+     * Updates the food type parameter of this fragment's event variable
+     */
+    @Override
+    public void updateFoodType(String foodType) {
+        event.setCuisine(foodType);
+        advanceViewPager();
+    }
+
+    /**
+     * Updates the date parameter on the event, also the last field to be called
+     * so we can save the event after this method runs
+     */
+    @Override
+    public void updateDate(Date date) {
+        event.setDate(date);
+        saveEvent();
+
+        // switch back to the home fragment
+        mListener.onEventCreated();
+
+        advanceViewPager();
+    }
+
+    private void saveEvent() {
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -97,18 +133,41 @@ public class LocalFragment extends Fragment {
         // TODO: upload event to parse server
         // TODO: only return to home screen within onsuccess
 
-        Log.i(TAG, "confirming");
         if (getFragmentManager() != null) {
-            Log.i(TAG, "confirming not null");
-
             try {
-                TabLayout tabLayout = activity.findViewById(R.id.sliding_tabs);
+                TabLayout tabLayout = getActivity().findViewById(R.id.tab_bar);
                 tabLayout.getTabAt(1).select();
-                Toast.makeText(activity, "Event created", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Event created", Toast.LENGTH_SHORT).show();
             } catch (NullPointerException e) {
                 Log.e(TAG, "Activity, tab layout, or home tab is null");
-                Toast.makeText(activity, "Could not create event", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Could not create event", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    /**
+     * Moves the pager one fragment backwards
+     */
+    public void retreatViewPager() {
+        if (viewPager.getCurrentItem() == 0)
+            throw new IllegalArgumentException("Cannot retreat view pager on the first fragment!");
+
+        viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+    }
+
+    public NoSwipingPagerAdapter getViewPager() {
+        return viewPager;
+    }
+
+    /**
+     * Moves the pager one fragment forward
+     */
+    private void advanceViewPager() {
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+    }
+
+
+    public interface OnFragmentInteractionListener {
+        void onEventCreated();
     }
 }

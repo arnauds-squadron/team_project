@@ -9,6 +9,9 @@ import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.visitor.VisitorFragment;
 
+/**
+ * Pager Adapter to handle the 3 main fragments we have in the MainActivity
+ */
 public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 3;
 
@@ -35,7 +38,7 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
         return HomeFragment.newInstance();
     }
 
-
+    // TODO: Remove unnecessary titles?
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position

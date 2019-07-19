@@ -2,6 +2,7 @@ package com.arnauds_squadron.eatup.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -61,11 +62,11 @@ public class Event extends ParseObject {
     }
 
     // TODO figure out how to turn geopointer into string and vice versa
-    public String getAddress() {
-        return getString(KEY_ADDRESS);
+    public ParseGeoPoint getAddress() {
+        return getParseGeoPoint(KEY_ADDRESS);
     }
 
-    public void setAddress(String address) {
+    public void setAddress(ParseGeoPoint address) {
         put(KEY_ADDRESS, address);
     }
 

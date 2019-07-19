@@ -1,14 +1,20 @@
 <resources>
     <string name="app_name">EatUp</string>
-    <string name="visitor_search_hint">What\'s on the menu?</string>
+    <string name="visitor_search_hint">What\'s on the menu for today?</string>
     <string name="btAccept">Accept</string>
     <string name="btDeny">Deny</string>
     <string name="tvApproveTitle">Approve this request?</string>
     <string name="btBook">Request meal</string>
     <string name="visitor_tv_greeting">Hello, </string>
     <string name="browse_nearby">Browse nearby meals</string>
-    <string name="current_location_title">Current location</string>
-    <string name="advanced_search_title">Advanced search</string>
+    <string name="current_location_title">Search by current location</string>
+    <string name="previous_location_title">Pick a previous location</string>
+    <string name="previous_location_text">No previous meals yet!</string>
     <string name="intent_scheme">oauth</string>
     <string name="intent_host">arnauds-squadron</string>
+    <string name="service_not_available">No geocoder available</string>
+    <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
+    <string name="no_address_found">Sorry, no address found</string>
+    <string name="address_found">Found address successfully!</string>
+    <string name="no_geocoder_available">No geocoder available</string>
 </resources>
