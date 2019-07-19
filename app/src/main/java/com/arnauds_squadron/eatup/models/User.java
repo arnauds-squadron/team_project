@@ -10,6 +10,7 @@ public class User extends ParseObject {
     private static final String KEY_PLACE = "Place";
     private static final String KEY_DATE = "Date";
     private static final String KEY_USER = "username";
+    private static final String KEY_RATING = "averageRating";
 
     public User() {}
 
@@ -43,5 +44,14 @@ public class User extends ParseObject {
 
     public String getDate() {
         return getString(KEY_DATE);
+    }
+
+    // TODO fix this method to take the average of all ratings
+//    public void setRating(float Rating) {
+//        put(KEY_RATING, Rating);
+//    }
+
+    public Float getFloatRating() {
+        return getNumber(KEY_RATING).floatValue();
     }
 }

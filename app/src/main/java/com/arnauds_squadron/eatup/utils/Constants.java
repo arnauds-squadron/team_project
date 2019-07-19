@@ -12,4 +12,5 @@ public final class Constants {
             ".LOCATION_DATA_EXTRA";
     public static final String HOST_BIO = "bio";
     public static final String DISPLAYNAME = "displayName";
+    public static final String AVERAGE_RATING = "averageRating";
 }
