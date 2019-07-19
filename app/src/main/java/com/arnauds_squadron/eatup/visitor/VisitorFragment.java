@@ -61,6 +61,8 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class VisitorFragment extends Fragment {
 
+    // TODO browsing nearby events - account for scenario in which user doesn't enable current location, use last remembered location or display a random array of events
+
     @BindView(R.id.tvDisplayName)
     TextView tvDisplayName;
     @BindView(R.id.tvBrowseTitle)

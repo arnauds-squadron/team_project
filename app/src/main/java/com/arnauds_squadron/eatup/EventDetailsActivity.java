@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
@@ -17,6 +18,7 @@ import com.parse.ParseQuery;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
@@ -67,6 +69,9 @@ public class EventDetailsActivity extends AppCompatActivity {
                     // TODO add text
                     tvHostName.setText(event.getHost().getString(Constants.DISPLAYNAME));
                     tvHostDescription.setText(event.getHost().getString(Constants.HOST_BIO));
+
+                    hostRating.setRating(event.getHost().getNumber(Constants.AVERAGE_RATING).floatValue());
+
                     // TODO add recyclerview for multiple event images
                     ParseFile eventImage = event.getEventImage();
                     if (eventImage != null) {
@@ -79,6 +84,12 @@ public class EventDetailsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @OnClick(R.id.btRequest)
+    public void eventRSVP(Button btRequest) {
+        // TODO send request to Parse server to RSVP to the event
+        Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
     }
 
 
