@@ -141,7 +141,6 @@ public class Event extends ParseObject {
 
         public Query getClosest(ParseGeoPoint location) {
             whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
-            whereWithinMiles(
             return this;
         }
     }
