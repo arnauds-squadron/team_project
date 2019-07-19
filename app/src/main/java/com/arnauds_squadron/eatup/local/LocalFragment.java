@@ -14,6 +14,8 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
+import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
+import com.arnauds_squadron.eatup.local.setup.StartFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
 import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
@@ -32,9 +34,11 @@ import butterknife.ButterKnife;
  * create an instance of this fragment.
  */
 public class LocalFragment extends Fragment implements
+        StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
         FoodTypeFragment.OnFragmentInteractionListener,
-        DateFragment.OnFragmentInteractionListener {
+        DateFragment.OnFragmentInteractionListener,
+        ReviewFragment.OnFragmentInteractionListener {
 
     private final static String TAG = "LocalFragment";
 
@@ -82,6 +86,18 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
+     * Overrides the StartFragment interface
+     *
+     * Begin creating a completely new event
+     */
+    @Override
+    public void startEventCreation() {
+        advanceViewPager();
+    }
+
+    /**
+     * Overrides the AddressFragment interface
+     *
      * Updates the address of the local event with the ParseGeoPoint of the address of the event
      */
     @Override
@@ -92,6 +108,8 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
+     * Overrides the FoodTypeFragment interface
+     *
      * Updates the food type parameter of this fragment's event variable
      */
     @Override
@@ -101,26 +119,44 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
+     * Overrides the DateFragment interface
+     *
      * Updates the date parameter on the event, also the last field to be called
      * so we can save the event after this method runs
      */
     @Override
     public void updateDate(Date date) {
         event.setDate(date);
-        saveEvent();
+        advanceViewPager();
     }
 
-    private void saveEvent() {
+    /**
+     * Overrides the ReviewFragment interface
+     *
+     * @return the current event so the ReviewFragment can display all the details of the created
+     * event
+     */
+    @Override
+    public Event getCurrentEvent() {
+        return event;
+    }
+
+    /**
+     * Overrides the ReviewFragment interface
+     *
+     * Saves the event to the parse server, resets the setup fragment, and switches to the home
+     * fragment
+     */
+    @Override
+    public void createEvent() {
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_SHORT).show();
                     Log.d("LocalFragment", "create post success");
-                    // switch back to the home fragment
-                    mListener.onEventCreated();
-                    // move viewpager to the first setup fragment
-                    advanceViewPager();
+                    mListener.switchToHomeFragment();
+                    advanceViewPager(); // move viewpager to the first setup fragment
                 } else {
                     Toast.makeText(getActivity(), "Could not create post",
                             Toast.LENGTH_LONG).show();
@@ -151,8 +187,7 @@ public class LocalFragment extends Fragment implements
         setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() + 1);
     }
 
-
     public interface OnFragmentInteractionListener {
-        void onEventCreated();
+        void switchToHomeFragment();
     }
 }

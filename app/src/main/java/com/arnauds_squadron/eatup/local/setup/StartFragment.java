@@ -6,29 +6,23 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 
 import com.arnauds_squadron.eatup.R;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Fragment that asks the user to input the cuisine of the restaurant they are visiting or of the
- * food they are cooking.
+ * Fragment that displays all the selected fields and will create the event when confirmed
  */
-public class FoodTypeFragment extends Fragment {
+public class StartFragment extends Fragment {
+    // TODO: Copy a recent event (have users working first)
 
     private OnFragmentInteractionListener mListener;
 
-    @BindView(R.id.tvEventFoodType)
-    AutoCompleteTextView tvEventFoodType;
-
-    public static FoodTypeFragment newInstance() {
+    public static StartFragment newInstance() {
         Bundle args = new Bundle();
-        FoodTypeFragment fragment = new FoodTypeFragment();
+        StartFragment fragment = new StartFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,16 +36,8 @@ public class FoodTypeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_event_food_type, container, false);
+        View view = inflater.inflate(R.layout.fragment_event_start, container, false);
         ButterKnife.bind(this, view);
-
-        // TODO: move array of food types to a server
-        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.food_types));
-
-        tvEventFoodType.setAdapter(adapter);
-        tvEventFoodType.setThreshold(1); //start searching from 1 character
         return view;
     }
 
@@ -76,18 +62,16 @@ public class FoodTypeFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.btnNext)
-    public void goToNextFragment() {
-        // TODO: validate food type, no bad words?
-        String foodType = tvEventFoodType.getText().toString();
-        mListener.updateFoodType(foodType);
+    @OnClick(R.id.btnStartNewEvent)
+    public void startEventCreation() {
+        mListener.startEventCreation();
     }
 
     public interface OnFragmentInteractionListener {
+
         /**
-         * When called by the parent fragment, it should switch to the next fragment in the
-         * setup queue
+         * Method that triggers the event creation method in the parent fragment
          */
-        void updateFoodType(String foodType);
+        void startEventCreation();
     }
 }

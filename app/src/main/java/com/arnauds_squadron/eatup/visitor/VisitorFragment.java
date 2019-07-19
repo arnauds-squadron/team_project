@@ -2,6 +2,8 @@ package com.arnauds_squadron.eatup.visitor;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
@@ -25,6 +27,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +47,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,7 +71,7 @@ public class VisitorFragment extends Fragment {
     TextView tvBrowseTitle;
     @BindView(R.id.rvBrowse)
     RecyclerView rvBrowse;
-    @BindView(R.id.searchView)
+    @BindView(R.id.resultsSearchView)
     SearchView searchView;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
@@ -168,11 +170,20 @@ public class VisitorFragment extends Fragment {
                 }
             }
         };
+
+        // initialize search services
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
     }
+
+
 
     @OnClick(R.id.tvCurrentLocation)
     public void searchCurrentLocation(TextView tvCurrentLocation) {
-        // TODO search the event database by current location
+        // TODO search the event database by current locationgi
         Toast.makeText(getActivity(), "Execute search by current location", Toast.LENGTH_SHORT).show();
     }
 

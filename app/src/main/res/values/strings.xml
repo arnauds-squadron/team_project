@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">EatUp</string>
-    <string name="visitor_search_hint">What\'s on the menu for today?</string>
+    <string name="visitor_search_hint">Search by location, food type, or user</string>
     <string name="btAccept">Accept</string>
     <string name="btDeny">Deny</string>
     <string name="tvApproveTitle">Approve this request?</string>
@@ -17,6 +17,9 @@
     <string name="no_address_found">Sorry, no address found</string>
     <string name="address_found">Found address successfully!</string>
     <string name="no_geocoder_available">No geocoder available</string>
+    <string name="event_creation_create_event_text">Create Event</string>
+    <string name="event_creation_next_button_text">Next</string>
+    <string name="event_creation_food_type_hint">Cuisine</string>
     <string name="detailview_event_title">Event Title</string>
     <string name="detailview_cuisine_name">Cuisine</string>
     <string name="detailview_distance">Distance</string>
@@ -26,4 +29,8 @@
     <string name="detailview_description_title">About</string>
     <string name="detailview_description">Bio content</string>
     <string name="detailview_book_prompt">Like what you see?</string>
+    <string name="event_creation_title">Set Up A Meal</string>
+    <string name="event_creation_start_new_event">Create a new event</string>
+    <string name="search_results_title">Search results</string>
+    <string name="search_again">Search again</string>
 </resources>

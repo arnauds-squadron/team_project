@@ -11,10 +11,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.EventDetailsActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 
@@ -22,6 +24,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static java.security.AccessController.getContext;
 
 public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
@@ -60,17 +64,19 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
     // create ViewHolder class
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.ivEventImage)
-        public ImageView ivEventImage;
+        ImageView ivEventImage;
         @BindView(R.id.tvEventName)
-        public TextView tvEventName;
-        @BindView(R.id.hostRating)
-        public RatingBar ratingBar;
+        TextView tvEventName;
+        @BindView(R.id.tvHostName)
+        TextView tvHostName;
         @BindView(R.id.tvCuisine)
-        public TextView tvCuisine;
+        TextView tvCuisine;
         @BindView(R.id.tvDistance)
-        public TextView tvDistance;
-        @BindView(R.id.btBook)
-        public Button btBook;
+        TextView tvDistance;
+        @BindView(R.id.hostRating)
+        RatingBar hostRating;
+        @BindView(R.id.btRequest)
+        Button btRequest;
 
         // constructor takes in inflated layout
         public ViewHolder(View itemView) {
@@ -78,10 +84,12 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
 
-            btBook.setOnClickListener(new View.OnClickListener() {
+            btRequest.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // TODO send request to Parse server with request to make reservation
+                    // TODO send user back to the refreshed home screen with the reservation request showing
+                    Toast.makeText(context, "RSVP request made", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -89,6 +97,10 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         public void bind(Event event) {
             // populate views according to data
             tvEventName.setText(event.getTitle());
+            tvCuisine.setText(event.getCuisine());
+            tvHostName.setText(event.getHost().getString(Constants.DISPLAYNAME));
+            hostRating.setRating(event.getHost().getNumber(Constants.AVERAGE_RATING).floatValue());
+
             // TODO set rating bar, cuisine
             // TODO calculate distance
             ParseFile eventImage = event.getEventImage();
@@ -105,7 +117,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             int position = getAdapterPosition();
             // ensure position valid (exists in view)
             if (position != RecyclerView.NO_POSITION) {
-                Log.d("eventAdapter", "View event Details");
+                Log.d("eventAdapter", "View event details");
                 Event event = events.get(position);
 
                 Intent intent = new Intent(context, EventDetailsActivity.class);

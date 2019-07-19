@@ -95,19 +95,11 @@ public class MainActivity extends AppCompatActivity implements
                 localFragment.retreatViewPager();
             else
                 finish();
-//            FragmentManager setupManager = localFragment.getChildFragmentManager();
-//
-//            // 1 on the stack means just the address tab is showing
-//            if (setupManager.getBackStackEntryCount() > 0) {
-//                setupManager.popBackStackImmediate();
-//            } else {
-//                finish();
-//            }
         }
     }
 
     @Override
-    public void onEventCreated() {
+    public void switchToHomeFragment() {
         viewPager.setCurrentItem(1);
     }
 
