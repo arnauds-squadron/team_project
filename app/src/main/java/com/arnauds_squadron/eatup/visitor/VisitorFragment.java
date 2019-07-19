@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
@@ -19,7 +18,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
@@ -49,6 +47,7 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -72,7 +71,7 @@ public class VisitorFragment extends Fragment {
     TextView tvCurrentLocation;
     private Unbinder unbinder;
     private EndlessRecyclerViewScrollListener scrollListener;
-    private BrowseEventAdapter postAdapter;
+    private BrowseEventAdapter eventAdapter;
     private ArrayList<Event> mEvents;
 
 
@@ -109,30 +108,31 @@ public class VisitorFragment extends Fragment {
         // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source
-        postAdapter = new BrowseEventAdapter(getContext(), mEvents);
+        eventAdapter = new BrowseEventAdapter(getContext(), mEvents);
         // RecyclerView setup
         SnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(rvBrowse);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1, GridLayoutManager.HORIZONTAL, false);
         rvBrowse.setLayoutManager(gridLayoutManager);
-        rvBrowse.setAdapter(postAdapter);
+        rvBrowse.setAdapter(eventAdapter);
 
         resultReceiver = new AddressResultReceiver(new Handler());
 
         // load data entries
-
         // retain instance so can call "resetStates" for fresh searches
-//        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                Date maxPostId = getMaxDate();
-//                Log.d("DATE", maxPostId.toString());
-//                loadTopPosts(getMaxDate());
-//            }
-//        };
-        // add endless scroll listener to RecyclerView
-//        rvPosts.addOnScrollListener(scrollListener);
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Date maxEventId = getMaxDate();
+                Log.d("DATE", maxEventId.toString());
+                loadTopEvents(getMaxDate());
+            }
+        };
+        // add endless scroll listener to RecyclerView and load items
+        rvBrowse.addOnScrollListener(scrollListener);
+        loadTopEvents(new Date(0));
 
+        // initialize current location services
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         locationRequest = new LocationRequest();
         locationRequest.setInterval(UPDATE_INTERVAL);
@@ -156,26 +156,49 @@ public class VisitorFragment extends Fragment {
                 }
             }
         };
+    }
 
-        final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<Event>() {
+    // methods to load posts into the recyclerview based on location
+    protected void loadTopEvents(Date maxDate) {
+//        progressBar.setVisibility(View.VISIBLE);
+        final Event.Query eventsQuery = new Event.Query();
+        // if opening app for the first time, get top 20 and clear old items
+        // otherwise, query for posts older than the oldest
+        if (maxDate.equals(new Date(0))) {
+            eventAdapter.clear();
+            eventsQuery.getTop().withUser();
+        } else {
+            eventsQuery.getOlder(maxDate).getTop().withUser();
+        }
+
+        eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
-                    for (int i = 0; i < objects.size(); i++) {
-                        Event event = objects.get(i);
-                        mEvents.add(event);
-                        postAdapter.notifyItemInserted(mEvents.size() - 1);
+                    for (int i = 0; i < objects.size(); ++i) {
+                        mEvents.add(objects.get(i));
+                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                        // on successful reload, signal that refresh has completed
+//                        swipeContainer.setRefreshing(false);
                     }
                 } else {
                     e.printStackTrace();
                 }
+//                progressBar.setVisibility(View.INVISIBLE);
             }
         });
-
     }
 
+    // get date of oldest post
+    protected Date getMaxDate() {
+        int postsSize = mEvents.size();
+        if (postsSize == 0) {
+            return (new Date(0));
+        } else {
+            Event oldest = mEvents.get(mEvents.size() - 1);
+            return oldest.getCreatedAt();
+        }
+    }
 
     @Override
     public void onStart() {
@@ -361,50 +384,8 @@ public class VisitorFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-    // TODO fix query for loading the event into the recyclerview for endless scroll
 
-// methods to load posts into the recyclerview based on location
-//    protected void loadTopPosts(Date maxDate) {
-//        progressBar.setVisibility(View.VISIBLE);
-//        final Post.Query postsQuery = new Post.Query();
-//        // if opening app for the first time, get top 20 and clear old items
-//        // otherwise, query for posts older than the oldest
-//        if (maxDate.equals(new Date(0))) {
-//            eventAdapter.clear();
-//            postsQuery.getTop().withUser();
-//        } else {
-//            postsQuery.getOlder(maxDate).getTop().withUser();
-//        }
-//
-//        postsQuery.findInBackground(new FindCallback<Post>() {
-//            @Override
-//            public void done(List<Post> objects, ParseException e) {
-//                if (e == null) {
-//                    for (int i = 0; i < objects.size(); ++i) {
-//                        mEvents.add(objects.get(i));
-//                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
-//                        // on successful reload, signal that refresh has completed
-//                        swipeContainer.setRefreshing(false);
-//                    }
-//                } else {
-//                    e.printStackTrace();
-//                }
-//                progressBar.setVisibility(View.INVISIBLE);
-//            }
-//        });
-//    }
-//
-//    // get date of oldest post
-//    protected Date getMaxDate() {
-//        int postsSize = mEvents.size();
-//        if (postsSize == 0) {
-//            return (new Date(0));
-//        } else {
-//            Post oldest = mEvents.get(mEvents.size() - 1);
-//            return oldest.getCreatedAt();
-//        }
-//    }
-
+    // ResultReceiver to set current location field based on address of lat/long
     class AddressResultReceiver extends ResultReceiver {
         public AddressResultReceiver(Handler handler) {
             super(handler);
