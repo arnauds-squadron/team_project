@@ -80,6 +80,13 @@ public class VisitorSearchActivity extends AppCompatActivity {
             // TODO implement search functionality
             // doMySearch(query);
         }
+        // otherwise called by a click on the location in VisitorFragment
+        else {
+            String query = intent.getStringExtra("coordinates");
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+            // TODO implement search functionality
+            // doMySearch(query);
+        }
 
         // load data entries
         // retain instance so can call "resetStates" for fresh searches
