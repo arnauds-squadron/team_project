@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,11 +33,15 @@ import butterknife.BindView;
 public class HomeFragment extends Fragment {
 
     private HomeAdapter homeAdapter;
+    private Unbinder unbinder;
+
     ArrayList<Event> agenda;
     @BindView(R.id.swipeContainer)
-    private SwipeRefreshLayout swipeContainer;
+    SwipeRefreshLayout swipeContainer;
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
+
+    @Nullable
     @BindView(R.id.ivProfile)
     ImageView ivProfile;
 
@@ -55,6 +61,20 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        return view;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // initialize data source
+        agenda = new ArrayList<>();
+        // construct adapter from data source
+        homeAdapter = new HomeAdapter(agenda);
+        // RecyclerView setup
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvAgenda.setLayoutManager(layoutManager);
+        rvAgenda.setAdapter(homeAdapter);
+
         rvAgenda = view.findViewById(R.id.rvAgenda);
         rvAgenda.setLayoutManager(new LinearLayoutManager(getContext()));
         homeAdapter = new HomeAdapter(agenda);
@@ -90,18 +110,6 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-        return view;
-    }
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // initialize data source
-        agenda = new ArrayList<>();
-        // construct adapter from data source
-        homeAdapter = new HomeAdapter(agenda);
-        // RecyclerView setup
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        rvAgenda.setLayoutManager(layoutManager);
-        rvAgenda.setAdapter(homeAdapter);
     }
     public void fetchTimelineAsync() {
         agenda.clear();
