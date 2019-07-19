@@ -15,6 +15,7 @@ import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
+import com.arnauds_squadron.eatup.local.setup.StartFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
 import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
@@ -33,6 +34,7 @@ import butterknife.ButterKnife;
  * create an instance of this fragment.
  */
 public class LocalFragment extends Fragment implements
+        StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
         FoodTypeFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener,
@@ -81,6 +83,16 @@ public class LocalFragment extends Fragment implements
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    /**
+     * Overrides the StartFragment interface
+     *
+     * Begin creating a completely new event
+     */
+    @Override
+    public void startEventCreation() {
+        advanceViewPager();
     }
 
     /**

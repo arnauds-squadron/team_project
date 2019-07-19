@@ -29,4 +29,6 @@
     <string name="detailview_description_title">About</string>
     <string name="detailview_description">Bio content</string>
     <string name="detailview_book_prompt">Like what you see?</string>
+    <string name="event_creation_title">Set Up A Meal</string>
+    <string name="event_creation_start_new_event">Create a new event</string>
 </resources>
