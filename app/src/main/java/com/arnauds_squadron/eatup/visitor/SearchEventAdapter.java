@@ -21,8 +21,6 @@ import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
-import org.parceler.Parcels;
-
 import java.util.List;
 import java.util.Locale;
 
@@ -96,17 +94,20 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             btRequest.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO send request to Parse server with request to make reservation
-                    // TODO send user back to the refreshed home screen with the reservation request showing
 
-                    // TODO make check to see if user has already requested in the past or is already RSVP'd to the event
-                    Toast.makeText(context, "RSVP request made", Toast.LENGTH_SHORT).show();
                     int position = getAdapterPosition();
                     Event event = events.get(position);
-                    event.createRequest(new ParseUser(), event);
-//                    Event event = new Event();
-//                    Intent returnEvent = new Intent();
-//                    returnEvent.putExtra(Event.class.getSimpleName(), Parcels.wrap(
+
+                    // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
+                    // otherwise, create request/add to "allRequests" and send back to home screen
+                    if(event.checkRequest(ParseUser.getCurrentUser(), event)) {
+                        Toast.makeText(context, "RSVP already requested", Toast.LENGTH_SHORT).show();
+                    } else {
+                        event.createRequest(ParseUser.getCurrentUser(), event);
+                        Toast.makeText(context, "RSVP requested", Toast.LENGTH_SHORT).show();
+                    }
+
+                    // TODO send user back to the refreshed home screen with the reservation request showing
                 }
             });
 

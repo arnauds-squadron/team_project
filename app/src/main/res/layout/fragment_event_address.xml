@@ -6,7 +6,7 @@
     android:background="@color/view_background">
 
     <fragment
-        android:id="@+id/map"
+        android:id="@+id/mapFragment"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
