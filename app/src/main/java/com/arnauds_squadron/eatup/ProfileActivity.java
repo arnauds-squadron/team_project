@@ -54,7 +54,6 @@ public class ProfileActivity extends AppCompatActivity {
             ratingBar.setRating(rating.floatValue());
         }
         else {
-            // TODO replace with some sort of text field that says "no rating yet"
             ratingBar.setRating(NO_RATING);
         }
         tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
@@ -80,8 +79,7 @@ public class ProfileActivity extends AppCompatActivity {
             tvBio.setText(bio);
         }
         else {
-            // TODO replace with some sort of text field that says "I don't have a bio"
-            Log.d("ProfileActivity", "no bio yet");
+            tvBio.setText(R.string.no_bio);
         }
     }
 }

@@ -1,16 +1,26 @@
 package com.arnauds_squadron.eatup.models;
 
+import android.app.Activity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
+import com.parse.GetCallback;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.arnauds_squadron.eatup.utils.Constants.PENDING_GUESTS;
 
 @ParseClassName("Event")
 public class Event extends ParseObject {
@@ -166,4 +176,18 @@ public class Event extends ParseObject {
         }
     }
 
+    public void createRequest(ParseUser user, Event event) {
+        event.addUnique(PENDING_GUESTS, user.getUsername());
+        event.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("createRequest", "RSVP requested");
+                }
+                else {
+                    Log.d("createRequest", "Error in making request. Try again.");
+                }
+            }
+        });
+    }
 }
