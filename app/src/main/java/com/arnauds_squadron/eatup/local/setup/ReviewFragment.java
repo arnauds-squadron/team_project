@@ -6,11 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.FormatHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,8 +23,14 @@ public class ReviewFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    @BindView(R.id.tvEventFoodType)
-    AutoCompleteTextView tvEventFoodType;
+    @BindView(R.id.tvCuisine)
+    TextView tvCuisine;
+
+    @BindView(R.id.tvSelectedDate)
+    TextView tvSelectedDate;
+
+    @BindView(R.id.tvSelectedTime)
+    TextView tvSelectedTime;
 
     private Event event;
 
@@ -46,14 +52,6 @@ public class ReviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_review, container, false);
         ButterKnife.bind(this, view);
-
-        // TODO: move array of food types to a server
-        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.food_types));
-
-        tvEventFoodType.setAdapter(adapter);
-        tvEventFoodType.setThreshold(1); //start searching from 1 character
         return view;
     }
 
@@ -76,7 +74,6 @@ public class ReviewFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
 
     /**
      * Called in onCreate to bind the this child fragment to its parent, so the listener
@@ -102,6 +99,10 @@ public class ReviewFragment extends Fragment {
      * Initalize all the textviews and details of the current event
      */
     private void initializeViews() {
+        tvCuisine.setText(event.getCuisine());
+        tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
+        tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));
+
     }
 
     public interface OnFragmentInteractionListener {

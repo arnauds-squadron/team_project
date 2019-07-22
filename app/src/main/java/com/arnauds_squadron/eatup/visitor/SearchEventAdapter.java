@@ -14,18 +14,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.EventDetailsActivity;
+import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
+
+import org.parceler.Parcels;
 
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static java.security.AccessController.getContext;
+import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
+import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
 
 public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
@@ -75,6 +82,8 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvDistance;
         @BindView(R.id.hostRating)
         RatingBar hostRating;
+        @BindView(R.id.tvNumRatings)
+        TextView tvNumRatings;
         @BindView(R.id.btRequest)
         Button btRequest;
 
@@ -89,7 +98,24 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                 public void onClick(View v) {
                     // TODO send request to Parse server with request to make reservation
                     // TODO send user back to the refreshed home screen with the reservation request showing
+
+                    // TODO make check to see if user has already requested in the past or is already RSVP'd to the event
                     Toast.makeText(context, "RSVP request made", Toast.LENGTH_SHORT).show();
+                    int position = getAdapterPosition();
+                    Event event = events.get(position);
+                    event.createRequest(new ParseUser(), event);
+//                    Event event = new Event();
+//                    Intent returnEvent = new Intent();
+//                    returnEvent.putExtra(Event.class.getSimpleName(), Parcels.wrap(
+                }
+            });
+
+            tvHostName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ProfileActivity.class);
+                    i.putExtra("user", (ParseUser) tvHostName.getTag());
+                    context.startActivity(i);
                 }
             });
         }
@@ -98,11 +124,24 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             // populate views according to data
             tvEventName.setText(event.getTitle());
             tvCuisine.setText(event.getCuisine());
-            tvHostName.setText(event.getHost().getString(Constants.DISPLAYNAME));
-            hostRating.setRating(event.getHost().getNumber(Constants.AVERAGE_RATING).floatValue());
+            tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
+            tvHostName.setTag(event.getHost());
 
-            // TODO set rating bar, cuisine
-            // TODO calculate distance
+            // load user rating
+            Number rating = event.getHost().getNumber(AVERAGE_RATING);
+            if (rating != null) {
+                hostRating.setRating(rating.floatValue());
+            }
+            else {
+                hostRating.setRating(NO_RATING);
+            }
+            Number numRatings = event.getHost().getNumber(NUM_RATINGS);
+            tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+
+            // TODO return distance between the current location and restaurant using Yelp API
+            // tvDistance.setText("");
+
+            // TODO set \cuisine
             ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)

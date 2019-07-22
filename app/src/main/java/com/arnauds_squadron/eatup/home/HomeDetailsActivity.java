@@ -17,6 +17,7 @@ import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
+import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -126,10 +127,12 @@ public class HomeDetailsActivity extends AppCompatActivity {
         if(event.getHost() != null) {
             try {
                 tvPerson.setText(event.getHost().fetchIfNeeded().getUsername());
+                final ParseUser user = event.getHost();
                 tvPerson.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent i = new Intent(HomeDetailsActivity.this, ProfileActivity.class);
+                        i.putExtra("user",Parcels.wrap(user));
                         startActivity(i);
                     }
                 });

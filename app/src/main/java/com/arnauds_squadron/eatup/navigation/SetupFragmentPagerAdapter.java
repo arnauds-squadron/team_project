@@ -14,7 +14,7 @@ import com.arnauds_squadron.eatup.local.setup.StartFragment;
  * Pager Adapter to handle all the setup fragments we need to create an event
  */
 public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
-    private final int PAGE_COUNT = 4;
+    private final int PAGE_COUNT = 5;
 
     public SetupFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -30,9 +30,9 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
         if(position == 0)
             return StartFragment.newInstance();
         if(position == 1)
-            return AddressFragment.newInstance();
-        if (position == 2)
             return FoodTypeFragment.newInstance();
+        if (position == 2)
+            return AddressFragment.newInstance();
         if (position == 3)
             return DateFragment.newInstance();
         if (position == 4)

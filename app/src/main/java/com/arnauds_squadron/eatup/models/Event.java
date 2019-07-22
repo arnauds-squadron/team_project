@@ -1,33 +1,49 @@
 package com.arnauds_squadron.eatup.models;
 
+import android.app.Activity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
+import com.parse.GetCallback;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import org.json.JSONArray;
 
 import java.util.Date;
+import java.util.List;
+
+import static com.arnauds_squadron.eatup.utils.Constants.PENDING_GUESTS;
 
 @ParseClassName("Event")
 public class Event extends ParseObject {
-    public static final String KEY_EVENT_IMAGE = "eventImage";
-    public static final String KEY_DATE = "date";
-    public static final String KEY_TITLE = "title";
-    public static final String KEY_HOST = "host";
-    public static final String KEY_ADDRESS = "address";
-    public static final String KEY_DESCRIPTION = "description";
-    public static final String KEY_FOOD_TYPE = "foodType";
-    public static final String KEY_MAX_GUESTS = "maxGuests";
-    public static final String KEY_21 = "over21";
-    public static final String KEY_RESTAURANT = "isRestaurant";
-    public static final String KEY_CONVERSATION = "conversation";
-    public static final String KEY_PENDING_GUESTS = "pendingGuests";
-    public static final String KEY_UPDATED_GUESTS = "updatedGuests";
-    public static final String KEY_CREATED_AT = "createdAt";
+    private static final String KEY_EVENT_IMAGE = "eventImage";
+    private static final String KEY_DATE = "date";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_HOST = "host";
+    private static final String KEY_ADDRESS = "address";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_FOOD_TYPE = "foodType";
+    private static final String KEY_TAGS = "tags";
+    private static final String KEY_MAX_GUESTS = "maxGuests";
+    private static final String KEY_21 = "over21";
+    private static final String KEY_RESTAURANT = "isRestaurant";
+    private static final String KEY_CONVERSATION = "conversation";
+    private static final String KEY_PENDING_GUESTS = "pendingGuests";
+    private static final String KEY_UPDATED_GUESTS = "updatedGuests";
+    private static final String KEY_CREATED_AT = "createdAt";
+    private static final Double MAX_DISTANCE = 0.1;
 
+    public Event() {
+    }
 
-    public Event() {}
     // ParseFile - class in SDK that allows accessing files stored with Parse
     public ParseFile getEventImage() {
         return getParseFile(KEY_EVENT_IMAGE);
@@ -78,7 +94,25 @@ public class Event extends ParseObject {
         put(KEY_DESCRIPTION, description);
     }
 
-    // TODO figure out if this should be set as multiple tags in array rather than a string
+    public JSONArray getTags() {
+        return getJSONArray(KEY_TAGS);
+    }
+
+    /**
+     * Sets the tags for this event, overwriting any previous tags
+     */
+    public void setTags(List<String> tags) {
+        put(KEY_TAGS, new JSONArray(tags));
+    }
+
+    /**
+     * Adds one tag to the current list of tags
+     */
+    public void addTag(String tag) {
+        add(KEY_TAGS, tag);
+    }
+
+    // TODO: replace with the tag system
     public String getCuisine() {
         return getString(KEY_FOOD_TYPE);
     }
@@ -115,7 +149,6 @@ public class Event extends ParseObject {
 
     // inner class to query event model
     public static class Query extends ParseQuery<Event> {
-        //
         public Query() {
             super(Event.class);
         }
@@ -129,7 +162,6 @@ public class Event extends ParseObject {
         public Query getTop() {
             setLimit(20);
             orderByDescending(KEY_CREATED_AT);
-            // builder pattern, allow chain methods
             return this;
         }
 
@@ -137,6 +169,25 @@ public class Event extends ParseObject {
             include("host");
             return this;
         }
+
+        public Query getClosest(ParseGeoPoint location) {
+            whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
+            return this;
+        }
     }
 
+    public void createRequest(ParseUser user, Event event) {
+        event.addUnique(PENDING_GUESTS, user.getUsername());
+        event.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("createRequest", "RSVP requested");
+                }
+                else {
+                    Log.d("createRequest", "Error in making request. Try again.");
+                }
+            }
+        });
+    }
 }

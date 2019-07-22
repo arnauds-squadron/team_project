@@ -10,7 +10,11 @@ public final class Constants {
             ".RESULT_DATA_KEY";
     public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME +
             ".LOCATION_DATA_EXTRA";
-    public static final String HOST_BIO = "bio";
-    public static final String DISPLAYNAME = "displayName";
+    public static final String KEY_PROFILE_PICTURE = "profilePicture";
+    public static final String BIO = "bio";
+    public static final String DISPLAY_NAME = "displayName";
     public static final String AVERAGE_RATING = "averageRating";
+    public static final float NO_RATING = 0f;
+    public static final String NUM_RATINGS = "numRatings";
+    public static final String PENDING_GUESTS = "pendingGuests";
 }
