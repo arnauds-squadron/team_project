@@ -25,6 +25,7 @@
     <string name="event_creation_start_new_event">Create a new event</string>
     <string name="event_creation_start_title">Set Up Your Event</string>
     <string name="event_creation_time_not_selected">Time not set</string>
+    <string name="event_creation_title_caption">And give it a good name!</string>
     <string name="detailview_event_title">Event Title</string>
     <string name="detailview_cuisine_name">Cuisine</string>
     <string name="detailview_distance">Distance</string>

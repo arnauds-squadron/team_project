@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/view_background"
@@ -85,10 +86,12 @@
         android:layout_height="50dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
+        android:contentDescription="Calendar icon"
         app:layout_constraintBottom_toBottomOf="@+id/tvSelectedDate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvSelectedDate"
-        app:srcCompat="@drawable/calendar_icon" />
+        app:srcCompat="@drawable/calendar_icon"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/ivClock"
@@ -96,10 +99,12 @@
         android:layout_height="50dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
+        android:contentDescription="Clock icon"
         app:layout_constraintBottom_toBottomOf="@+id/tvSelectedTime"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvSelectedTime"
-        app:srcCompat="@drawable/clock_icon" />
+        app:srcCompat="@drawable/clock_icon"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/btnCreateEvent"
@@ -116,7 +121,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="And give it a good name!"
+        android:text="@string/event_creation_title_caption"
         android:textColor="@color/bottom_gray"
         app:layout_constraintBottom_toTopOf="@+id/etEventName"
         app:layout_constraintEnd_toEndOf="parent"
