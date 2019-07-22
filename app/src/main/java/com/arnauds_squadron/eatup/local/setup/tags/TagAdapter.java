@@ -13,9 +13,19 @@ import com.arnauds_squadron.eatup.R;
 
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * Adapter to handle adding tags to the user's event and displaying them in a ListView
+ */
 public class TagAdapter extends ArrayAdapter<String> {
+
+    @BindView(R.id.tvName)
+    TextView tvName;
+
+    @BindView(R.id.ibClose)
+    ImageButton ibClose;
 
     private List<String> tags;
 
@@ -27,27 +37,31 @@ public class TagAdapter extends ArrayAdapter<String> {
     @NonNull
     @Override
     public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
-        ButterKnife.bind(this, convertView);
-
-        String tag = getItem(position);
-
-        // Check if an existing view is being reused, otherwise inflate the view
-        if (convertView == null) {
+        if (convertView == null) { // Check to see if we can reuse the view
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_tag,
                     parent, false);
         }
-        TextView tvName = convertView.findViewById(R.id.tvName);
-        ImageButton ibClose = convertView.findViewById(R.id.ibClose);
 
-        ibClose.setOnClickListener(new View.OnClickListener() {
+        ButterKnife.bind(this, convertView);
+        tvName.setText(getItem(position));
+        removeTagOnClick(ibClose, position);
+
+        return convertView;
+    }
+
+    /**
+     * Removes an item when the image button is clicked, not using ButterKnife annotation because
+     * we need the position
+     * @param button The button being clicked
+     * @param position The position of the view in the ListView
+     */
+    private void removeTagOnClick(ImageButton button, final int position) {
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tags.remove(position);
                 notifyDataSetChanged();
             }
         });
-
-        tvName.setText(tag);
-        return convertView;
     }
 }
