@@ -16,4 +16,5 @@ public final class Constants {
     public static final String AVERAGE_RATING = "averageRating";
     public static final float NO_RATING = 0f;
     public static final String NUM_RATINGS = "numRatings";
+    public static final String PENDING_GUESTS = "pendingGuests";
 }

@@ -21,7 +21,10 @@ import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
+import org.parceler.Parcels;
+
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,6 +32,7 @@ import butterknife.ButterKnife;
 import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
 
 public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
@@ -78,6 +82,8 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvDistance;
         @BindView(R.id.hostRating)
         RatingBar hostRating;
+        @BindView(R.id.tvNumRatings)
+        TextView tvNumRatings;
         @BindView(R.id.btRequest)
         Button btRequest;
 
@@ -92,7 +98,15 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                 public void onClick(View v) {
                     // TODO send request to Parse server with request to make reservation
                     // TODO send user back to the refreshed home screen with the reservation request showing
+
+                    // TODO make check to see if user has already requested in the past or is already RSVP'd to the event
                     Toast.makeText(context, "RSVP request made", Toast.LENGTH_SHORT).show();
+                    int position = getAdapterPosition();
+                    Event event = events.get(position);
+                    event.createRequest(new ParseUser(), event);
+//                    Event event = new Event();
+//                    Intent returnEvent = new Intent();
+//                    returnEvent.putExtra(Event.class.getSimpleName(), Parcels.wrap(
                 }
             });
 
@@ -107,7 +121,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         }
 
         public void bind(Event event) {
-            // TODO account for null fields
             // populate views according to data
             tvEventName.setText(event.getTitle());
             tvCuisine.setText(event.getCuisine());
@@ -118,13 +131,13 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             Number rating = event.getHost().getNumber(AVERAGE_RATING);
             if (rating != null) {
                 hostRating.setRating(rating.floatValue());
-
             }
             else {
-                // TODO replace with some sort of text field that says "no rating yet"
                 hostRating.setRating(NO_RATING);
-                Log.d("SearchEventAdapter", "no host rating yet");
             }
+            Number numRatings = event.getHost().getNumber(NUM_RATINGS);
+            tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+
             // TODO return distance between the current location and restaurant using Yelp API
             // tvDistance.setText("");
 
