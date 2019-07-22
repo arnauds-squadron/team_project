@@ -17,4 +17,5 @@ public final class Constants {
     public static final float NO_RATING = 0f;
     public static final String NUM_RATINGS = "numRatings";
     public static final String PENDING_GUESTS = "pendingGuests";
+    public static final String ALL_REQUESTS = "allRequests";
 }

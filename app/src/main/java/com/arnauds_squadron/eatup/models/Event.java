@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
@@ -12,14 +13,17 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.arnauds_squadron.eatup.utils.Constants.ALL_REQUESTS;
 import static com.arnauds_squadron.eatup.utils.Constants.PENDING_GUESTS;
 
 @ParseClassName("Event")
@@ -145,6 +149,10 @@ public class Event extends ParseObject {
         put(KEY_RESTAURANT, restaurant);
     }
 
+    public List<ParseUser> getAllRequests() {
+        return getList(ALL_REQUESTS);
+    }
+
     // TODO how to access conversation/do we actually need to use the create/update at methods
 
     // inner class to query event model
@@ -177,7 +185,8 @@ public class Event extends ParseObject {
     }
 
     public void createRequest(ParseUser user, Event event) {
-        event.addUnique(PENDING_GUESTS, user.getUsername());
+        event.addUnique(PENDING_GUESTS, user);
+        event.addUnique(ALL_REQUESTS, user);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -189,5 +198,17 @@ public class Event extends ParseObject {
                 }
             }
         });
+    }
+
+    public Boolean checkRequest(ParseUser user, Event event) {
+        if(event.getAllRequests() != null) {
+            List<ParseUser> userRequests = event.getAllRequests();
+            for(int i = 0; i < userRequests.size(); i++) {
+                if(userRequests.get(i) == user) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
