@@ -19,7 +19,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseGeoPoint;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -105,7 +104,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Initalize all the textviews and details of the current event
+     * Initialize all the TextViews and details of the current event
      */
     private void initializeViews() {
         tvCuisine.setText(event.getCuisine());
@@ -125,8 +124,6 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         LatLng eventLocation = new LatLng(event.getAddress().getLatitude(),
                 event.getAddress().getLongitude());
-
-        event.getAddress().
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
                 UIHelper.DEFAULT_MAP_ZOOM_LEVEL));
