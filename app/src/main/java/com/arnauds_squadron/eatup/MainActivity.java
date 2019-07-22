@@ -45,9 +45,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onPageSelected(int index) {
                 if (index != 0) { // switched to a fragment other than the local fragment
                     LocalFragment localFragment = getLocalFragment();
-//                    if (localFragment != null) {
-//                        localFragment.resetSetupViewPager();
-//                    }
+                    if (localFragment != null) {
+                        localFragment.resetSetupViewPager();
+                    }
                 }
             }
 
