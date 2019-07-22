@@ -19,7 +19,7 @@
     <string name="no_geocoder_available">No geocoder available</string>
     <string name="event_creation_create_event_text">Create Event</string>
     <string name="event_creation_date_not_selected">Date not set</string>
-    <string name="event_creation_food_type_hint">Cuisine</string>
+    <string name="event_creation_tags_hint">Cuisine</string>
     <string name="event_creation_next_button_text">Next</string>
     <string name="event_creation_review_title">Confirm Your Event</string>
     <string name="event_creation_start_new_event">Create a new event</string>
@@ -37,8 +37,6 @@
     <string name="detailview_book_prompt">Like what you see?</string>
     <string name="search_results_title">Search results</string>
     <string name="search_again">Search again</string>
-    <string name="event_creation_time_not_selected">Time not set</string>
-    <string name="event_creation_date_not_selected">Date not set</string>
     <string name="about">About</string>
 
     <!--latitude/longitude tags-->
