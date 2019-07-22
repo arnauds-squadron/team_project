@@ -2,44 +2,86 @@ package com.arnauds_squadron.eatup;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.arnauds_squadron.eatup.models.User;
-import com.parse.ParseImageView;
+import com.bumptech.glide.Glide;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.BIO;
+import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
+import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
+
 public class ProfileActivity extends AppCompatActivity {
 
-    User user;
+    ParseUser user;
     @BindView(R.id.ivProfile)
-    ParseImageView ivProfile;
+    ImageView ivProfile;
     @BindView(R.id.tvUsername)
     TextView tvUsername;
+    @BindView(R.id.tvUsername2)
+    TextView tvUsername2;
     @BindView(R.id.tvBio)
     TextView tvBio;
     @BindView(R.id.tvRatings)
     TextView tvRatings;
-    @BindView(R.id.rating)
-    RatingBar rating;
+    @BindView(R.id.ratingBar)
+    RatingBar ratingBar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-//        if(user.getFloatRating() != null) {
-//            float floatRating = user.getFloatRating();
-//            rating.setRating(floatRating = floatRating > 0 ? user.getFloatRating() / 2.0f : floatRating);
-//        }
-        if(user.getProfilePicture() != null) {
-            ivProfile.setParseFile(user.getProfilePicture());
-            ivProfile.loadInBackground();
+        user = getIntent().getParcelableExtra("user");
+
+        // load user rating
+        Number rating = user.getNumber(AVERAGE_RATING);
+        Number numRatings = user.getNumber(NUM_RATINGS);
+        if (rating != null) {
+            ratingBar.setRating(rating.floatValue());
         }
+        else {
+            // TODO replace with some sort of text field that says "no rating yet"
+            ratingBar.setRating(NO_RATING);
+        }
+        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+
+        // load user profileImage
+        ParseFile profileImage = user.getParseFile(KEY_PROFILE_PICTURE);
+        if (profileImage != null) {
+            Glide.with(getApplicationContext())
+                    .load(profileImage.getUrl())
+                    .centerCrop()
+                    .into(ivProfile);
+        }
+
+        String username = user.getUsername();
         if(user.getUsername() != null) {
-            tvUsername.setText(user.getUsername());
+            tvUsername.setText(username);
+            tvUsername2.setText(username);
+        }
+
+        // load user bio
+        String bio = user.getString(BIO);
+        if (bio != null) {
+            tvBio.setText(bio);
+        }
+        else {
+            // TODO replace with some sort of text field that says "I don't have a bio"
+            Log.d("ProfileActivity", "no bio yet");
         }
     }
 }

@@ -36,7 +36,6 @@ import com.arnauds_squadron.eatup.BuildConfig;
 import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -60,6 +59,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
+import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
+import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
+import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 
@@ -436,8 +439,8 @@ public class VisitorFragment extends Fragment {
     // start Intent to get address from lat/long coordinates
     protected void startIntentService(Location newLocation) {
         Intent intent = new Intent(getContext(), FetchAddressIntentService.class);
-        intent.putExtra(Constants.RECEIVER, resultReceiver);
-        intent.putExtra(Constants.LOCATION_DATA_EXTRA, newLocation);
+        intent.putExtra(RECEIVER, resultReceiver);
+        intent.putExtra(LOCATION_DATA_EXTRA, newLocation);
         getActivity().startService(intent);
     }
 
@@ -457,13 +460,13 @@ public class VisitorFragment extends Fragment {
 
             // Display the address string
             // or an error message sent from the intent service.
-            addressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            addressOutput = resultData.getString(RESULT_DATA_KEY);
             if (addressOutput == null) {
                 addressOutput = "";
             }
 
             // display current address to user if found.
-            if (resultCode == Constants.SUCCESS_RESULT) {
+            if (resultCode == SUCCESS_RESULT) {
                 tvCurrentLocation.setText(addressOutput);
             }
 
