@@ -93,6 +93,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
             // doMySearch(query);
         }
 
+/*
         // load data entries
         // retain instance so can call "resetStates" for fresh searches
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
@@ -122,7 +123,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
                 getResources().getColor(android.R.color.holo_green_light),
                 getResources().getColor(android.R.color.holo_orange_light),
                 getResources().getColor(android.R.color.holo_red_light));
-
+*/
     }
 
     private void searchByDistance(ParseGeoPoint geoPoint) {
@@ -138,7 +139,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
                         mEvents.add(objects.get(i));
                         eventAdapter.notifyItemInserted(mEvents.size() - 1);
                         // on successful reload, signal that refresh has completed
-                        swipeContainer.setRefreshing(false);
+                        // swipeContainer.setRefreshing(false);
                     }
                 } else {
                     e.printStackTrace();
