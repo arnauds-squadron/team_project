@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.utils.UIHelper;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,9 +35,6 @@ import butterknife.OnClick;
  */
 public class AddressFragment extends Fragment implements OnMapReadyCallback {
     private final static String TAG = "AddressFragment";
-
-    // 1-19
-    private final static Float ZOOM_LEVEL = 15f;
 
     // The listener that communicates to the LocalFragment to update the address when
     // the user hits the next button
@@ -68,7 +66,7 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_event_address, container, false);
         ButterKnife.bind(this, view);
 
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
         setupAutoCompleteFragment();
         initializePlaces(); // initialize the places sdk
         mapFragment.getMapAsync(this); // update the map
@@ -102,7 +100,8 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
             // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user.location.latlng, 1));
         } else {
             mMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(selectedPlace.getLatLng(), ZOOM_LEVEL));
+                    CameraUpdateFactory.newLatLngZoom(selectedPlace.getLatLng(),
+                            UIHelper.DEFAULT_MAP_ZOOM_LEVEL));
 
             mMap.addMarker(new MarkerOptions()
                     .position(selectedPlace.getLatLng())
