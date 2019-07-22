@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
-import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
+import com.arnauds_squadron.eatup.local.setup.tags.TagFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.StartFragment;
 
@@ -30,7 +30,7 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
         if(position == 0)
             return StartFragment.newInstance();
         if(position == 1)
-            return FoodTypeFragment.newInstance();
+            return TagFragment.newInstance();
         if (position == 2)
             return AddressFragment.newInstance();
         if (position == 3)

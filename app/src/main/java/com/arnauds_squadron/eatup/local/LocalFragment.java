@@ -13,9 +13,9 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
-import com.arnauds_squadron.eatup.local.setup.FoodTypeFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.StartFragment;
+import com.arnauds_squadron.eatup.local.setup.tags.TagFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
 import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
@@ -24,6 +24,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,7 +37,7 @@ import butterknife.ButterKnife;
 public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
-        FoodTypeFragment.OnFragmentInteractionListener,
+        TagFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener,
         ReviewFragment.OnFragmentInteractionListener {
 
@@ -95,6 +96,19 @@ public class LocalFragment extends Fragment implements
         advanceViewPager();
     }
 
+
+    /**
+     * Overrides the TagFragment interface
+     *
+     * Updates the food type parameter of this fragment's event variable
+     */
+    @Override
+    public void updateTags(List<String> tags) {
+        event = new Event();
+        event.setTags(tags);
+        advanceViewPager();
+    }
+
     /**
      * Overrides the AddressFragment interface
      *
@@ -102,19 +116,7 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void updateAddress(ParseGeoPoint address) {
-        event = new Event();
         event.setAddress(address);
-        advanceViewPager();
-    }
-
-    /**
-     * Overrides the FoodTypeFragment interface
-     *
-     * Updates the food type parameter of this fragment's event variable
-     */
-    @Override
-    public void updateFoodType(String foodType) {
-        event.setCuisine(foodType);
         advanceViewPager();
     }
 

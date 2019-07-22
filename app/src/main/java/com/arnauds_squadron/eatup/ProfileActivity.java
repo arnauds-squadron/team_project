@@ -7,9 +7,13 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.models.Event;
+import com.parse.ParseImageView;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
+
+import org.parceler.Parcels;
 
 import java.util.Locale;
 
@@ -45,7 +49,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-        user = getIntent().getParcelableExtra("user");
+        user = Parcels.unwrap(getIntent().getParcelableExtra("user"));
 
         // load user rating
         Number rating = user.getNumber(AVERAGE_RATING);
