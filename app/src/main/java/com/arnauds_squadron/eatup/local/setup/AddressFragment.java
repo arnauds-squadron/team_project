@@ -46,7 +46,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     // The place that the user selects after searching for its address
     private Place selectedPlace;
 
-
     public static AddressFragment newInstance() {
         Bundle args = new Bundle();
         AddressFragment fragment = new AddressFragment();
@@ -133,7 +132,8 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         } else {
             double latitude = selectedPlace.getLatLng().latitude;
             double longitude = selectedPlace.getLatLng().longitude;
-            mListener.updateAddress(new ParseGeoPoint(latitude, longitude));
+            mListener.updateAddress(new ParseGeoPoint(latitude, longitude),
+                    selectedPlace.getAddress());
         }
     }
 
@@ -154,14 +154,15 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
             initializePlaces();
         }
 
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+        final AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         autocompleteFragment.setHint("Address");
         autocompleteFragment.setPlaceFields(Arrays.asList(
                 Place.Field.ID,
                 Place.Field.NAME,
-                Place.Field.LAT_LNG));
+                Place.Field.LAT_LNG,
+                Place.Field.ADDRESS));
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -184,6 +185,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
          * Method called in the parent to update the event object to have the user's selected
          * address, and to switch to the next setup fragment
          */
-        void updateAddress(ParseGeoPoint address);
+        void updateAddress(ParseGeoPoint address, String addressString);
     }
 }

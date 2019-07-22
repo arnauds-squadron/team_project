@@ -34,6 +34,9 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.tvCuisine)
     TextView tvCuisine;
 
+    @BindView(R.id.tvAddress)
+    TextView tvAddress;
+
     @BindView(R.id.tvSelectedDate)
     TextView tvSelectedDate;
 
@@ -108,6 +111,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      */
     private void initializeViews() {
         tvCuisine.setText(event.getCuisine());
+        tvAddress.setText(event.getAddressString());
         tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
         tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));
 
@@ -126,7 +130,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                 event.getAddress().getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
-                UIHelper.DEFAULT_MAP_ZOOM_LEVEL));
+                UIHelper.DETAILED_MAP_ZOOM_LEVEL));
 
         googleMap.addMarker(new MarkerOptions()
                 .position(eventLocation)

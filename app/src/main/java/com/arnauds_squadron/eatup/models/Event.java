@@ -1,11 +1,7 @@
 package com.arnauds_squadron.eatup.models;
 
-import android.app.Activity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import com.parse.GetCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -29,6 +25,7 @@ public class Event extends ParseObject {
     private static final String KEY_TITLE = "title";
     private static final String KEY_HOST = "host";
     private static final String KEY_ADDRESS = "address";
+    private static final String KEY_ADDRESS_STRING = "addressString";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_FOOD_TYPE = "foodType";
     private static final String KEY_TAGS = "tags";
@@ -84,6 +81,14 @@ public class Event extends ParseObject {
 
     public void setAddress(ParseGeoPoint address) {
         put(KEY_ADDRESS, address);
+    }
+
+    public String getAddressString() {
+        return getString(KEY_ADDRESS_STRING);
+    }
+
+    public void setAddressString(String address) {
+        put(KEY_ADDRESS_STRING, address);
     }
 
     public String getDescription() {

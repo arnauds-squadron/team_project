@@ -115,8 +115,9 @@ public class LocalFragment extends Fragment implements
      * Updates the address of the local event with the ParseGeoPoint of the address of the event
      */
     @Override
-    public void updateAddress(ParseGeoPoint address) {
+    public void updateAddress(ParseGeoPoint address, String addressString) {
         event.setAddress(address);
+        event.setAddressString(addressString);
         advanceViewPager();
     }
 
