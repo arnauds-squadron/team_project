@@ -30,9 +30,9 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
         if(position == 0)
             return StartFragment.newInstance();
         if(position == 1)
-            return AddressFragment.newInstance();
-        if (position == 2)
             return FoodTypeFragment.newInstance();
+        if (position == 2)
+            return AddressFragment.newInstance();
         if (position == 3)
             return DateFragment.newInstance();
         if (position == 4)
