@@ -14,11 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.EventDetailsActivity;
+import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -92,6 +94,15 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                     Toast.makeText(context, "RSVP request made", Toast.LENGTH_SHORT).show();
                 }
             });
+
+            tvHostName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ProfileActivity.class);
+                    i.putExtra("user", (ParseUser) tvHostName.getTag());
+                    context.startActivity(i);
+                }
+            });
         }
 
         public void bind(Event event) {
@@ -99,10 +110,12 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             tvEventName.setText(event.getTitle());
             tvCuisine.setText(event.getCuisine());
             tvHostName.setText(event.getHost().getString(Constants.DISPLAYNAME));
+            tvHostName.setTag(event.getHost());
             hostRating.setRating(event.getHost().getNumber(Constants.AVERAGE_RATING).floatValue());
+            // TODO return distance between the current location and restaurant using Yelp API
+            // tvDistance.setText("");
 
             // TODO set rating bar, cuisine
-            // TODO calculate distance
             ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)

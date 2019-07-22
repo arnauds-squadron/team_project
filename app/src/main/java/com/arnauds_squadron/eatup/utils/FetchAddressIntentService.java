@@ -38,7 +38,6 @@ public class FetchAddressIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d("FAIS", "beginning of handling the intent");
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         if (intent == null) {
             return;
@@ -99,6 +98,5 @@ public class FetchAddressIntentService extends IntentService {
         Bundle bundle = new Bundle();
         bundle.putString(Constants.RESULT_DATA_KEY, message);
         receiver.send(resultCode, bundle);
-        Log.d("FAIS", "deliver the results to the receiver");
     }
 }

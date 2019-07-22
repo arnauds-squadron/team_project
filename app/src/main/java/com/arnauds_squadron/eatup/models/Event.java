@@ -25,6 +25,7 @@ public class Event extends ParseObject {
     public static final String KEY_PENDING_GUESTS = "pendingGuests";
     public static final String KEY_UPDATED_GUESTS = "updatedGuests";
     public static final String KEY_CREATED_AT = "createdAt";
+    public static final Double MAX_DISTANCE = 0.1;
 
 
     public Event() {}
@@ -135,6 +136,11 @@ public class Event extends ParseObject {
 
         public Query withHost() {
             include("host");
+            return this;
+        }
+
+        public Query getClosest(ParseGeoPoint location) {
+            whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
             return this;
         }
     }

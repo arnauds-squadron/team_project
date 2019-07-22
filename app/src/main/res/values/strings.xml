@@ -18,13 +18,13 @@
     <string name="address_found">Found address successfully!</string>
     <string name="no_geocoder_available">No geocoder available</string>
     <string name="event_creation_create_event_text">Create Event</string>
-    <string name="event_creation_next_button_text">Next</string>
-    <string name="event_creation_food_type_hint">Cuisine</string>
-    <string name="event_creation_start_new_event">Create a new event</string>
-    <string name="event_creation_time_not_selected">Time not set</string>
     <string name="event_creation_date_not_selected">Date not set</string>
-    <string name="event_creation_start_title">Set Up Your Event</string>
+    <string name="event_creation_food_type_hint">Cuisine</string>
+    <string name="event_creation_next_button_text">Next</string>
     <string name="event_creation_review_title">Confirm Your Event</string>
+    <string name="event_creation_start_new_event">Create a new event</string>
+    <string name="event_creation_start_title">Set Up Your Event</string>
+    <string name="event_creation_time_not_selected">Time not set</string>
     <string name="detailview_event_title">Event Title</string>
     <string name="detailview_cuisine_name">Cuisine</string>
     <string name="detailview_distance">Distance</string>
@@ -36,4 +36,8 @@
     <string name="detailview_book_prompt">Like what you see?</string>
     <string name="search_results_title">Search results</string>
     <string name="search_again">Search again</string>
+
+    <!--latitude/longitude tags-->
+    <item name="latitude" type="id" />
+    <item name="longitude" type="id" />
 </resources>
