@@ -1,14 +1,13 @@
 package com.arnauds_squadron.eatup;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.arnauds_squadron.eatup.models.Event;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -18,7 +17,6 @@ import butterknife.ButterKnife;
 
 public class LoginActivity extends AppCompatActivity {
 
-    Event event;
     @BindView(R.id.etUsername)
     EditText etUsername;
     @BindView(R.id.etPassword)
@@ -36,11 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
-            //do stuff with the user
-            Log.d("LoginActivity", "Login Successful");
-            final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            goToMainActivity();
         }
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,11 +57,7 @@ public class LoginActivity extends AppCompatActivity {
     private void login(final String username, String password) {
         ParseUser.becomeInBackground("session-token-here", new LogInCallback() {
             public void done(ParseUser user, ParseException e) {
-                if (user != null) {
-                    user = ParseUser.getCurrentUser();
-                    event.setHost(user);
-
-                } else {
+                if(user == null) {
                     Log.e("LoginActivity", "Unknown user");
                 }
             }
@@ -80,12 +70,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (currentUser != null) {
                         name = username;
                         user.setUsername(username);
-                        event.setHost(currentUser);
-                        //do stuff with the user
-                        Log.d("LoginActivity", "Login Successful");
-                        final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        goToMainActivity();
                     }
 
                 } else {
@@ -94,8 +79,13 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-        final Intent i = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(i);
+    }
+
+    private void goToMainActivity() {
+        Log.d("LoginActivity", "Login Successful");
+        final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 }
