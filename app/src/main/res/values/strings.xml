@@ -37,6 +37,9 @@
     <string name="detailview_book_prompt">Like what you see?</string>
     <string name="search_results_title">Search results</string>
     <string name="search_again">Search again</string>
+    <string name="event_creation_time_not_selected">Time not set</string>
+    <string name="event_creation_date_not_selected">Date not set</string>
+    <string name="about">About</string>
 
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />

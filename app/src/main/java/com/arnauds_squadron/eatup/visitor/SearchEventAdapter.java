@@ -17,7 +17,6 @@ import com.arnauds_squadron.eatup.EventDetailsActivity;
 import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -27,7 +26,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static java.security.AccessController.getContext;
+import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
+import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 
 public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
@@ -106,16 +107,28 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         }
 
         public void bind(Event event) {
+            // TODO account for null fields
             // populate views according to data
             tvEventName.setText(event.getTitle());
             tvCuisine.setText(event.getCuisine());
-            tvHostName.setText(event.getHost().getString(Constants.DISPLAYNAME));
+            tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
             tvHostName.setTag(event.getHost());
-            hostRating.setRating(event.getHost().getNumber(Constants.AVERAGE_RATING).floatValue());
+
+            // load user rating
+            Number rating = event.getHost().getNumber(AVERAGE_RATING);
+            if (rating != null) {
+                hostRating.setRating(rating.floatValue());
+
+            }
+            else {
+                // TODO replace with some sort of text field that says "no rating yet"
+                hostRating.setRating(NO_RATING);
+                Log.d("SearchEventAdapter", "no host rating yet");
+            }
             // TODO return distance between the current location and restaurant using Yelp API
             // tvDistance.setText("");
 
-            // TODO set rating bar, cuisine
+            // TODO set \cuisine
             ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)

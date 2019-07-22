@@ -80,7 +80,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
-            // TODO implement search functionality
+            // TODO implement additional search functionality
             // doMySearch(query);
         }
         // otherwise called by a click on the location in VisitorFragment
@@ -89,7 +89,7 @@ public class VisitorSearchActivity extends AppCompatActivity {
             Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
             ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
             searchByDistance(location);
-            // TODO implement search functionality
+            // TODO implement additional search functionality
             // doMySearch(query);
         }
 

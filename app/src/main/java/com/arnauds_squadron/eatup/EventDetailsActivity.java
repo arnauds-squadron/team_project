@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -20,6 +19,10 @@ import com.parse.ParseQuery;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
+import static com.arnauds_squadron.eatup.utils.Constants.BIO;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
@@ -70,10 +73,10 @@ public class EventDetailsActivity extends AppCompatActivity {
                     // TODO add calculation for distance from the user
                     // tvDistance.setText();
                     // TODO add text
-                    tvHostName.setText(event.getHost().getString(Constants.DISPLAYNAME));
-                    tvHostDescription.setText(event.getHost().getString(Constants.HOST_BIO));
+                    tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
+                    tvHostDescription.setText(event.getHost().getString(BIO));
 
-                    hostRating.setRating(event.getHost().getNumber(Constants.AVERAGE_RATING).floatValue());
+                    hostRating.setRating(event.getHost().getNumber(AVERAGE_RATING).floatValue());
 
                     // TODO add recyclerview for multiple event images
                     ParseFile eventImage = event.getEventImage();
