@@ -1,6 +1,5 @@
 package com.arnauds_squadron.eatup.home;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -15,12 +14,9 @@ import android.widget.TextView;
 import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.User;
 import com.bumptech.glide.Glide;
-import com.google.gson.JsonArray;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
-import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,10 +27,8 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class HomeDetailsActivity extends AppCompatActivity {
@@ -136,7 +130,6 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent i = new Intent(HomeDetailsActivity.this, ProfileActivity.class);
-//                        i.putExtra(Event.class.getSimpleName(), parcels)
                         startActivity(i);
                     }
                 });
