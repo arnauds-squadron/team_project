@@ -14,7 +14,7 @@ public class UIHelper {
     public final static float DEFAULT_MAP_ZOOM_LEVEL = 15;
 
     // Shows name of restaurant if it's decently well known
-    public final static float DETAILED_MAP_ZOOM_LEVEL = 19;
+    public final static float DETAILED_MAP_ZOOM_LEVEL = 18;
 
     /**
      * Given an activity context and a view, it will hide the soft Android keyboard from that view
