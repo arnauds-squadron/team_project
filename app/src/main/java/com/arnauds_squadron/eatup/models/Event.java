@@ -1,25 +1,18 @@
 package com.arnauds_squadron.eatup.models;
 
-import android.app.Activity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +26,7 @@ public class Event extends ParseObject {
     private static final String KEY_TITLE = "title";
     private static final String KEY_HOST = "host";
     private static final String KEY_ADDRESS = "address";
+    private static final String KEY_ADDRESS_STRING = "addressString";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_FOOD_TYPE = "foodType";
     private static final String KEY_TAGS = "tags";
@@ -88,6 +82,14 @@ public class Event extends ParseObject {
 
     public void setAddress(ParseGeoPoint address) {
         put(KEY_ADDRESS, address);
+    }
+
+    public String getAddressString() {
+        return getString(KEY_ADDRESS_STRING);
+    }
+
+    public void setAddressString(String address) {
+        put(KEY_ADDRESS_STRING, address);
     }
 
     public String getDescription() {
@@ -192,8 +194,7 @@ public class Event extends ParseObject {
             public void done(ParseException e) {
                 if (e == null) {
                     Log.d("createRequest", "RSVP requested");
-                }
-                else {
+                } else {
                     Log.d("createRequest", "Error in making request. Try again.");
                 }
             }
@@ -201,10 +202,10 @@ public class Event extends ParseObject {
     }
 
     public Boolean checkRequest(ParseUser user, Event event) {
-        if(event.getAllRequests() != null) {
+        if (event.getAllRequests() != null) {
             List<ParseUser> userRequests = event.getAllRequests();
-            for(int i = 0; i < userRequests.size(); i++) {
-                if(userRequests.get(i) == user) {
+            for (int i = 0; i < userRequests.size(); i++) {
+                if (userRequests.get(i) == user) {
                     return true;
                 }
             }

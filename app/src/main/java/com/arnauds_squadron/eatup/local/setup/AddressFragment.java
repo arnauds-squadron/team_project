@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.utils.UIHelper;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,9 +36,6 @@ import butterknife.OnClick;
 public class AddressFragment extends Fragment implements OnMapReadyCallback {
     private final static String TAG = "AddressFragment";
 
-    // 1-19
-    private final static Float ZOOM_LEVEL = 15f;
-
     // The listener that communicates to the LocalFragment to update the address when
     // the user hits the next button
     private OnFragmentInteractionListener mListener;
@@ -47,7 +45,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
 
     // The place that the user selects after searching for its address
     private Place selectedPlace;
-
 
     public static AddressFragment newInstance() {
         Bundle args = new Bundle();
@@ -68,7 +65,7 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_event_address, container, false);
         ButterKnife.bind(this, view);
 
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
         setupAutoCompleteFragment();
         initializePlaces(); // initialize the places sdk
         mapFragment.getMapAsync(this); // update the map
@@ -102,7 +99,8 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
             // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user.location.latlng, 1));
         } else {
             mMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(selectedPlace.getLatLng(), ZOOM_LEVEL));
+                    CameraUpdateFactory.newLatLngZoom(selectedPlace.getLatLng(),
+                            UIHelper.DEFAULT_MAP_ZOOM_LEVEL));
 
             mMap.addMarker(new MarkerOptions()
                     .position(selectedPlace.getLatLng())
@@ -134,7 +132,8 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         } else {
             double latitude = selectedPlace.getLatLng().latitude;
             double longitude = selectedPlace.getLatLng().longitude;
-            mListener.updateAddress(new ParseGeoPoint(latitude, longitude));
+            mListener.updateAddress(new ParseGeoPoint(latitude, longitude),
+                    selectedPlace.getAddress());
         }
     }
 
@@ -155,14 +154,15 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
             initializePlaces();
         }
 
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+        final AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         autocompleteFragment.setHint("Address");
         autocompleteFragment.setPlaceFields(Arrays.asList(
                 Place.Field.ID,
                 Place.Field.NAME,
-                Place.Field.LAT_LNG));
+                Place.Field.LAT_LNG,
+                Place.Field.ADDRESS));
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -185,6 +185,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
          * Method called in the parent to update the event object to have the user's selected
          * address, and to switch to the next setup fragment
          */
-        void updateAddress(ParseGeoPoint address);
+        void updateAddress(ParseGeoPoint address, String addressString);
     }
 }

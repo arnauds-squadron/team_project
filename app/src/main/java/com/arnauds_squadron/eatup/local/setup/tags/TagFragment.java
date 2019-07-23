@@ -36,9 +36,11 @@ public class TagFragment extends Fragment {
     @BindView(R.id.lvTagList)
     ListView lvTagList;
 
+    // Helpful variable to access the context
     private Activity activity;
-
+    // List of tags selected by the user
     private List<String> tagList;
+    // Adapter instance to handle adding tag items to the ListView
     private TagAdapter tagAdapter;
 
     public static TagFragment newInstance() {
@@ -103,13 +105,13 @@ public class TagFragment extends Fragment {
      * Called in onCreate to bind the this child fragment to its parent, so the listener
      * can be used
      *
-     * @param fragment The parent fragment
+     * @param parent The parent fragment
      */
-    public void onAttachToParentFragment(Fragment fragment) {
+    public void onAttachToParentFragment(Fragment parent) {
         try {
-            mListener = (OnFragmentInteractionListener) fragment;
+            mListener = (OnFragmentInteractionListener) parent;
         } catch (ClassCastException e) {
-            throw new ClassCastException(fragment.toString() + " must implement the interface");
+            throw new ClassCastException(parent.toString() + " must implement the interface");
         }
     }
 
@@ -127,15 +129,22 @@ public class TagFragment extends Fragment {
         mListener.updateTags(tagList);
     }
 
+    /**
+     * Adds the tag selected by the user in the Autocomplete TextView to the tag list
+     * Only adds a tag if the value is not empty and has not already been selected
+     */
     private void addTag() {
         String newTag = tvEventFoodType.getText().toString().trim();
-        if (!tagList.contains(newTag)) {
+        if (newTag.isEmpty()) {
+            Toast.makeText(activity, "Select a tag or make your own!", Toast.LENGTH_SHORT)
+                    .show();
+        } else if (tagList.contains(newTag)) {
+            Toast.makeText(activity, String.format("Can't add the '%s' tag again", newTag),
+                    Toast.LENGTH_SHORT).show();
+        } else {
             tagList.add(newTag);
             tagAdapter.notifyDataSetChanged();
             tvEventFoodType.setText("");
-        } else {
-            Toast.makeText(getActivity(), String.format("Can't add the '%s' tag again", newTag),
-                    Toast.LENGTH_SHORT).show();
         }
     }
 

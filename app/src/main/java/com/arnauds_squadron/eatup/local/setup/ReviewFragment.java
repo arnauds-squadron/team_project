@@ -11,6 +11,14 @@ import android.widget.TextView;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
+import com.arnauds_squadron.eatup.utils.UIHelper;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,12 +27,15 @@ import butterknife.OnClick;
 /**
  * Fragment that displays all the selected fields and will create the event when confirmed
  */
-public class ReviewFragment extends Fragment {
+public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
     private OnFragmentInteractionListener mListener;
 
     @BindView(R.id.tvCuisine)
     TextView tvCuisine;
+
+    @BindView(R.id.tvAddress)
+    TextView tvAddress;
 
     @BindView(R.id.tvSelectedDate)
     TextView tvSelectedDate;
@@ -96,13 +107,36 @@ public class ReviewFragment extends Fragment {
     }
 
     /**
-     * Initalize all the textviews and details of the current event
+     * Initialize all the TextViews and details of the current event
      */
     private void initializeViews() {
         tvCuisine.setText(event.getCuisine());
+        tvAddress.setText(event.getAddressString());
         tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
         tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));
 
+        SupportMapFragment mapFragment = (SupportMapFragment)
+                getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(this); // update the map
+    }
+
+    /**
+     * Called whenever getMapAsync() is called, and sets up the map
+     * @param googleMap The map obtained from the maps API
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng eventLocation = new LatLng(event.getAddress().getLatitude(),
+                event.getAddress().getLongitude());
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
+                UIHelper.DETAILED_MAP_ZOOM_LEVEL));
+
+        googleMap.addMarker(new MarkerOptions()
+                .position(eventLocation)
+                .title(event.getTitle())
+                .snippet("snippet")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
     }
 
     public interface OnFragmentInteractionListener {

@@ -45,9 +45,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onPageSelected(int index) {
                 if (index != 0) { // switched to a fragment other than the local fragment
                     LocalFragment localFragment = getLocalFragment();
-//                    if (localFragment != null) {
-//                        localFragment.resetSetupViewPager();
-//                    }
+                    if (localFragment != null) {
+                        localFragment.resetSetupViewPager();
+                    }
                 }
             }
 
@@ -62,19 +62,19 @@ public class MainActivity extends AppCompatActivity implements
         // Set home fragment as the first screen
         viewPager.setCurrentItem(1);
 
-        // TODO: change visitor meal icon
-        // Set icons to each tab
+        // TODO: change visitor meal icon, profile icon, and chat icon
         int[] icons = {
+                R.drawable.chat_icon,
                 R.drawable.host_create_tab,
                 R.drawable.home_tab,
                 R.drawable.visitor_meal_tab,
+                R.drawable.profile_icon
         };
 
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(icons[i]);
         }
 
-        // Setup autocomplete
         Places.initialize(getApplicationContext(), getString(R.string.google_api_key));
     }
 
