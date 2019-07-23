@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.EventDetailsActivity;
+import com.arnauds_squadron.eatup.EventDetailsTest;
 import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
@@ -158,7 +159,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                 Log.d("eventAdapter", "View event details");
                 Event event = events.get(position);
 
-                Intent intent = new Intent(context, EventDetailsActivity.class);
+                Intent intent = new Intent(context, EventDetailsTest.class);
                 intent.putExtra("event_id", event.getObjectId());
                 context.startActivity(intent);
             }

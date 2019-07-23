@@ -7,20 +7,20 @@
     tools:context=".EventDetailsTest">
 
     <TextView
-    android:id="@+id/tvEventTitle"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="24dp"
-    android:layout_marginLeft="24dp"
-    android:layout_marginTop="18dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginRight="16dp"
-    android:text="@string/detailview_event_title"
-    android:textSize="18sp"
-    android:textStyle="bold"
-    app:layout_constraintEnd_toStartOf="@+id/tvCuisine"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/tvEventTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="@string/detailview_event_title"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/tvCuisine"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 <Button
     android:id="@+id/btRequest"
@@ -37,26 +37,28 @@
     app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-    android:id="@+id/tvCuisine"
-    android:layout_width="wrap_content"
-    android:layout_height="0dp"
-    android:layout_marginTop="18dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginRight="16dp"
-    android:text="@string/detailview_cuisine_name"
-    app:layout_constraintEnd_toStartOf="@+id/tvDistance"
-    app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/tvCuisine"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="@string/detailview_cuisine_name"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/tvDistance"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-    android:id="@+id/tvDistance"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="18dp"
-    android:layout_marginEnd="24dp"
-    android:layout_marginRight="24dp"
-    android:text="@string/detailview_distance"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/tvDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
+        android:text="@string/detailview_distance"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 <TextView
     android:id="@+id/tvBookPrompt"
@@ -75,11 +77,10 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvEventDetails"
-        android:layout_width="395dp"
-        android:layout_height="560dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:clipToPadding="false"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="16dp"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         app:layout_constraintBottom_toTopOf="@+id/tvBookPrompt"

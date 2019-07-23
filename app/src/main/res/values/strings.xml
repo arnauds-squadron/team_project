@@ -35,7 +35,7 @@
     <string name="detailview_description_title">About</string>
     <string name="detailview_description">Bio content</string>
     <string name="detailview_book_prompt">Like what you see?</string>
-    <string name="detailview_location_title">Location</string>
+    <string name="detailview_location_title">Where it\'s at</string>
     <string name="detailview_location_name">Restaurant Name</string>
     <string name="detailview_address">Address</string>
     <string name="detailview_phone">Phone</string>
@@ -45,7 +45,6 @@
     <string name="about">About</string>
     <string name="no_bio">This user hasn\'t set a bio</string>
     <string name="num_ratings">numRatings</string>
-
 
 
     <!--latitude/longitude tags-->

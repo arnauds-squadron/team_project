@@ -21,7 +21,8 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".EventDetailsTest"></activity>
+        <activity android:name=".EventDetailsRestaurantActivity"></activity>
+        <activity android:name=".EventDetailsTest" />
         <activity android:name=".SignupActivity" />
         <activity android:name=".ProfileActivity" />
 

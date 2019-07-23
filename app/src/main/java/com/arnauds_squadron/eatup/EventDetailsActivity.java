@@ -78,8 +78,6 @@ public class EventDetailsActivity extends AppCompatActivity {
                     tvHostDescription.setText(event.getHost().getString(BIO));
 
                     hostRating.setRating(event.getHost().getNumber(AVERAGE_RATING).floatValue());
-
-                    // TODO add recyclerview for multiple event images
                     ParseFile eventImage = event.getEventImage();
                     if (eventImage != null) {
                         Glide.with(getApplicationContext())
