@@ -53,10 +53,6 @@ public class HomeFragment extends Fragment {
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
 
-    @Nullable
-    @BindView(R.id.btnProfile)
-    Button profile;
-
     public static HomeFragment newInstance() {
         Bundle args = new Bundle();
         HomeFragment fragment = new HomeFragment();
@@ -92,15 +88,6 @@ public class HomeFragment extends Fragment {
         homeAdapter = new HomeAdapter(agenda);
         rvAgenda.setAdapter(homeAdapter);
 
-        final ParseUser user = ParseUser.getCurrentUser();
-        profile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getActivity(), ProfileActivity.class);
-                i.putExtra("user", Parcels.wrap(user));
-                startActivity(i);
-            }
-        });
         //ivProfile.setParseFile(user.getParseFile("profilePicture"));
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

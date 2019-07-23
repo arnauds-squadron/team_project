@@ -36,12 +36,7 @@ import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
 
 public class ProfileActivity extends AppCompatActivity {
-
-    private String photoFileName = "photo.jpg";
-    private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    public final String APP_TAG = "Eat Up";
     ParseUser user;
-    File photoFile;
     @BindView(R.id.ivProfile)
     ImageView ivProfile;
     @BindView(R.id.tvUsername)
@@ -54,8 +49,6 @@ public class ProfileActivity extends AppCompatActivity {
     TextView tvRatings;
     @BindView(R.id.ratingBar)
     RatingBar ratingBar;
-    @BindView(R.id.btnNewProfileImage)
-    Button btnNewProfileImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,18 +77,6 @@ public class ProfileActivity extends AppCompatActivity {
                     .centerCrop()
                     .into(ivProfile);
         }
-
-        if(user.getUsername().equals(ParseUser.getCurrentUser().toString())) {
-            btnNewProfileImage.setVisibility(View.VISIBLE);
-            btnNewProfileImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onLaunchCamera();
-                }
-            });
-        } else {
-            btnNewProfileImage.setVisibility(View.GONE);
-        }
         String username = user.getUsername();
         if(user.getUsername() != null) {
             tvUsername.setText(username);
@@ -110,34 +91,5 @@ public class ProfileActivity extends AppCompatActivity {
         else {
             tvBio.setText(R.string.no_bio);
         }
-    }
-    public void onLaunchCamera() {
-        // create Intent to take a picture and return control to the calling application
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Create a File reference to access to future access
-        photoFile = getPhotoFileUri(photoFileName);
-        Uri fileProvider = FileProvider.getUriForFile(ProfileActivity.this, "com.codepath.fileprovider", photoFile);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
-
-        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-        // So as long as the result is not null, it's safe to use the intent.
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            // Start the image capture intent to take photo
-            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-        }
-    }
-    public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
-        File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-            Log.d(APP_TAG, "failed to create directory");
-        }
-        // Return the file target for the photo based on filename
-        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
-        return file;
     }
 }
