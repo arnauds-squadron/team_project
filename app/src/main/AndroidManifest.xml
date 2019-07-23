@@ -22,7 +22,7 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
         <activity android:name=".EventDetailsRestaurantActivity"></activity>
-        <activity android:name=".EventDetailsTest" />
+        <activity android:name=".EventDetailsActivity" />
         <activity android:name=".SignupActivity" />
         <activity android:name=".ProfileActivity" />
 
@@ -35,7 +35,6 @@
             android:value="@string/google_api_key" />
 
         <activity android:name=".home.HomeDetailsActivity" />
-        <activity android:name=".EventDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
         <activity android:name=".visitor.VisitorSearchActivity">
             <intent-filter>

@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup.visitor;
+package com.arnauds_squadron.eatup;
 
 import android.app.Activity;
 import android.content.Context;

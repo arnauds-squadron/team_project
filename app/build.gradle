@@ -58,4 +58,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:11.8.0'
     //swipe refresh
     //implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+
+    // page indicator for recyclerview
+    implementation 'com.ryanjeffreybrooks:indefinitepagerindicator:1.0.10'
 }

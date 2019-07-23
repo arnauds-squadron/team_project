@@ -1,35 +1,31 @@
 package com.arnauds_squadron.eatup;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PagerSnapHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.models.Event;
-import com.bumptech.glide.Glide;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
-import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
-import static com.arnauds_squadron.eatup.utils.Constants.BIO;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
-    // TODO allow user to click through details about the host
     // TODO sliding view to let user view details of the restaurant from the yelp API
-    // TODO styling - add progress bar for background network tasks
+    // TODO add calculation for distance from the user
 
     @BindView(R.id.tvEventTitle)
     TextView tvEventTitle;
@@ -37,19 +33,14 @@ public class EventDetailsActivity extends AppCompatActivity {
     TextView tvCuisine;
     @BindView(R.id.tvDistance)
     TextView tvDistance;
-    @BindView(R.id.ivEventImage)
-    ImageView ivEventImage;
-    @BindView(R.id.tvHostName)
-    TextView tvHostName;
-    @BindView(R.id.hostRating)
-    RatingBar hostRating;
-    @BindView(R.id.tvHostDescriptionTitle)
-    TextView tvHostDescription;
+    @BindView(R.id.rvEventDetails)
+    RecyclerView rvEventDetails;
     @BindView(R.id.btRequest)
     Button btRequest;
 
     private String eventId;
     private Event currentEvent;
+    private EventDetailsAdapter eventDetailsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,22 +60,21 @@ public class EventDetailsActivity extends AppCompatActivity {
             public void done(final Event event, ParseException e) {
                 if (e == null) {
                     currentEvent = event;
+                    eventDetailsAdapter = new EventDetailsAdapter(EventDetailsActivity.this, event, rvEventDetails);
+                    SnapHelper pagerSnapHelper = new PagerSnapHelper();
+                    pagerSnapHelper.attachToRecyclerView(rvEventDetails);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1, GridLayoutManager.HORIZONTAL, false);
+                    rvEventDetails.setLayoutManager(gridLayoutManager);
+                    rvEventDetails.setAdapter(eventDetailsAdapter);
+
+                    IndefinitePagerIndicator indefinitePagerIndicator = findViewById(R.id.recyclerview_pager_indicator);
+                    indefinitePagerIndicator.attachToRecyclerView(rvEventDetails);
+
                     tvEventTitle.setText(event.getTitle());
                     tvCuisine.setText(event.getCuisine());
-                    // TODO add calculation for distance from the user
-                    // tvDistance.setText();
-                    // TODO add text
-                    tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
-                    tvHostDescription.setText(event.getHost().getString(BIO));
 
-                    hostRating.setRating(event.getHost().getNumber(AVERAGE_RATING).floatValue());
-                    ParseFile eventImage = event.getEventImage();
-                    if (eventImage != null) {
-                        Glide.with(getApplicationContext())
-                                .load(event.getEventImage().getUrl())
-                                .into(ivEventImage);
                     }
-                } else {
+                else {
                     e.printStackTrace();
                 }
             }
@@ -97,23 +87,13 @@ public class EventDetailsActivity extends AppCompatActivity {
         Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
         // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
         // otherwise, create request/add to "allRequests" and send back to home screen
-        if(currentEvent.checkRequest(ParseUser.getCurrentUser(), currentEvent)) {
+        if (currentEvent.checkRequest(ParseUser.getCurrentUser(), currentEvent)) {
             Toast.makeText(this, "RSVP already requested", Toast.LENGTH_SHORT).show();
         } else {
             currentEvent.createRequest(ParseUser.getCurrentUser(), currentEvent);
             Toast.makeText(this, "RSVP requested", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-    @OnClick(R.id.tvHostName)
-    public void viewUserProfile() {
-        Intent i = new Intent(EventDetailsActivity.this, ProfileActivity.class);
-        i.putExtra("user", currentEvent.getHost());
-        startActivity(i);
-    }
-
-
 
     //    private void logoutUser() {
 //        ParseUser.logOut();
@@ -124,6 +104,4 @@ public class EventDetailsActivity extends AppCompatActivity {
 //        startActivity(i);
 //        finish();
 //    }
-
 }
-

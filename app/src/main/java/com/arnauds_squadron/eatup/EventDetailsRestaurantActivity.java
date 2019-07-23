@@ -54,7 +54,7 @@ public class EventDetailsRestaurantActivity extends AppCompatActivity {
                     .centerCrop()
                     .into(ivEventImage);
         }
-        // TODO get rating and restaurant name
+        // TODO get all restaurant information from database and query to Yelp API
 
         // load restaurant rating
 //        Number rating = user.getNumber(AVERAGE_RATING);
