@@ -97,7 +97,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvHostName" />
 
     <TextView
-        android:id="@+id/tvDescriptionTitle"
+        android:id="@+id/tvHostDescriptionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -109,7 +109,7 @@
         app:layout_constraintTop_toBottomOf="@+id/hostRating" />
 
     <TextView
-        android:id="@+id/tvHostDescription"
+        android:id="@+id/tvHostDescriptionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -117,7 +117,7 @@
         android:layout_marginTop="4dp"
         android:text="@string/detailview_description"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDescriptionTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvHostDescriptionTitle" />
 
     <TextView
         android:id="@+id/tvDistance"

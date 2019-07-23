@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.EventDetailsActivity;
+import com.arnauds_squadron.eatup.EventDetailsTest;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
@@ -92,7 +93,7 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
                 Log.d("BrowseEventAdapter", "View Event Details");
                 Event event = events.get(position);
 
-                Intent intent = new Intent(context, EventDetailsActivity.class);
+                Intent intent = new Intent(context, EventDetailsTest.class);
                 intent.putExtra("event_id", event.getObjectId());
                 context.startActivity(intent);
             }

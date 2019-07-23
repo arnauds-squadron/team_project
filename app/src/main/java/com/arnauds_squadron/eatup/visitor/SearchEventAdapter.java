@@ -17,7 +17,6 @@ import com.arnauds_squadron.eatup.EventDetailsActivity;
 import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.User;
 import com.bumptech.glide.Glide;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -120,8 +119,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                         event.createRequest(ParseUser.getCurrentUser(), event);
                         Toast.makeText(context, "RSVP requested", Toast.LENGTH_SHORT).show();
                     }
-
-                    // TODO send user back to the refreshed home screen with the reservation request showing
                 }
             });
 
