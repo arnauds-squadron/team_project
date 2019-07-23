@@ -54,10 +54,7 @@ public class DateFragment extends Fragment {
     private boolean timeSet;
 
     public static DateFragment newInstance() {
-        Bundle args = new Bundle();
-        DateFragment fragment = new DateFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new DateFragment();
     }
 
     @Override

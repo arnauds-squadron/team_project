@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,26 +28,22 @@ import butterknife.OnClick;
  * Fragment that asks the user to input the cuisine of the restaurant they are visiting or of the
  * food they are cooking.
  */
-public class TagFragment extends Fragment {
+public class ChatDashboardFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    @BindView(R.id.tvEventFoodType)
-    AutoCompleteTextView tvEventFoodType;
+    @BindView(R.id.rvChats)
+    RecyclerView rvChats;
 
-    @BindView(R.id.lvTagList)
-    ListView lvTagList;
+    // List of the different active conversations
+    private List<String> chatList;
 
-    // Helpful variable to access the context
-    private Activity activity;
-    // List of tags selected by the user
-    private List<String> tagList;
     // Adapter instance to handle adding tag items to the ListView
-    private TagAdapter tagAdapter;
+    private ChatDashboardAdapter chatAdapter;
 
-    public static TagFragment newInstance() {
+    public static ChatDashboardFragment newInstance() {
         Bundle args = new Bundle();
-        TagFragment fragment = new TagFragment();
+        ChatDashboardFragment fragment = new ChatDashboardFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,38 +57,12 @@ public class TagFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_event_tags, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat_dashboard, container, false);
         ButterKnife.bind(this, view);
 
-        activity = getActivity();
-        // TODO: move array of food types to a server
-        ArrayAdapter adapter = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.food_types));
-
-        tvEventFoodType.setAdapter(adapter);
-        tvEventFoodType.setThreshold(1); // show results after one letter
-
-        // Show the dropdown of cuisines once the user selects the view
-        tvEventFoodType.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                tvEventFoodType.showDropDown();
-            }
-        });
-
-        // Add the item if they select a preset
-        tvEventFoodType.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                addTag();
-                tvEventFoodType.showDropDown();
-            }
-        });
-
-        // Set tag list adapter
-        tagList = new ArrayList<>();
-        tagAdapter = new TagAdapter(activity, tagList);
-        lvTagList.setAdapter(tagAdapter);
+        chatList = new ArrayList<>();
+        chatAdapter = new ChatDashboardAdapter(getActivity(), chatList);
+        rvChats.setAdapter(chatAdapter);
 
         return view;
     }

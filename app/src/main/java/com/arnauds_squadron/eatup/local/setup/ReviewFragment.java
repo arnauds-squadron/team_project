@@ -46,10 +46,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     private Event event;
 
     public static ReviewFragment newInstance() {
-        Bundle args = new Bundle();
-        ReviewFragment fragment = new ReviewFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new ReviewFragment();
     }
 
     @Override

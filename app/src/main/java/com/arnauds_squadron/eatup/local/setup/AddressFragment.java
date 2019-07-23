@@ -47,10 +47,7 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     private Place selectedPlace;
 
     public static AddressFragment newInstance() {
-        Bundle args = new Bundle();
-        AddressFragment fragment = new AddressFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new AddressFragment();
     }
 
     @Override

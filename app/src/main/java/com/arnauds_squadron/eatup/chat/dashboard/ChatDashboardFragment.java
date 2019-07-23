@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup.chat.dashboard;
+package com.arnauds_squadron.eatup.chat;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,14 +14,14 @@ import butterknife.ButterKnife;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ChatDashboardFragment#newInstance} factory method to
+ * Use the {@link ChatFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatDashboardFragment extends Fragment {
+public class ChatFragment extends Fragment {
 
-    public static ChatDashboardFragment newInstance() {
+    public static ChatFragment newInstance() {
         Bundle args = new Bundle();
-        ChatDashboardFragment fragment = new ChatDashboardFragment();
+        ChatFragment fragment = new ChatFragment();
         fragment.setArguments(args);
         return fragment;
     }

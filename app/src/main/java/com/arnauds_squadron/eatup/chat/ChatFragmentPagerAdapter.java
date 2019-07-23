@@ -1,14 +1,10 @@
-package com.arnauds_squadron.eatup.navigation;
+package com.arnauds_squadron.eatup.local.setup;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.arnauds_squadron.eatup.local.setup.AddressFragment;
-import com.arnauds_squadron.eatup.local.setup.DateFragment;
-import com.arnauds_squadron.eatup.local.setup.tags.TagFragment;
-import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
-import com.arnauds_squadron.eatup.local.setup.StartFragment;
+import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 
 /**
  * Pager Adapter to handle all the setup fragments we need to create an event
@@ -30,7 +26,7 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
         if(position == 0)
             return StartFragment.newInstance();
         if(position == 1)
-            return TagFragment.newInstance();
+            return TagsFragment.newInstance();
         if (position == 2)
             return AddressFragment.newInstance();
         if (position == 3)
