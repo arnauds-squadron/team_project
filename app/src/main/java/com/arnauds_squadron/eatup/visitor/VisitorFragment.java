@@ -28,7 +28,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +65,10 @@ import butterknife.Unbinder;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER;
 import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -84,6 +91,8 @@ public class VisitorFragment extends Fragment {
     TextView tvPrevLocation1;
     @BindView(R.id.tvPrevLocation2)
     TextView tvPrevLocation2;
+    @BindView(R.id.searchSpinner)
+    Spinner searchSpinner;
 
 
     private Unbinder unbinder;
@@ -104,6 +113,8 @@ public class VisitorFragment extends Fragment {
 
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
+
+    private String searchCategory;
 
     public static VisitorFragment newInstance() {
         Bundle args = new Bundle();
@@ -193,8 +204,48 @@ public class VisitorFragment extends Fragment {
         // TODO tag previous locations with latitude and longitude. default (0, 0)
         tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
         tvPrevLocation2.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
-    }
 
+        // initialize spinner for search filtering
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.search_categories, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        searchSpinner.setAdapter(adapter);
+        searchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            // when item selected, bring user to the new search activity with search bar and search category packaged as intent extra
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch(position) {
+                    // search category hint
+                    case 0:
+                        break;
+                    // user
+                    case 1:
+                        searchCategory = SEARCH_USER;
+                        break;
+                    // cuisine
+                    case 2:
+                        searchCategory = SEARCH_CUISINE;
+                        break;
+                    // location
+                    case 3:
+                        searchCategory = SEARCH_LOCATION;
+                        break;
+                }
+                if(searchCategory != null) {
+//                    Intent i = new Intent(getContext(), VisitorSearchActivity.class);
+//                    i.putExtra(SEARCH_CATEGORY, searchCategory);
+//                    getContext().startActivity(i);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO what does this entail
+            }
+        });
+    }
 
 
     @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1, R.id.tvPrevLocation2})

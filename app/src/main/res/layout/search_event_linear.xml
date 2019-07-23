@@ -32,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <RatingBar
-        android:id="@+id/restaurantRating"
+        android:id="@+id/hostRating"
         style="@style/Widget.AppCompat.RatingBar.Small"
         android:layout_width="81dp"
         android:layout_height="17dp"
@@ -81,7 +81,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/tvRestaurantName"
+        android:id="@+id/tvHostName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
