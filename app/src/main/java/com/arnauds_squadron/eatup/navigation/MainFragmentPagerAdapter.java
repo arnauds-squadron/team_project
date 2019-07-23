@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.arnauds_squadron.eatup.chat.ChatFragment;
+import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardFragment;
 import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.profile.ProfileFragment;
@@ -29,7 +29,7 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0)
-            return ChatFragment.newInstance();
+            return ChatDashboardFragment.newInstance();
         if(position == 1)
             return LocalFragment.newInstance();
         if (position == 2)

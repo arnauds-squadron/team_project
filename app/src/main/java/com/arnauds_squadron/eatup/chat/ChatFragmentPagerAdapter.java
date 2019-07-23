@@ -1,18 +1,18 @@
-package com.arnauds_squadron.eatup.local.setup;
+package com.arnauds_squadron.eatup.chat;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
+import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardFragment;
 
 /**
  * Pager Adapter to handle all the setup fragments we need to create an event
  */
-public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
-    private final int PAGE_COUNT = 5;
+public class ChatFragmentPagerAdapter extends FragmentPagerAdapter {
+    private final int PAGE_COUNT = 2;
 
-    public SetupFragmentPagerAdapter(FragmentManager fm) {
+    public ChatFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -24,15 +24,9 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0)
-            return StartFragment.newInstance();
+            return ChatDashboardFragment.newInstance();
         if(position == 1)
-            return TagsFragment.newInstance();
-        if (position == 2)
-            return AddressFragment.newInstance();
-        if (position == 3)
-            return DateFragment.newInstance();
-        if (position == 4)
-            return ReviewFragment.newInstance();
-        return StartFragment.newInstance();
+            return ChatFragment.newInstance();
+        return ChatDashboardFragment.newInstance();
     }
 }

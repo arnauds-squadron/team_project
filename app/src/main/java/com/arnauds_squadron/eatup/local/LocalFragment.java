@@ -15,10 +15,9 @@ import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.StartFragment;
-import com.arnauds_squadron.eatup.local.setup.tags.TagFragment;
+import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
-import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
@@ -37,7 +36,7 @@ import butterknife.ButterKnife;
 public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
-        TagFragment.OnFragmentInteractionListener,
+        TagsFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener,
         ReviewFragment.OnFragmentInteractionListener {
 
@@ -54,10 +53,7 @@ public class LocalFragment extends Fragment implements
     private Event event;
 
     public static LocalFragment newInstance() {
-        Bundle args = new Bundle();
-        LocalFragment fragment = new LocalFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new LocalFragment();
     }
 
     @Override
@@ -98,7 +94,7 @@ public class LocalFragment extends Fragment implements
 
 
     /**
-     * Overrides the TagFragment interface
+     * Overrides the TagsFragment interface
      *
      * Updates the food type parameter of this fragment's event variable
      */
