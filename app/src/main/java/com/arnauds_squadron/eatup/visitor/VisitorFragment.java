@@ -63,6 +63,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
+import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
@@ -134,7 +135,7 @@ public class VisitorFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // TODO uncomment so can set name of current user
-        // tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
+        tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
         // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source
