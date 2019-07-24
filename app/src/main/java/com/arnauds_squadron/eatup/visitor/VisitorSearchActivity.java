@@ -103,6 +103,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             public boolean onQueryTextSubmit(String query) {
                 int spinnerPosition = searchSpinner.getSelectedItemPosition();
                 if(spinnerPosition != NO_SEARCH) {
+                    mEvents.clear();
+                    eventAdapter.notifyDataSetChanged();
                     Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
                     searchIntent.putExtra(SearchManager.QUERY, query);
                     searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
@@ -131,41 +133,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         searchSpinner.setAdapter(adapter);
         searchSpinner.setOnItemSelectedListener(this);
 
-        // Get the intent, verify the action and get the query
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
-            int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
-            // TODO keep search term in the search bar
-            Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
-            switch(newSearchCategory) {
-                case USER_SEARCH:
-                    userSearch(query);
-                    break;
-                case CUISINE_SEARCH:
-                    loadTopEvents(query);
-                    // TODO get search suggestions of cuisines from the Yelp Search API
-                    break;
-            }
-        }
-        // otherwise called by a click on something in VisitorFragment
-        else {
-            searchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
-            // if not any of the categories, user clicked on current/previous location
-            if (searchCategory == NO_SEARCH) {
-                Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
-                Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
-                ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
-                locationSearch(location);
-            } else if (searchCategory == LOCATION_SEARCH) {
-                startLocationSearchActivity();
-            }
-            else {
-                // display user's choice in the spinner
-                searchSpinner.setSelection(searchCategory);
-            }
-        }
+        // handle search intent
+        handleIntent(getIntent());
 
 /*
         // load data entries
@@ -199,8 +168,49 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 */
     }
 
+    // Get the intent, verify the action and get the query
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
+    }
 
-    // methods for the search category spinner
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+            int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
+            Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
+            switch(newSearchCategory) {
+                case USER_SEARCH:
+                    userSearch(query);
+                    break;
+                case CUISINE_SEARCH:
+                    loadTopEvents(query);
+                    // TODO get search suggestions of cuisines from the Yelp Search API
+                    break;
+            }
+        }
+        // otherwise called by a click on something in VisitorFragment
+        else {
+            searchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
+            // if not any of the categories, user clicked on current/previous location
+            if (searchCategory == NO_SEARCH) {
+                Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
+                Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
+                ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
+                locationSearch(location);
+            } else if (searchCategory == LOCATION_SEARCH) {
+                startLocationSearchActivity();
+            }
+            else {
+                // display user's choice in the spinner
+                searchSpinner.setSelection(searchCategory);
+            }
+        }
+    }
+
+    // Methods for search category spinner
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         searchCategory = pos;
         if(searchCategory == LOCATION_SEARCH) {
@@ -212,7 +222,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // TODO what does this entail
     }
 
-    // search methods
+    // Methods to query parse server
     private void userSearch(String userQuery) {
         // query for user, then query for events containing user
         ParseQuery<ParseUser> query = ParseUser.getQuery();
