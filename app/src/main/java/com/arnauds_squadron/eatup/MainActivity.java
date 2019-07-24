@@ -6,7 +6,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.arnauds_squadron.eatup.chat.MessengerFragment;
+import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
 import com.google.android.libraries.places.api.Places;
 
@@ -16,13 +19,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements
-        LocalFragment.OnFragmentInteractionListener {
+        HomeFragment.OnFragmentInteractionListener,
+        LocalFragment.OnFragmentInteractionListener,
+        MessengerFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.viewPager)
     ViewPager viewPager;
 
     @BindView(R.id.tab_bar)
     TabLayout tabLayout;
+
+    // Chat selected in the HomeFragment, stored to be accessed by the MessengerFragment
+    private Chat chat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout.setupWithViewPager(viewPager);
 
         // Set home fragment as the first screen
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(2);
 
         // TODO: change visitor meal icon, profile icon, and chat icon
         int[] icons = {
@@ -93,9 +101,41 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Overrides the LocalFragment interface
+     *
+     * Switches to the HomeFragment when the user finishes creating the event
+     */
     @Override
     public void switchToHomeFragment() {
         viewPager.setCurrentItem(1);
+    }
+
+    /**
+     * Overrides the HomeFragment interface
+     *
+     * Switches to the MessengerFragment when the user clicks on a chat
+     */
+    @Override
+    public void switchToChatFragment(Chat chat) {
+        this.chat = chat;
+        viewPager.setCurrentItem(0);
+    }
+
+    /**
+     * Overrides the MessengerFragment interface
+     *
+     * Accessor for the chat object, and also DELETES the local chat variable so the
+     * MessengerFragment knows not to directly open a chat again
+     *
+     * @effects Deletes the local copy of the chat
+     * @return The chat object selected through the HomeFragment
+     */
+    @Override
+    public Chat getSelectedChat() {
+        Chat temp = chat;
+        chat = null;
+        return temp;
     }
 
     private LocalFragment getLocalFragment() {

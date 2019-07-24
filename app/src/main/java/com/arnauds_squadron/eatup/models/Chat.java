@@ -8,6 +8,8 @@ import com.parse.ParseUser;
 
 import org.json.JSONArray;
 
+import java.util.List;
+
 @ParseClassName("Chat")
 public class Chat extends ParseObject {
     private static final String KEY_NAME = "name";
@@ -41,6 +43,10 @@ public class Chat extends ParseObject {
 
     public void addMember(ParseUser member) {
         add(KEY_MEMBERS, member);
+    }
+
+    public void addMembers(List<ParseUser> members) {
+        addAll(KEY_MEMBERS, members);
     }
 
     public JSONArray getMessages() {

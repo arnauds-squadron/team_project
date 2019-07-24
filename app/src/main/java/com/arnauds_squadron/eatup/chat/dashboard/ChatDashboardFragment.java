@@ -81,13 +81,13 @@ public class ChatDashboardFragment extends Fragment {
     }
 
     public void openChat(Chat chat) {
-        mListener.setSelectedChat(chat);
+        mListener.openChatFragment(chat);
     }
 
     public interface OnFragmentInteractionListener {
         /**
          * Opens the selected chat in a newly created ChatActivity
          */
-        void setSelectedChat(Chat chat);
+        void openChatFragment(Chat chat);
     }
 }

@@ -22,21 +22,26 @@ import butterknife.ButterKnife;
  */
 public class ChatFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-
     @BindView(R.id.testChat)
     TextView testChat;
 
     private Chat chat;
 
-    public static ChatFragment newInstance() {
-        return new ChatFragment();
+    public static ChatFragment newInstance(Chat chat) {
+        Bundle args = new Bundle();
+        args.putParcelable("chat", chat);
+        ChatFragment fragment = new ChatFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        onAttachToParentFragment(getParentFragment());
+        Bundle bundle = this.getArguments();
+
+        if(bundle != null) // Get the data saved in the newInstance() method
+            chat = bundle.getParcelable("chat");
     }
 
     @Override
@@ -44,6 +49,7 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         ButterKnife.bind(this, view);
+        initializeChat();
         return view;
     }
 
@@ -52,43 +58,9 @@ public class ChatFragment extends Fragment {
     }
 
     /**
-     * Called in onCreate to bind the this child fragment to its parent, so the listener
-     * can be used
-     *
-     * @param parent The parent fragment
+     * Initializes all the views in the ChatFragment after the Chat object is received
      */
-    public void onAttachToParentFragment(Fragment parent) {
-        try {
-            mListener = (OnFragmentInteractionListener) parent;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(parent.toString() + " must implement the interface");
-        }
-    }
-
-    /**
-     * Method to create the date picker only when the date fragment is actually visible
-     * to the users
-     */
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        chat = mListener.getSelectedChat();
-
-
-
-        initializeChat();
-
-    }
-
     private void initializeChat() {
         testChat.setText(chat.getName());
     }
-
-    public interface OnFragmentInteractionListener {
-        /**
-         * Opens the selected chat in a newly created ChatActivity
-         */
-        Chat getSelectedChat();
-    }
-
 }

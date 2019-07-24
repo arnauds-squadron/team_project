@@ -64,8 +64,8 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Method to create the date picker only when the date fragment is actually visible
-     * to the users
+     * Method to only initialize the vies when this fragment is visible (don't initialize views
+     * before the dates are selected)
      */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {

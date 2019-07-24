@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardFragment;
+import com.arnauds_squadron.eatup.models.Chat;
 
 /**
  * Pager Adapter to handle all the setup fragments we need to create an event
@@ -12,7 +13,9 @@ import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardFragment;
 public class ChatFragmentPagerAdapter extends FragmentPagerAdapter {
     private final int PAGE_COUNT = 2;
 
-    public ChatFragmentPagerAdapter(FragmentManager fm) {
+    private Chat chat;
+
+    ChatFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -26,7 +29,11 @@ public class ChatFragmentPagerAdapter extends FragmentPagerAdapter {
         if(position == 0)
             return ChatDashboardFragment.newInstance();
         if(position == 1)
-            return ChatFragment.newInstance();
+            return ChatFragment.newInstance(chat);
         return ChatDashboardFragment.newInstance();
+    }
+
+    public void setChat(Chat chat) {
+        this.chat = chat;
     }
 }

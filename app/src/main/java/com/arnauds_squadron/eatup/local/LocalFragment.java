@@ -194,6 +194,7 @@ public class LocalFragment extends Fragment implements
         setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() + 1);
     }
 
+    //TODO: documentation
     public interface OnFragmentInteractionListener {
         void switchToHomeFragment();
     }

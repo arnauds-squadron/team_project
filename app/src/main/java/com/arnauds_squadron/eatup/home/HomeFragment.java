@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -34,10 +36,13 @@ public class HomeFragment extends Fragment {
 
     private HomeAdapter homeAdapter;
     private Unbinder unbinder;
+    private OnFragmentInteractionListener mListener;
 
-    ArrayList<Event> agenda;
+    private ArrayList<Event> agenda;
+
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeContainer;
+
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
 
@@ -46,15 +51,7 @@ public class HomeFragment extends Fragment {
     ImageView ivProfile;
 
     public static HomeFragment newInstance() {
-        Bundle args = new Bundle();
-        HomeFragment fragment = new HomeFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        return new HomeFragment();
     }
 
     @Override
@@ -64,20 +61,16 @@ public class HomeFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         return view;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // initialize data source
         agenda = new ArrayList<>();
         // construct adapter from data source
-        homeAdapter = new HomeAdapter(agenda);
+        homeAdapter = new HomeAdapter(this, agenda);
         // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvAgenda.setLayoutManager(layoutManager);
-        rvAgenda.setAdapter(homeAdapter);
-
-        rvAgenda = view.findViewById(R.id.rvAgenda);
-        rvAgenda.setLayoutManager(new LinearLayoutManager(getContext()));
-        homeAdapter = new HomeAdapter(agenda);
         rvAgenda.setAdapter(homeAdapter);
 
         // Setup refresh listener which triggers new data loading
@@ -111,6 +104,20 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * Attaches the listener to the MainActivity
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (OnFragmentInteractionListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement the interface");
+        }
+    }
+
     public void fetchTimelineAsync() {
         agenda.clear();
         final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
@@ -131,5 +138,17 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    /**
+     * Called by the HomeAdapter to open an event's chat
+     */
+    public void openChat(Chat chat) {
+        mListener.switchToChatFragment(chat);
+    }
+
+    //TODO: documentation
+    public interface OnFragmentInteractionListener {
+        void switchToChatFragment(Chat chat);
     }
 }
