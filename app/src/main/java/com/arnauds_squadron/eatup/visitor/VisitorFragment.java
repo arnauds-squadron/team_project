@@ -62,14 +62,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
+import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
+import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER;
 import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
+import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 
@@ -83,8 +84,8 @@ public class VisitorFragment extends Fragment {
     TextView tvBrowseTitle;
     @BindView(R.id.rvBrowse)
     RecyclerView rvBrowse;
-    @BindView(R.id.resultsSearchView)
-    SearchView searchView;
+//    @BindView(R.id.resultsSearchView)
+//    SearchView searchView;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
     @BindView(R.id.tvPrevLocation1)
@@ -114,7 +115,7 @@ public class VisitorFragment extends Fragment {
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
 
-    private String searchCategory;
+    private int searchCategoryCode;
 
     public static VisitorFragment newInstance() {
         Bundle args = new Bundle();
@@ -134,7 +135,7 @@ public class VisitorFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // TODO uncomment so can set name of current user
-        // tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
+        tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
         // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source
@@ -194,12 +195,12 @@ public class VisitorFragment extends Fragment {
             }
         };
 
-        // initialize search services
-        // Get the SearchView and set the searchable configuration
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+//        // initialize search services
+//        // Get the SearchView and set the searchable configuration
+//        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+//        // Assumes current activity is the searchable activity
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+//        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 
         // TODO tag previous locations with latitude and longitude. default (0, 0)
         tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
@@ -222,21 +223,22 @@ public class VisitorFragment extends Fragment {
                         break;
                     // user
                     case 1:
-                        searchCategory = SEARCH_USER;
+                        searchCategoryCode = USER_SEARCH;
                         break;
                     // cuisine
                     case 2:
-                        searchCategory = SEARCH_CUISINE;
+                        searchCategoryCode = CUISINE_SEARCH;
                         break;
                     // location
                     case 3:
-                        searchCategory = SEARCH_LOCATION;
+                        searchCategoryCode = LOCATION_SEARCH;
                         break;
                 }
-                if(searchCategory != null) {
-//                    Intent i = new Intent(getContext(), VisitorSearchActivity.class);
-//                    i.putExtra(SEARCH_CATEGORY, searchCategory);
-//                    getContext().startActivity(i);
+                if(searchCategoryCode != 0) {
+                    searchSpinner.setSelection(0);
+                    Intent i = new Intent(getContext(), VisitorSearchActivity.class);
+                    i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
+                    getContext().startActivity(i);
                 }
             }
 
