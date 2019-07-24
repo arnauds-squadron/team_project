@@ -28,6 +28,8 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
         <activity android:name=".ProfileImageActivity"></activity>
+        <activity android:name=".EventDetailsRestaurantActivity"></activity>
+        <activity android:name=".EventDetailsActivity" />
         <activity android:name=".SignupActivity" />
         <activity android:name=".ProfileActivity" />
 
@@ -50,7 +52,6 @@
             android:value="@string/google_api_key" />
 
         <activity android:name=".home.HomeDetailsActivity" />
-        <activity android:name=".EventDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
         <activity android:name=".visitor.VisitorSearchActivity">
             <intent-filter>
@@ -64,17 +65,20 @@
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".visitor.VisitorSearchActivity" />
         </activity>
+             <!--<intent-filter> -->
+             <!--<action android:name="android.intent.action.MAIN" /> -->
+
+
+             <!--<category android:name="android.intent.category.LAUNCHER" /> -->
+             <!--</intent-filter> -->
     </application>
 
 </manifest>

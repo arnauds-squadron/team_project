@@ -15,7 +15,6 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
-import com.parse.ParseUser;
 
 import java.util.List;
 
