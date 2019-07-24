@@ -234,6 +234,7 @@ public class VisitorFragment extends Fragment {
                         break;
                 }
                 if(searchCategoryCode != 0) {
+                    searchSpinner.setSelection(0);
                     Intent i = new Intent(getContext(), VisitorSearchActivity.class);
                     i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
                     getContext().startActivity(i);

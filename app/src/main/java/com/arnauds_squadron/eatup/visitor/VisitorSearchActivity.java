@@ -70,6 +70,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // TODO make searches case insensitive
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_visitor_search);
@@ -110,11 +112,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     startActivity(searchIntent);
                     // clear focus so search doesn't fire twice
                     resultsSearchView.clearFocus();
-                    resultsSearchView.setQuery(query, false);
+                    finish();
                     return true;
                 }
                 else {
-                    // prevent submission if no category selected
+                    // TODO prevent submission if no category selected
                     resultsSearchView.setQuery(query, false);
                     Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
                     return true;
@@ -135,10 +137,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
             int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
             // TODO keep search term in the search bar
-            Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
             switch(newSearchCategory) {
                 case USER_SEARCH:
                     userSearch(query);
@@ -221,7 +221,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             public void done(List<ParseUser> objects, ParseException e) {
                 if (e == null) {
                     if(objects.size() != 0) {
-                        Log.d("VisitorSearchActivity", "found user");
                         ParseUser foundUser = objects.get(0);
                         loadTopEvents(foundUser);
                     } else {
