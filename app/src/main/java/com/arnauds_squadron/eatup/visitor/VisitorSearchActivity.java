@@ -37,11 +37,11 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE_CODE;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_INTENT_CODE;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION_CODE;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER_CODE;
-
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER;
+g
 public class VisitorSearchActivity extends AppCompatActivity {
 
     // initialize adapter, views, scroll listener
@@ -92,27 +92,29 @@ public class VisitorSearchActivity extends AppCompatActivity {
         }
         // otherwise called by a click on something in VisitorFragment
         else {
-            int intentCode = intent.getIntExtra(SEARCH_INTENT_CODE, 0);
-            switch(intentCode) {
+            String searchCategory = intent.getStringExtra(SEARCH_CATEGORY);
+            // selection from dropdown menu in VisitorFragment
+            if(searchCategory != null) {
+                switch (searchCategory) {
+                    case SEARCH_USER:
+                        // TODO implement search by user
+                        Toast.makeText(this, "search by user", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SEARCH_CUISINE:
+                        Toast.makeText(this, "search by cuisine", Toast.LENGTH_SHORT).show();
+                        /// TODO implement search by cuisine
+                        break;
+                    case SEARCH_LOCATION:
+                        Toast.makeText(this, "search by location", Toast.LENGTH_SHORT).show();
+                        // TODO implement search by location. change the search bar or something so can have suggestions by location (similar to events tab)
+                        break;
+                }
+            } else {
                 // called by click on location in VisitorFragment
-                case 0:
-                    Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
-                    Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
-                    ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
-                    searchByDistance(location);
-                    break;
-                case SEARCH_USER_CODE:
-                    // TODO implement search by user
-                    Toast.makeText(this, "search by user", Toast.LENGTH_SHORT).show();
-                    break;
-                case SEARCH_CUISINE_CODE:
-                    Toast.makeText(this, "search by cuisine", Toast.LENGTH_SHORT).show();
-                    /// TODO implement search by cuisine
-                    break;
-                case SEARCH_LOCATION_CODE:
-                    Toast.makeText(this, "search by location", Toast.LENGTH_SHORT).show();
-                    // TODO implement search by location. change the search bar or something so can have suggestions by location (similar to events tab)
-                    break;
+                Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
+                Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
+                ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
+                searchByDistance(location);
             }
         }
 

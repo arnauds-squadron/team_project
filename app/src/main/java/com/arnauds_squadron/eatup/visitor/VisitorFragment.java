@@ -67,12 +67,8 @@ import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE_CODE;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_INTENT_CODE;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION_CODE;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER_CODE;
 import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -119,7 +115,6 @@ public class VisitorFragment extends Fragment {
     private String addressOutput;
 
     private String searchCategory;
-    private int searchCode;
 
     public static VisitorFragment newInstance() {
         Bundle args = new Bundle();
@@ -228,22 +223,18 @@ public class VisitorFragment extends Fragment {
                     // user
                     case 1:
                         searchCategory = SEARCH_USER;
-                        searchCode = SEARCH_USER_CODE;
                         break;
                     // cuisine
                     case 2:
                         searchCategory = SEARCH_CUISINE;
-                        searchCode = SEARCH_CUISINE_CODE;
                         break;
                     // location
                     case 3:
                         searchCategory = SEARCH_LOCATION;
-                        searchCode = SEARCH_LOCATION_CODE;
                         break;
                 }
                 if(searchCategory != null) {
                     Intent i = new Intent(getContext(), VisitorSearchActivity.class);
-                    i.putExtra(SEARCH_INTENT_CODE, searchCode);
                     i.putExtra(SEARCH_CATEGORY, searchCategory);
                     getContext().startActivity(i);
                 }
