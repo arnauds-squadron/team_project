@@ -149,7 +149,8 @@ public class LocalFragment extends Fragment implements
      * fragment
      */
     @Override
-    public void createEvent() {
+    public void createEvent(String eventTitle) {
+        event.setTitle(eventTitle);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {

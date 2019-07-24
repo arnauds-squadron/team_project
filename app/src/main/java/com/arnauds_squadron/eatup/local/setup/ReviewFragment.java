@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
@@ -42,6 +43,9 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
     @BindView(R.id.tvSelectedTime)
     TextView tvSelectedTime;
+
+    @BindView(R.id.etEventTitle)
+    EditText etEventTitle;
 
     private Event event;
 
@@ -100,7 +104,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
-        mListener.createEvent();
+        mListener.createEvent(etEventTitle.getText().toString());
     }
 
     /**
@@ -145,6 +149,6 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         /**
          * Method that triggers the event creation method in the parent fragment
          */
-        void createEvent();
+        void createEvent(String eventTitle);
     }
 }
