@@ -62,14 +62,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
+import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER;
 import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
+import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 
@@ -114,7 +114,7 @@ public class VisitorFragment extends Fragment {
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
 
-    private String searchCategory;
+    private int searchCategoryCode;
 
     public static VisitorFragment newInstance() {
         Bundle args = new Bundle();
@@ -222,20 +222,20 @@ public class VisitorFragment extends Fragment {
                         break;
                     // user
                     case 1:
-                        searchCategory = SEARCH_USER;
+                        searchCategoryCode = USER_SEARCH;
                         break;
                     // cuisine
                     case 2:
-                        searchCategory = SEARCH_CUISINE;
+                        searchCategoryCode = CUISINE_SEARCH;
                         break;
                     // location
                     case 3:
-                        searchCategory = SEARCH_LOCATION;
+                        searchCategoryCode = LOCATION_SEARCH;
                         break;
                 }
-                if(searchCategory != null) {
+                if(searchCategoryCode != 0) {
                     Intent i = new Intent(getContext(), VisitorSearchActivity.class);
-                    i.putExtra(SEARCH_CATEGORY, searchCategory);
+                    i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
                     getContext().startActivity(i);
                 }
             }

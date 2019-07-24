@@ -36,7 +36,8 @@
 
         <activity android:name=".home.HomeDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
-        <activity android:name=".visitor.VisitorSearchActivity">
+        <activity android:name=".visitor.VisitorSearchActivity"
+            android:windowSoftInputMode="stateVisible">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
