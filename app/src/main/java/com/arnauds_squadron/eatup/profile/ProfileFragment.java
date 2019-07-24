@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.LoginActivity;
 import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.ProfileImageActivity;
 import com.arnauds_squadron.eatup.R;
@@ -78,6 +79,8 @@ public class ProfileFragment extends Fragment {
     Button btnSave;
     @BindView(R.id.btnCancel)
     Button btnCancel;
+    @BindView(R.id.ivLogout)
+    ImageView ivLogout;
     @Nullable
     @BindView(R.id.ivProfile)
     ImageView ivProfile;
@@ -162,7 +165,6 @@ public class ProfileFragment extends Fragment {
     }
     @OnClick(R.id.ivEditUsername)
     public void editUsername () {
-        ParseUser user = ParseUser.getCurrentUser();
         tvBio.setVisibility(View.INVISIBLE);
         tvUsername.setVisibility(View.INVISIBLE);
         etUsername.setVisibility(View.VISIBLE);
@@ -176,16 +178,16 @@ public class ProfileFragment extends Fragment {
         //todo make changes update to ParseDashboard
         if (!user.getUsername().equals(etUsername.toString())) {
             if (etUsername.toString().isEmpty()) {
-                user.setUsername(tvUsername.toString());
+                user.setUsername(tvUsername.getText().toString());
             } else {
-                user.setUsername(etUsername.toString());
+                user.setUsername(etUsername.getText().toString());
             }
         }
         if (!etBio.toString().equals(user.getString(BIO))) {
             if (etBio.toString().isEmpty()) {
-                user.put(BIO, tvBio.toString());
+                user.put(BIO, tvBio.getText().toString());
             } else {
-                user.put(BIO, etBio.toString());
+                user.put(BIO, etBio.getText().toString());
             }
         }
         tvUsername.setText(etUsername.getText());
@@ -208,4 +210,10 @@ public class ProfileFragment extends Fragment {
         btnCancel.setVisibility(View.INVISIBLE);
         btnSave.setVisibility(View.INVISIBLE);
     }
+    //todo figure out if this should be a hollywood house
+//    @OnClick(R.id.ivLogout)
+//    public void logout () {
+//        Intent i = new Intent(getActivity(), LoginActivity.class);
+//        startActivity(i);
+//    }
 }

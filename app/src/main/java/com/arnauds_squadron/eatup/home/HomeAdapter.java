@@ -1,9 +1,12 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +16,15 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.parse.Parse;
 import com.parse.ParseImageView;
+import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,10 +48,17 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return viewHolder;
     }
 
+//    @SuppressLint("ResourceType")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
+        Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
         if(event.getDate() != null) {
+            if(event.getDate().before(localCalendar.getTime())) {
+                viewHolder.tvDate.setTextColor(Color.RED);
+            } else {
+                viewHolder.tvDate.setTextColor(Color.BLACK);
+            }
             viewHolder.tvDate.setText(event.getDate().toString());
         }
         if(event.getTitle() != null) {
@@ -54,7 +68,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             viewHolder.ivProfile.setParseFile(event.getEventImage());
             viewHolder.ivProfile.loadInBackground();
         }
- //       viewHolder.tvPlace.setText(event.getAddress());
+//        viewHolder.tvPlace.setText(event.getAddress());
 
     }
 
