@@ -37,6 +37,11 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE_CODE;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_INTENT_CODE;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION_CODE;
+import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER_CODE;
+
 public class VisitorSearchActivity extends AppCompatActivity {
 
     // initialize adapter, views, scroll listener
@@ -78,21 +83,37 @@ public class VisitorSearchActivity extends AppCompatActivity {
         resultsSearchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 
         // Get the intent, verify the action and get the query
+        // TODO modify so can search by category
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
-            // TODO implement additional search functionality
             // doMySearch(query);
         }
-        // otherwise called by a click on the location in VisitorFragment
+        // otherwise called by a click on something in VisitorFragment
         else {
-            Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
-            Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
-            ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
-            searchByDistance(location);
-            // TODO implement additional search functionality
-            // doMySearch(query);
+            int intentCode = intent.getIntExtra(SEARCH_INTENT_CODE, 0);
+            switch(intentCode) {
+                // called by click on location in VisitorFragment
+                case 0:
+                    Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
+                    Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
+                    ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
+                    searchByDistance(location);
+                    break;
+                case SEARCH_USER_CODE:
+                    // TODO implement search by user
+                    Toast.makeText(this, "search by user", Toast.LENGTH_SHORT).show();
+                    break;
+                case SEARCH_CUISINE_CODE:
+                    Toast.makeText(this, "search by cuisine", Toast.LENGTH_SHORT).show();
+                    /// TODO implement search by cuisine
+                    break;
+                case SEARCH_LOCATION_CODE:
+                    Toast.makeText(this, "search by location", Toast.LENGTH_SHORT).show();
+                    // TODO implement search by location. change the search bar or something so can have suggestions by location (similar to events tab)
+                    break;
+            }
         }
 
 /*
@@ -129,7 +150,6 @@ public class VisitorSearchActivity extends AppCompatActivity {
     }
 
     private void searchByDistance(ParseGeoPoint geoPoint) {
-        Toast.makeText(this, "geoPoint successfully created", Toast.LENGTH_SHORT).show();
         final Event.Query eventsQuery = new Event.Query();
         eventsQuery.getClosest(geoPoint).getTop().withHost();
 

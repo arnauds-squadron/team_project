@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="search_categories">
-        <item>Search by...</item>
+        <item>Search events by...</item>
         <item>User</item>
         <item>Cuisine</item>
         <item>Location</item>

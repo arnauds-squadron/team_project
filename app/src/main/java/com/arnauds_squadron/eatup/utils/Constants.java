@@ -18,8 +18,14 @@ public final class Constants {
     public static final String NUM_RATINGS = "numRatings";
     public static final String PENDING_GUESTS = "pendingGuests";
     public static final String ALL_REQUESTS = "allRequests";
+
+    // search constants
+    public static final String SEARCH_CATEGORY = "searchCategory";
+    public static final String SEARCH_INTENT_CODE = "searchIntentCode";
     public static final String SEARCH_USER = "user";
     public static final String SEARCH_CUISINE = "cuisine";
     public static final String SEARCH_LOCATION = "location";
-    public static final String SEARCH_CATEGORY = "searchCategory";
+    public static final int SEARCH_USER_CODE = 17;
+    public static final int SEARCH_CUISINE_CODE = 18;
+    public static final int SEARCH_LOCATION_CODE = 19;
 }
