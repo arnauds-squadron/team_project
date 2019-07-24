@@ -94,6 +94,7 @@ public class ChatFragment extends Fragment implements
      * Overrides the ChatDashboardFragment interface
      * @param chat The chat object that the messenger fragment might display
      */
+    //TODO : still lags
     @Override
     public void openChatFragment(Chat chat) {
         messengerFragment.setChat(chat);

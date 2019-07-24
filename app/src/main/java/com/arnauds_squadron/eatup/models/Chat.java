@@ -56,18 +56,19 @@ public class Chat extends ParseObject {
 
     // inner class to query event model
     public static class Query extends ParseQuery<Chat> {
-        private final static int QUERY_LIMIT = 20;
+        private final static int QUERY_LIMIT = 10;
 
         public Query() {
             super(Chat.class);
         }
 
+        // Only get the first 10 chats
         public Query setQueryLimit() {
             setLimit(QUERY_LIMIT);
             return this;
         }
 
-        // get most recent posts
+        // get most recently active chats
         public Query getTop() {
             orderByDescending(KEY_UPDATED_AT);
             return this;

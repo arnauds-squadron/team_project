@@ -4,13 +4,19 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +41,6 @@ public class ChatDashboardFragment extends Fragment {
     private ChatDashboardAdapter chatAdapter;
 
     public static ChatDashboardFragment newInstance() {
-        Log.i("Dashboard", "dashbaord new instance");
         Bundle args = new Bundle();
         ChatDashboardFragment fragment = new ChatDashboardFragment();
         fragment.setArguments(args);
@@ -57,6 +62,8 @@ public class ChatDashboardFragment extends Fragment {
         chatList = new ArrayList<>();
         chatAdapter = new ChatDashboardAdapter(this, chatList);
         rvChats.setAdapter(chatAdapter);
+
+        getChats();
 
         return view;
     }
@@ -85,9 +92,47 @@ public class ChatDashboardFragment extends Fragment {
         mListener.openChatFragment(chat);
     }
 
+    // TODO: caching
+    private void getChats() {
+        Chat.Query query = new Chat.Query();
+        query.setQueryLimit().getTop();
+        query.findInBackground(new FindCallback<Chat>() {
+            @Override
+            public void done(List<Chat> objects, ParseException e) {
+                if (e == null) {
+                    String userId = ParseUser.getCurrentUser().getObjectId();
+                    for (int i = 0; i < objects.size(); i++) {
+                        Chat chat = objects.get(i);
+                        JSONArray members = chat.getMembers();
+
+                        for (int j = 0; j < members.length(); j++) {
+                            try {
+                                // TODO: move to new thread?
+                                if (chat.getMembers().getJSONObject(j).getString("objectId")
+                                        .equals(userId)) {
+                                    chatList.add(chat);
+                                    chatAdapter.notifyItemInserted(chatList.size() - 1);
+                                }
+                            } catch (JSONException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
+
+                } else {
+                    Toast.makeText(getActivity(), "Could not load chats",
+                            Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+
     public interface OnFragmentInteractionListener {
         /**
-         * Opens the selected chat in a newly created ChatActivity
+         * Opens the selected chat in the MessengerFragment
          */
         void openChatFragment(Chat chat);
     }
