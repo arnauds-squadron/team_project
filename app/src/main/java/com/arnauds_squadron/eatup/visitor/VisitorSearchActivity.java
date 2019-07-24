@@ -50,6 +50,8 @@ import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
 
 public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    // TODO styling for location search activity - how to get rid of the action bar?
+
     // initialize adapter, views, scroll listener
     private SearchEventAdapter eventAdapter;
     private ArrayList<Event> mEvents;
