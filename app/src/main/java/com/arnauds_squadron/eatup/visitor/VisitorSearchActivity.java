@@ -126,12 +126,12 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             }
         });
 
-        // initialize spinner for search filtering
+        // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.search_categories, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //c Apply the adapter to the spinner
+        //c Apply the adapter to the spinner_text_view
         searchSpinner.setAdapter(adapter);
         searchSpinner.setOnItemSelectedListener(this);
 
@@ -164,7 +164,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 startLocationSearchActivity();
             }
             else {
-                // display user's choice in the spinner
+                // display user's choice in the spinner_text_view
                 searchSpinner.setSelection(searchCategory);
             }
         }
@@ -202,7 +202,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     }
 
 
-    // methods for the search category spinner
+    // methods for the search category spinner_text_view
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         searchCategory = pos;
         if(searchCategory == LOCATION_SEARCH) {

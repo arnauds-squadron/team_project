@@ -46,11 +46,11 @@
         android:layout_height="0dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/btnNext"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/swIs21Plus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnAddTag" />
@@ -59,11 +59,45 @@
         android:id="@+id/btnAddTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="Add"
         app:layout_constraintEnd_toEndOf="@+id/tilEventFoodType"
         app:layout_constraintStart_toStartOf="@+id/tilEventFoodType"
         app:layout_constraintTop_toBottomOf="@+id/tilEventFoodType"
         tools:ignore="HardcodedText" />
+
+    <Switch
+        android:id="@+id/swIs21Plus"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:scaleX="1.2"
+        android:scaleY="1.2"
+        app:layout_constraintBottom_toTopOf="@+id/btnNext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/spIsRestaurant" />
+
+    <TextView
+        android:id="@+id/tvIs21PlusLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="21+"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/swIs21Plus"
+        app:layout_constraintEnd_toStartOf="@+id/swIs21Plus"
+        app:layout_constraintTop_toTopOf="@+id/swIs21Plus" />
+
+    <Spinner
+        android:id="@+id/spIsRestaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/swIs21Plus"
+        app:layout_constraintEnd_toStartOf="@+id/swIs21Plus"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/swIs21Plus" />
 
 </android.support.constraint.ConstraintLayout>

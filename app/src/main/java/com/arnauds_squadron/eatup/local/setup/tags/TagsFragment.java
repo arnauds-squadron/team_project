@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -28,21 +29,18 @@ import butterknife.OnClick;
  */
 public class TagsFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-
     @BindView(R.id.tvEventFoodType)
     AutoCompleteTextView tvEventFoodType;
 
     @BindView(R.id.lvTagList)
     ListView lvTagList;
 
-    // Helpful variable to access the context
+    @BindView(R.id.spIsRestaurant)
+    Spinner spIsRestaurant;
+
+    private OnFragmentInteractionListener mListener;
     private Activity activity;
-
-    // List of tags selected by the user
     private List<String> tagList;
-
-    // Adapter instance to handle adding tag items to the ListView
     private TagAdapter tagAdapter;
 
     public static TagsFragment newInstance() {
@@ -59,37 +57,12 @@ public class TagsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_tags, container, false);
+        activity = getActivity();
         ButterKnife.bind(this, view);
 
-        activity = getActivity();
-        // TODO: move array of food types to a server
-        ArrayAdapter adapter = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.food_types));
-
-        tvEventFoodType.setAdapter(adapter);
-        tvEventFoodType.setThreshold(1); // show results after one letter
-
-        // Show the dropdown of cuisines once the user selects the view
-        tvEventFoodType.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                tvEventFoodType.showDropDown();
-            }
-        });
-
-        // Add the item if they select a preset
-        tvEventFoodType.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                addTag();
-                tvEventFoodType.showDropDown();
-            }
-        });
-
-        // Set tag list adapter
-        tagList = new ArrayList<>();
-        tagAdapter = new TagAdapter(activity, tagList);
-        lvTagList.setAdapter(tagAdapter);
+        setupAutocompleteTextView();
+        setupListView();
+        setupRestaurantSpinner();
 
         return view;
     }
@@ -122,16 +95,23 @@ public class TagsFragment extends Fragment {
         addTag();
     }
 
+    /**
+     * Navigates to the next setup fragment if at least 1 tag is selected for their event
+     */
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
-        // TODO: validate food type, no bad words?
-        mListener.updateTags(tagList);
+        if (!tagList.isEmpty())
+            mListener.updateTags(tagList);
+        else
+            Toast.makeText(activity, "Select at least 1 tag for your event",
+                    Toast.LENGTH_SHORT).show();
     }
 
     /**
      * Adds the tag selected by the user in the Autocomplete TextView to the tag list
      * Only adds a tag if the value is not empty and has not already been selected
      */
+    // TODO: validate food type, no bad words?
     private void addTag() {
         String newTag = tvEventFoodType.getText().toString().trim();
         if (newTag.isEmpty()) {
@@ -146,6 +126,57 @@ public class TagsFragment extends Fragment {
             tvEventFoodType.setText("");
         }
     }
+
+    /**
+     * Sets up the Autocomplete TextView so the user sees likely tags that they might be searching
+     * for.
+     */
+    private void setupAutocompleteTextView() {
+        // TODO: move array of food types to a server
+        ArrayAdapter adapter = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.food_types));
+
+        tvEventFoodType.setAdapter(adapter);
+        tvEventFoodType.setThreshold(1); // show results after one letter
+
+        // Show the dropdown of cuisines once the user selects the view
+        tvEventFoodType.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                tvEventFoodType.showDropDown();
+            }
+        });
+
+        // Add the item immediately after they select a preset (no button press required)
+        tvEventFoodType.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                addTag();
+                tvEventFoodType.showDropDown();
+            }
+        });
+    }
+
+    /**
+     * Sets up the ListView so when an item is added to the tagList, the ListView is updated
+     */
+    private void setupListView() {
+        tagList = new ArrayList<>();
+        tagAdapter = new TagAdapter(activity, tagList);
+        lvTagList.setAdapter(tagAdapter);
+    }
+
+    /**
+     * Sets up the restaurant spinner_text_view with the options in the data array, select between
+     * restaurant and home-cooked
+     */
+    //TODO: fix style
+    private void setupRestaurantSpinner() {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
+                R.array.isRestaurantSpinnerData, android.R.layout.simple_spinner_dropdown_item);
+        spIsRestaurant.setAdapter(adapter);
+    }
+
 
     public interface OnFragmentInteractionListener {
         /**
