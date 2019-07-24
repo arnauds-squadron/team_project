@@ -66,7 +66,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
         String secretKey = getString(R.string.yelp_api_key);
         final OkHttpClient client = new OkHttpClient();
         final Request request = new Request.Builder()
-                .url("https://api.yelp.com/v3/businesses/search?term=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
+                .url("https://api.yelp.com/v3/businesses/search?term=food&categories=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
                 //.url("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco")
                 .addHeader("Authorization", "Bearer " + secretKey)
                 .build();

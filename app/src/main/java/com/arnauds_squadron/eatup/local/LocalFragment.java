@@ -21,6 +21,7 @@ import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
 import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
@@ -105,6 +106,7 @@ public class LocalFragment extends Fragment implements
     @Override
     public void updateTags(List<String> tags) {
         event = new Event();
+//        event.setHost(ParseUser.getCurrentUser());
         event.setTags(tags);
         advanceViewPager();
     }

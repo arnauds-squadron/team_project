@@ -167,7 +167,6 @@ public class Event extends ParseObject {
             whereLessThan("createdAt", maxId);
             return this;
         }
-
         // get most recent 20 posts
         public Query getTop() {
             setLimit(20);

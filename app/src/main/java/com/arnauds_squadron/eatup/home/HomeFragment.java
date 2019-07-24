@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
@@ -35,6 +37,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
+import static com.parse.Parse.LOG_LEVEL_DEBUG;
 import static com.parse.Parse.getApplicationContext;
 
 /**
@@ -80,16 +83,9 @@ public class HomeFragment extends Fragment {
         homeAdapter = new HomeAdapter(agenda);
         // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
-
-        rvAgenda = view.findViewById(R.id.rvAgenda);
-        rvAgenda.setLayoutManager(new LinearLayoutManager(getContext()));
-        homeAdapter = new HomeAdapter(agenda);
-        rvAgenda.setAdapter(homeAdapter);
-
-        //ivProfile.setParseFile(user.getParseFile("profilePicture"));
-        // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -103,19 +99,26 @@ public class HomeFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
+        final Event.Query query = new Event.Query();
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
+                    ParseUser parseUser = ParseUser.getCurrentUser();
+                    String username = null;
                     for (int i = 0; i < objects.size(); i++) {
                         Event event = objects.get(i);
-                        agenda.add(event);
-                        homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        try {
+                            username = event.getHost().fetchIfNeeded().getUsername();
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                        if (username.equals(parseUser.getUsername())) {
+                            agenda.add(event);
+                            homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        }
                     }
-                } else {
-                    e.printStackTrace();
                 }
             }
         });
@@ -128,13 +131,21 @@ public class HomeFragment extends Fragment {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
+                    ParseUser parseUser = ParseUser.getCurrentUser();
+                    String username = null;
                     for (int i = 0; i < objects.size(); i++) {
                         Event event = objects.get(i);
-                        agenda.add(event);
-                        homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        try {
+                            username = event.getHost().fetchIfNeeded().getUsername();
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                        if (username.equals(parseUser.getUsername())) {
+                            agenda.add(event);
+                            homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        }
                     }
                     swipeContainer.setRefreshing(false);
-
                 } else {
                     e.printStackTrace();
                 }
