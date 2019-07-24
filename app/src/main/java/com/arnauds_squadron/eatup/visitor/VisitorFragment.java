@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView;
@@ -50,7 +49,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,12 +63,9 @@ import butterknife.Unbinder;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
-import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CUISINE;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_LOCATION;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_USER;
-import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
-import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 
 public class VisitorFragment extends Fragment {
@@ -516,10 +511,10 @@ public class VisitorFragment extends Fragment {
                 addressOutput = "";
             }
 
-            // display current address to user if found.
-            if (resultCode == SUCCESS_RESULT) {
-                tvCurrentLocation.setText(addressOutput);
-            }
+//            // display current address to user if found.
+//            if (resultCode == SUCCESS_RESULT) {
+//                tvCurrentLocation.setText(addressOutput);
+//            }
 
         }
     }

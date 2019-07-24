@@ -42,7 +42,7 @@ public class LocalFragment extends Fragment implements
 
     private final static String TAG = "LocalFragment";
 
-    @BindView(R.id.viewPager)
+    @BindView(R.id.frameLayout)
     NoSwipingPagerAdapter setupViewPager;
 
     // Listener that communicates with the parent activity to switch back to the HomeFragment
@@ -80,6 +80,20 @@ public class LocalFragment extends Fragment implements
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+            try {
+                String test = null;
+                test.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

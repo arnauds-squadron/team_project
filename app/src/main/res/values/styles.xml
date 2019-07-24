@@ -9,4 +9,9 @@
         <item name="android:windowContentTransitions" tools:targetApi="lollipop">true</item>
     </style>
 
+    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:background">@color/toolbar_color</item>
+
+    </style>
+
 </resources>

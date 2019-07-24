@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Message;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -14,6 +15,7 @@ public class ParseApp extends Application {
 
         ParseObject.registerSubclass(Event.class);
         ParseObject.registerSubclass(Chat.class);
+        ParseObject.registerSubclass(Message.class);
 
         final Parse.Configuration configuration = new Parse.Configuration.Builder(this)
                 .applicationId("eat_up")

@@ -107,7 +107,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     final Chat chat = event.getChat() == null ? new Chat() : event.getChat();
 
                     chat.setName(event.getTitle() + " Chat");
-                    chat.setImage(event.getEventImage());
+                    if (event.getEventImage() != null) {
+                        chat.setImage(event.getEventImage());
+                    }
                     // TODO: move get current user to new thread
                     chat.addMember(ParseUser.getCurrentUser());
                     // TODO: add accepted guests

@@ -1,11 +1,10 @@
 package com.arnauds_squadron.eatup.navigation;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.arnauds_squadron.eatup.chat.MessengerFragment;
+import com.arnauds_squadron.eatup.chat.ChatFragment;
 import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.profile.ProfileFragment;
@@ -17,7 +16,7 @@ import com.arnauds_squadron.eatup.visitor.VisitorFragment;
 public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 5;
 
-    public MainFragmentPagerAdapter(FragmentManager fm, Context context) {
+    public MainFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -29,7 +28,7 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0)
-            return MessengerFragment.newInstance();
+            return ChatFragment.newInstance();
         if(position == 1)
             return LocalFragment.newInstance();
         if (position == 2)

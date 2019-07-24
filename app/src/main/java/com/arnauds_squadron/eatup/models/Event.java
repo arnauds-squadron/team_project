@@ -39,9 +39,6 @@ public class Event extends ParseObject {
     private static final String KEY_CREATED_AT = "createdAt";
     private static final Double MAX_DISTANCE = 0.1;
 
-    public Event() {
-    }
-
     // ParseFile - class in SDK that allows accessing files stored with Parse
     public ParseFile getEventImage() {
         return getParseFile(KEY_EVENT_IMAGE);

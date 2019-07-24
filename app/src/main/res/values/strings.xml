@@ -45,6 +45,9 @@
     <string name="about">About</string>
     <string name="no_bio">This user hasn\'t set a bio</string>
     <string name="num_ratings">numRatings</string>
+    <string name="message_profile_image">my profile image</string>
+    <string name="message_other_profile_image">profile image</string>
+    <string name="messenger_message_hint">Type a message</string>
 
 
     <!--latitude/longitude tags-->

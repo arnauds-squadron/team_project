@@ -18,9 +18,6 @@ public class Chat extends ParseObject {
     private static final String KEY_MESSAGES = "messages";
     private static final String KEY_UPDATED_AT = "updatedAt";
 
-    public Chat() {
-    }
-
     public String getName() {
         return getString(KEY_NAME);
     }

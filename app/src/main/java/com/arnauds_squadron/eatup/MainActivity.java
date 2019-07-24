@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.arnauds_squadron.eatup.chat.MessengerFragment;
+import com.arnauds_squadron.eatup.chat.ChatFragment;
 import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -21,15 +21,15 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener,
         LocalFragment.OnFragmentInteractionListener,
-        MessengerFragment.OnFragmentInteractionListener {
+        ChatFragment.OnFragmentInteractionListener {
 
-    @BindView(R.id.viewPager)
+    @BindView(R.id.frameLayout)
     ViewPager viewPager;
 
     @BindView(R.id.tab_bar)
     TabLayout tabLayout;
 
-    // Chat selected in the HomeFragment, stored to be accessed by the MessengerFragment
+    // Chat selected in the HomeFragment, stored to be accessed by the ChatFragment
     private Chat chat;
 
     @Override
@@ -39,8 +39,10 @@ public class MainActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager(),
-                MainActivity.this));
+        viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager()));
+
+        // All the tabs in this viewpager will be loaded (4 neighboring tabs)
+        viewPager.setOffscreenPageLimit(4);
 
         // Detect page switch and clear the back stack if the user switches to
         // a different fragment so the back button can exit the app
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Overrides the HomeFragment interface
      *
-     * Switches to the MessengerFragment when the user clicks on a chat
+     * Switches to the ChatFragment when the user clicks on a chat
      */
     @Override
     public void switchToChatFragment(Chat chat) {
@@ -123,10 +125,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Overrides the MessengerFragment interface
+     * Overrides the ChatFragment interface
      *
-     * Accessor for the chat object, and also DELETES the local chat variable so the
-     * MessengerFragment knows not to directly open a chat again
+     * Accessor for the chat object, DELETES the local copy of chat. Chat should not be null only
+     * when the user just clicked on an event's chat in the HomeFragment
      *
      * @effects Deletes the local copy of the chat
      * @return The chat object selected through the HomeFragment

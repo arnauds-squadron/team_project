@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ public class ChatDashboardFragment extends Fragment {
     private ChatDashboardAdapter chatAdapter;
 
     public static ChatDashboardFragment newInstance() {
+        Log.i("Dashboard", "dashbaord new instance");
         Bundle args = new Bundle();
         ChatDashboardFragment fragment = new ChatDashboardFragment();
         fragment.setArguments(args);
