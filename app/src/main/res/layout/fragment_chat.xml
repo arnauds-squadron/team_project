@@ -24,7 +24,7 @@
 
         <fragment
             android:id="@+id/messengerFragment"
-            class="com.arnauds_squadron.eatup.chat.MessengerFragment"
+            class="com.arnauds_squadron.eatup.chat.messaging.MessengerFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>

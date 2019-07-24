@@ -19,8 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Fragment that asks the user to input the cuisine of the restaurant they are visiting or of the
- * food they are cooking.
+ * Fragment that displays the list of active chats the user is part of
  */
 public class ChatDashboardFragment extends Fragment {
 

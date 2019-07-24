@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup.chat;
+package com.arnauds_squadron.eatup.chat.messaging;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.chat.messaging.MessageAdapter;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Message;
 import com.parse.FindCallback;
@@ -34,9 +33,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link MessengerFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment to display a single chat with messages from different users. Also allows sending of
+ * messages and periodically updates the messages in real time
  */
 public class MessengerFragment extends Fragment {
 
@@ -56,7 +54,6 @@ public class MessengerFragment extends Fragment {
     private MessageAdapter messageAdapter;
 
     public static MessengerFragment newInstance(Chat chat) {
-        Log.i("MessgenerFragment", "new instance");
         Bundle args = new Bundle();
         args.putParcelable("chat", chat);
         MessengerFragment fragment = new MessengerFragment();
@@ -81,11 +78,10 @@ public class MessengerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_messenger, container, false);
         ButterKnife.bind(this, view);
 
-        Log.i("iansfsdf", "initailizing stuff");
         Context context = getContext();
         messages = new ArrayList<>();
         //TODO move to new thread?
-        messageAdapter = new MessageAdapter(context, null, messages);
+        messageAdapter = new MessageAdapter(context, ParseUser.getCurrentUser(), messages);
         rvMessages.setAdapter(messageAdapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
@@ -119,6 +115,7 @@ public class MessengerFragment extends Fragment {
         initializeChat();
     }
 
+    // TODO: update messages periodically
     private static final int POLL_INTERVAL_MILLIS = 1000;
     Handler myHandler = new Handler();
     Runnable mRefreshMessagesRunnable = new Runnable() {
@@ -152,11 +149,18 @@ public class MessengerFragment extends Fragment {
         }
     }
 
+    /**
+     * Re-queries the Parse server to obtain the newest messages
+     * // TODO: scroll to position on new message?
+     * // TODO: don't always clear, just append new messages?
+     */
     private void refreshMessages() {
         // Construct query to execute
         Message.Query query = new Message.Query();
 
-        query.setQueryLimit().inOrder().inChat(chat);
+        query.setQueryLimit()
+                .inOrder()
+                .inChat(chat);
 
         query.findInBackground(new FindCallback<Message>() {
             public void done(List<Message> results, ParseException e) {
@@ -176,10 +180,6 @@ public class MessengerFragment extends Fragment {
      * Initializes all the views in the MessengerFragment after the Chat object is received
      */
     private void initializeChat() {
-        // Message recycler view setup
-        refreshMessages();
-
-        // View setup
         tvChatName.setText(chat.getName());
 
         etMessage.setOnEditorActionListener(new EditText.OnEditorActionListener() {
@@ -192,6 +192,8 @@ public class MessengerFragment extends Fragment {
                 return false;
             }
         });
+
+        refreshMessages();
     }
 
     public interface OnFragmentInteractionListener {

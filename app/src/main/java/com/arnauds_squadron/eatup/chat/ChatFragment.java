@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardFragment;
+import com.arnauds_squadron.eatup.chat.messaging.MessengerFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 
 import butterknife.BindView;

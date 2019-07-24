@@ -39,11 +39,4 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
             return ProfileFragment.newInstance();
         return HomeFragment.newInstance();
     }
-
-    // TODO: Remove unnecessary titles?
-    @Override
-    public CharSequence getPageTitle(int position) {
-        // Generate title based on item position
-        return null;
-    }
 }

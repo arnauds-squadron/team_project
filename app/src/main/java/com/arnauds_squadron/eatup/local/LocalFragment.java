@@ -82,20 +82,6 @@ public class LocalFragment extends Fragment implements
         mListener = null;
     }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisibleToUser) {
-            try {
-                String test = null;
-                test.toString();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     /**
      * Overrides the StartFragment interface
      *
@@ -105,7 +91,6 @@ public class LocalFragment extends Fragment implements
     public void startEventCreation() {
         advanceViewPager();
     }
-
 
     /**
      * Overrides the TagsFragment interface
@@ -169,7 +154,7 @@ public class LocalFragment extends Fragment implements
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_SHORT).show();
                     Log.d("LocalFragment", "create post success");
                     mListener.switchToHomeFragment();
-                    advanceViewPager(); // move viewpager to the first setup fragment
+                    setupViewPager.setCurrentItem(0);
                 } else {
                     Toast.makeText(getActivity(), "Could not create post",
                             Toast.LENGTH_LONG).show();
@@ -208,8 +193,15 @@ public class LocalFragment extends Fragment implements
         setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() + 1);
     }
 
-    //TODO: documentation
+
+    /**
+     * Interface to communicate with the parent activity so the HomeFragment is navigated to
+     * after an event is created
+     */
     public interface OnFragmentInteractionListener {
+        /**
+         * Callback to the parent's listener to switch to the home fragment
+         */
         void switchToHomeFragment();
     }
 }
