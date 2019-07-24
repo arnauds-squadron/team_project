@@ -11,10 +11,10 @@ import com.arnauds_squadron.eatup.profile.ProfileFragment;
 import com.arnauds_squadron.eatup.visitor.VisitorFragment;
 
 /**
- * Pager Adapter to handle the 3 main fragments we have in the MainActivity
+ * Pager Adapter to handle the 5 main fragments we have in the MainActivity
  */
 public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
-    final int PAGE_COUNT = 5;
+    private final static int PAGE_COUNT = 5;
 
     public MainFragmentPagerAdapter(FragmentManager fm) {
         super(fm);

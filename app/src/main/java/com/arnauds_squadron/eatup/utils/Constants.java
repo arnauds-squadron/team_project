@@ -25,4 +25,7 @@ public final class Constants {
     public static final int USER_SEARCH = 1;
     public static final int CUISINE_SEARCH = 2;
     public static final int LOCATION_SEARCH = 3;
+
+    // PagerAdapter constants
+    public static final int MAIN_PAGER_START_PAGE = 2;
 }

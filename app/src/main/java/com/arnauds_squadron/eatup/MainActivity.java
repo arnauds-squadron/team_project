@@ -11,6 +11,7 @@ import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.google.android.libraries.places.api.Places;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // All the tabs in this viewpager will be loaded (4 neighboring tabs)
         viewPager.setOffscreenPageLimit(4);
+        viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
 
         // Detect page switch and clear the back stack if the user switches to
         // a different fragment so the back button can exit the app
@@ -66,11 +68,8 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        // Give the TabLayout the ViewPage
+        // Give the TabLayout the ViewPager
         tabLayout.setupWithViewPager(viewPager);
-
-        // Set home fragment as the first screen
-        viewPager.setCurrentItem(2);
 
         // TODO: change visitor meal icon, profile icon, and chat icon
         int[] icons = {
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void switchToHomeFragment() {
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
     }
 
     /**

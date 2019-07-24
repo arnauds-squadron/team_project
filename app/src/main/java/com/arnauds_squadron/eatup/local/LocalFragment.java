@@ -101,7 +101,8 @@ public class LocalFragment extends Fragment implements
     @Override
     public void updateTags(List<String> tags) {
         event = new Event();
-//        event.setHost(ParseUser.getCurrentUser());
+        // TODO new thread?
+        event.setHost(ParseUser.getCurrentUser());
         event.setTags(tags);
         advanceViewPager();
     }
