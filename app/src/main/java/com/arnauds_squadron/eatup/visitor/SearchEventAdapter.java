@@ -106,8 +106,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                         event.createRequest(ParseUser.getCurrentUser(), event);
                         Toast.makeText(context, "RSVP requested", Toast.LENGTH_SHORT).show();
                     }
-
-                    // TODO send user back to the refreshed home screen with the reservation request showing
                 }
             });
 

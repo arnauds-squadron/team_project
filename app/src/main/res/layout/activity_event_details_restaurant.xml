@@ -7,8 +7,8 @@
     tools:context=".ProfileActivity">
 
     <com.parse.ParseImageView
-        android:id="@+id/ivProfile"
-        android:transitionName="profileImage"
+        android:id="@+id/ivEventImage"
+        android:transitionName="eventImage"
         android:layout_width="0dp"
         android:layout_height="250dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -17,8 +17,7 @@
         app:srcCompat="@android:color/black" />
 
     <TextView
-        android:id="@+id/tvUsername"
-        android:transitionName="hostName"
+        android:id="@+id/tvRestaurantName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -26,32 +25,17 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:text="Username"
+        android:text="@string/detailview_location_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="28sp"
         android:textStyle="bold"
+        android:transitionName="restaurantName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/ivEventImage" />
 
     <TextView
-        android:id="@+id/tvBio"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginRight="24dp"
-        android:text="Bio"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
-    <TextView
-        android:id="@+id/tvRatings"
+        android:id="@+id/tvNumberRatings"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -59,13 +43,13 @@
         android:layout_marginTop="14dp"
         android:text="# of Ratings"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintStart_toEndOf="@+id/ratingBar"
-        app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
+        app:layout_constraintStart_toEndOf="@+id/restaurantRating"
+        app:layout_constraintTop_toBottomOf="@+id/tvRestaurantName" />
 
     <RatingBar
-        android:id="@+id/ratingBar"
+        android:id="@+id/restaurantRating"
         style="@style/Widget.AppCompat.RatingBar.Indicator"
-        android:transitionName="hostRating"
+        android:transitionName="restaurantRating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -74,29 +58,52 @@
         android:numStars="5"
         android:stepSize="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
+        app:layout_constraintTop_toBottomOf="@+id/tvRestaurantName" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tvAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="12dp"
-        android:text="@string/about"
-        android:textSize="20sp"
+        android:layout_marginTop="16dp"
+        android:text="@string/detailview_address"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ratingBar" />
+        app:layout_constraintTop_toBottomOf="@+id/restaurantRating" />
 
     <TextView
-        android:id="@+id/tvUsername2"
+        android:id="@+id/tvPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="12dp"
-        android:text="@string/detailview_host_name"
-        android:textSize="20sp"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/ratingBar" />
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/detailview_phone"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAddress" />
+
+    <TextView
+        android:id="@+id/tvURL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/detailview_url"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPhone" />
+
+    <Button
+        android:id="@+id/btYelp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:text="View On Yelp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
