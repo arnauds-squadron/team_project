@@ -25,7 +25,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:text="@string/detailview_location_name"
+        android:text="detailview_location_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -67,7 +67,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
-        android:text="@string/detailview_address"
+        android:text="detailview_address"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/restaurantRating" />
@@ -79,7 +79,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="8dp"
-        android:text="@string/detailview_phone"
+        android:text="detailview_phone"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvAddress" />
@@ -91,7 +91,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="8dp"
-        android:text="@string/detailview_url"
+        android:text="detailview_url"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPhone" />

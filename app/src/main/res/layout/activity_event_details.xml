@@ -94,10 +94,11 @@
         android:layout_marginLeft="82dp"
         android:layout_marginEnd="83dp"
         android:layout_marginRight="83dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="40dp"
         app:dotColor="@color/bottom_gray"
         app:layout_constraintBottom_toTopOf="@+id/tvBookPrompt"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:selectedDotColor="@color/colorPrimary" />
 

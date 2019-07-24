@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,13 +11,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
+import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.bumptech.glide.Glide;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseImageView;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +33,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
+import static com.parse.Parse.getApplicationContext;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,10 +52,6 @@ public class HomeFragment extends Fragment {
     SwipeRefreshLayout swipeContainer;
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
-
-    @Nullable
-    @BindView(R.id.ivProfile)
-    ImageView ivProfile;
 
     public static HomeFragment newInstance() {
         Bundle args = new Bundle();
@@ -80,6 +88,7 @@ public class HomeFragment extends Fragment {
         homeAdapter = new HomeAdapter(agenda);
         rvAgenda.setAdapter(homeAdapter);
 
+        //ivProfile.setParseFile(user.getParseFile("profilePicture"));
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

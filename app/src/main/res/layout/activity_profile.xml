@@ -99,4 +99,5 @@
         android:textSize="20sp"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/ratingBar" />
+
 </android.support.constraint.ConstraintLayout>
