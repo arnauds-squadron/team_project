@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -19,13 +18,13 @@ import com.arnauds_squadron.eatup.models.Event;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +34,6 @@ import butterknife.Unbinder;
 public class HomeFragment extends Fragment {
 
     private HomeAdapter homeAdapter;
-    private Unbinder unbinder;
     private OnFragmentInteractionListener mListener;
 
     private ArrayList<Event> agenda;
@@ -46,10 +44,6 @@ public class HomeFragment extends Fragment {
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
 
-    @Nullable
-    @BindView(R.id.ivProfile)
-    ImageView ivProfile;
-
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
@@ -58,7 +52,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        ButterKnife.bind(this, view);
         return view;
     }
 
@@ -70,6 +64,7 @@ public class HomeFragment extends Fragment {
         homeAdapter = new HomeAdapter(this, agenda);
         // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
 
@@ -87,19 +82,26 @@ public class HomeFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
+        final Event.Query query = new Event.Query();
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
+                    ParseUser parseUser = ParseUser.getCurrentUser();
+                    String username = null;
                     for (int i = 0; i < objects.size(); i++) {
                         Event event = objects.get(i);
-                        agenda.add(event);
-                        homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        try {
+                            username = event.getHost().fetchIfNeeded().getUsername();
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                        if (username.equals(parseUser.getUsername())) {
+                            agenda.add(event);
+                            homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        }
                     }
-                } else {
-                    e.printStackTrace();
                 }
             }
         });
@@ -126,13 +128,21 @@ public class HomeFragment extends Fragment {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
+                    ParseUser parseUser = ParseUser.getCurrentUser();
+                    String username = null;
                     for (int i = 0; i < objects.size(); i++) {
                         Event event = objects.get(i);
-                        agenda.add(event);
-                        homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        try {
+                            username = event.getHost().fetchIfNeeded().getUsername();
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                        if (username.equals(parseUser.getUsername())) {
+                            agenda.add(event);
+                            homeAdapter.notifyItemInserted(agenda.size() - 1);
+                        }
                     }
                     swipeContainer.setRefreshing(false);
-
                 } else {
                     e.printStackTrace();
                 }

@@ -9,6 +9,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="true" />
 
     <application
         android:name=".ParseApp"
@@ -21,6 +27,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <activity android:name=".ProfileImageActivity"></activity>
         <activity android:name=".EventDetailsRestaurantActivity"></activity>
         <activity android:name=".EventDetailsActivity" />
         <activity android:name=".SignupActivity" />
@@ -30,13 +37,25 @@
             android:name=".utils.FetchAddressIntentService"
             android:exported="false" />
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.arnauds_squadron.eatup.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fileprovider" />
+        </provider>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key" />
 
         <activity android:name=".home.HomeDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
-        <activity android:name=".visitor.VisitorSearchActivity">
+        <activity android:name=".visitor.VisitorSearchActivity"
+            android:windowSoftInputMode="stateVisible"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -47,26 +66,21 @@
         </activity>
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
+        <activity android:name=".LoginActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".visitor.VisitorSearchActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
+             <!--<intent-filter> -->
+             <!--<action android:name="android.intent.action.MAIN" /> -->
 
 
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-
-        </activity>
+             <!--<category android:name="android.intent.category.LAUNCHER" /> -->
+             <!--</intent-filter> -->
     </application>
 
 </manifest>

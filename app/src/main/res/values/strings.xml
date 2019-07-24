@@ -7,7 +7,7 @@
     <string name="btBook">Request meal</string>
     <string name="visitor_tv_greeting">Hello, </string>
     <string name="browse_nearby">Browse nearby meals</string>
-    <string name="current_location_title">Search by current location</string>
+    <string name="current_location_title">Use my current location</string>
     <string name="previous_location_title">Pick a previous location</string>
     <string name="previous_location_text">No previous meals yet!</string>
     <string name="intent_scheme">oauth</string>
@@ -40,7 +40,7 @@
     <string name="detailview_address">Address</string>
     <string name="detailview_phone">Phone</string>
     <string name="detailview_url">URL</string>
-    <string name="search_results_title">Search results</string>
+    <string name="search_results_title">Results</string>
     <string name="search_again">Search again</string>
     <string name="about">About</string>
     <string name="no_bio">This user hasn\'t set a bio</string>

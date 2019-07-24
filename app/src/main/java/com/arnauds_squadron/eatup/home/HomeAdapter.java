@@ -2,6 +2,7 @@ package com.arnauds_squadron.eatup.home;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,6 +24,8 @@ import com.parse.SaveCallback;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,17 +54,24 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
         if (event.getDate() != null) {
-            viewHolder.tvDate.setText(event.getDate().toString());
+            Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+            if (event.getDate() != null) {
+                if (event.getDate().before(localCalendar.getTime())) {
+                    viewHolder.tvDate.setTextColor(Color.RED);
+                } else {
+                    viewHolder.tvDate.setTextColor(Color.BLACK);
+                }
+                viewHolder.tvDate.setText(event.getDate().toString());
+            }
+            if (event.getTitle() != null) {
+                viewHolder.tvTitle.setText(event.getTitle());
+            }
+            if (event.getEventImage() != null) {
+                viewHolder.ivProfile.setParseFile(event.getEventImage());
+                viewHolder.ivProfile.loadInBackground();
+            }
+            //       viewHolder.tvPlace.setText(event.getAddress());
         }
-        if (event.getTitle() != null) {
-            viewHolder.tvTitle.setText(event.getTitle());
-        }
-        if (event.getEventImage() != null) {
-            viewHolder.ivProfile.setParseFile(event.getEventImage());
-            viewHolder.ivProfile.loadInBackground();
-        }
-        //       viewHolder.tvPlace.setText(event.getAddress());
-
     }
 
     @Override
