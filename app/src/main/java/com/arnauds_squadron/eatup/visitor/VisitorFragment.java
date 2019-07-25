@@ -66,6 +66,7 @@ import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
+import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
 import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
 
@@ -513,10 +514,10 @@ public class VisitorFragment extends Fragment {
                 addressOutput = "";
             }
 
-//            // display current address to user if found.
-//            if (resultCode == SUCCESS_RESULT) {
-//                tvCurrentLocation.setText(addressOutput);
-//            }
+            // display current address to user if found.
+            if (resultCode == SUCCESS_RESULT) {
+                tvCurrentLocation.setText(addressOutput);
+            }
 
         }
     }
