@@ -3,9 +3,9 @@ package com.arnauds_squadron.eatup.visitor;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,9 +21,12 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -39,16 +42,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
+import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
-import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
 
 public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-    // TODO styling for location search activity - how to get rid of the action bar?
 
     // initialize adapter, views, scroll listener
     private SearchEventAdapter eventAdapter;
@@ -74,10 +75,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // TODO make searches case insensitive
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_visitor_search);
@@ -119,11 +119,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     startActivity(searchIntent);
                     // clear focus so search doesn't fire twice
                     resultsSearchView.clearFocus();
-                    finish();
+                    resultsSearchView.setQuery(query, false);
                     return true;
                 }
                 else {
-                    // TODO prevent submission if no category selected
+                    // prevent submission if no category selected
                     resultsSearchView.setQuery(query, false);
                     Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
                     return true;
@@ -131,12 +131,12 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             }
         });
 
-        // initialize spinner_text_view for search filtering
+        // initialize spinner for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.search_categories, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //c Apply the adapter to the spinner_text_view
+        //c Apply the adapter to the spinner
         searchSpinner.setAdapter(adapter);
         searchSpinner.setOnItemSelectedListener(this);
 
@@ -196,6 +196,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
             int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
             Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
             switch(newSearchCategory) {
@@ -219,10 +220,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
                 locationSearch(queriedGeoPoint, new Date(0));
             } else if (searchCategory == LOCATION_SEARCH) {
-                startLocationSearchActivity();
+                // TODO how to start google places autocomplete fragment on launch?
+                startLocationSearchFragment();
             }
             else {
-                // display user's choice in the spinner_text_view
+                // display user's choice in the spinner
                 searchSpinner.setSelection(searchCategory);
             }
         }
@@ -234,7 +236,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         eventAdapter.notifyDataSetChanged();
         searchCategory = pos;
         if(searchCategory == LOCATION_SEARCH) {
-            startLocationSearchActivity();
+            startLocationSearchFragment();
         }
     }
 
@@ -264,36 +266,33 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         });
     }
 
-    // handle results from a location search
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                Place place = Autocomplete.getPlaceFromIntent(data);
+    private void startLocationSearchFragment() {
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+
                 Double latitude = place.getLatLng().latitude;
                 Double longitude = place.getLatLng().longitude;
                 ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
                 locationSearch(location, new Date(0));
-            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                Toast.makeText(this, "Location search error. Try again.", Toast.LENGTH_SHORT).show();
-                Status status = Autocomplete.getStatusFromIntent(data);
-                Log.i("VisitorSearchActivity", status.getStatusMessage());
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
-                Toast.makeText(this, "Location search canceled", Toast.LENGTH_SHORT).show();
+                searchSpinner.setSelection(NO_SEARCH);
+                Log.i("VisitorSearchActivity", "Place: " + place.getName() + ", " + place.getId());
             }
-            searchSpinner.setSelection(NO_SEARCH);
-        }
-    }
 
-    private void startLocationSearchActivity() {
-        // for location searches, return latlng place data after user makes a selection
-        List<Place.Field> fields = Arrays.asList(Place.Field.LAT_LNG);
-        // Start the location autocomplete intent.
-        Intent locationIntent = new Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.FULLSCREEN, fields)
-                .build(this);
-        startActivityForResult(locationIntent, AUTOCOMPLETE_REQUEST_CODE);
+            @Override
+            public void onError(Status status) {
+                Toast.makeText(getApplicationContext(), "An error occurred.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {

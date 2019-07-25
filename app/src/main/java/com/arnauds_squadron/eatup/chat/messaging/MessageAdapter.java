@@ -13,8 +13,10 @@ import android.widget.TextView;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Message;
 import com.bumptech.glide.Glide;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -47,8 +49,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Message message = messages.get(position);
         String senderId = message.getSender().getObjectId();
-        boolean isMe = senderId.equals(sender.getObjectId());
 
+        holder.tvContent.setText(message.getContent());
+
+        boolean isMe = senderId.equals(sender.getObjectId());
         if (isMe) {
             holder.ivProfileMe.setVisibility(View.VISIBLE);
             holder.ivProfileOther.setVisibility(View.GONE);
@@ -59,21 +63,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             holder.tvContent.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
         }
 
-        ImageView profileView = isMe ? holder.ivProfileMe : holder.ivProfileOther;
-        // TODO: new thread?
+        final ImageView profileView = isMe ? holder.ivProfileMe : holder.ivProfileOther;
 
-        try {
-            ParseFile profilePicture = (ParseFile)
-                    message.getSender().fetchIfNeeded().get("profilePicture");
-
-            if (profilePicture != null)
-                Glide.with(context).load(profilePicture.getUrl()).into(profileView);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        holder.tvContent.setText(message.getContent());
+        message.getSender().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                ParseFile profilePicture = object.getParseFile("profilePicture");
+                if (profilePicture != null) {
+                    Glide.with(context)
+                            .load(profilePicture.getUrl())
+                            .into(profileView);
+                }
+            }
+        });
     }
 
     @Override

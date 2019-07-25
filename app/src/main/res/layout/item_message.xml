@@ -8,8 +8,7 @@
         android:id="@+id/ivProfileOther"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:contentDescription="@string/message_other_profile_image"
-        android:src="@mipmap/ic_launcher" />
+        android:contentDescription="@string/message_other_profile_image" />
 
     <TextView
         android:id="@+id/tvContent"
@@ -27,6 +26,5 @@
         android:id="@+id/ivProfileMe"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:contentDescription="@string/message_profile_image"
-        android:src="@mipmap/ic_launcher" />
+        android:contentDescription="@string/message_profile_image" />
 </LinearLayout>

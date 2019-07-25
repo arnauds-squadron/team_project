@@ -16,9 +16,6 @@ import org.json.JSONArray;
 import java.util.Date;
 import java.util.List;
 
-import static com.arnauds_squadron.eatup.utils.Constants.ALL_REQUESTS;
-import static com.arnauds_squadron.eatup.utils.Constants.PENDING_GUESTS;
-
 @ParseClassName("Event")
 public class Event extends ParseObject {
     private static final String KEY_EVENT_IMAGE = "eventImage";
@@ -34,8 +31,9 @@ public class Event extends ParseObject {
     private static final String KEY_21 = "over21";
     private static final String KEY_RESTAURANT = "isRestaurant";
     private static final String KEY_CHAT = "chat";
+    private static final String KEY_ALL_REQUESTS = "allRequests";
     private static final String KEY_PENDING_GUESTS = "pendingGuests";
-    private static final String KEY_UPDATED_GUESTS = "updatedGuests";
+    private static final String KEY_ACCEPTED_GUESTS = "acceptedGuests";
     private static final String KEY_CREATED_AT = "createdAt";
     private static final Double MAX_DISTANCE = 0.1;
 
@@ -108,13 +106,6 @@ public class Event extends ParseObject {
         put(KEY_TAGS, new JSONArray(tags));
     }
 
-    /**
-     * Adds one tag to the current list of tags
-     */
-    public void addTag(String tag) {
-        add(KEY_TAGS, tag);
-    }
-
     // TODO: replace with the tag system
     public String getCuisine() {
         return getString(KEY_FOOD_TYPE);
@@ -122,6 +113,20 @@ public class Event extends ParseObject {
 
     public void setCuisine(String foodType) {
         put(KEY_FOOD_TYPE, foodType);
+    }
+
+    public JSONArray getAcceptedGuests() {
+        return getJSONArray(KEY_ACCEPTED_GUESTS);
+    }
+
+    /**
+     * Adds another accepted guest to the already initialized array);
+     */
+    public void addAcceptedGuest(ParseUser guest, boolean isFirstGuest) {
+        if (isFirstGuest)
+            put(KEY_ACCEPTED_GUESTS, new JSONArray());
+
+        add(KEY_ACCEPTED_GUESTS, guest);
     }
 
     public int getMaxGuests() {
@@ -148,12 +153,6 @@ public class Event extends ParseObject {
         put(KEY_RESTAURANT, restaurant);
     }
 
-    public List<ParseUser> getAllRequests() {
-        return getList(ALL_REQUESTS);
-    }
-
-    // TODO how to access conversation/do we actually need to use the create/update at methods
-
     public Chat getChat() {
         return (Chat) get(KEY_CHAT);
     }
@@ -162,38 +161,20 @@ public class Event extends ParseObject {
         put(KEY_CHAT, chat);
     }
 
-
-    // inner class to query event model
-    public static class Query extends ParseQuery<Event> {
-        public Query() {
-            super(Event.class);
-        }
-
-        public Query getOlder(Date maxId) {
-            whereLessThan("createdAt", maxId);
-            return this;
-        }
-        // get most recent 20 posts
-        public Query getTop() {
-            setLimit(20);
-            orderByDescending(KEY_CREATED_AT);
-            return this;
-        }
-
-        public Query withHost() {
-            include("host");
-            return this;
-        }
-
-        public Query getClosest(ParseGeoPoint location) {
-            whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
-            return this;
-        }
+    public List<ParseUser> getAllRequests() {
+        return getList(KEY_ALL_REQUESTS);
     }
 
+    /**
+     * Adds the user to this event's pending guests lists, and they must be accepted or denied
+     * later by the host
+     *
+     * @param user  The user to be added to the pending guests list
+     * @param event The event they are RSVPing for
+     */
     public void createRequest(ParseUser user, Event event) {
-        event.addUnique(PENDING_GUESTS, user);
-        event.addUnique(ALL_REQUESTS, user);
+        event.addUnique(KEY_PENDING_GUESTS, user);
+        event.addUnique(KEY_ALL_REQUESTS, user);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -216,5 +197,34 @@ public class Event extends ParseObject {
             }
         }
         return false;
+    }
+
+    // inner class to query event model
+    public static class Query extends ParseQuery<Event> {
+        public Query() {
+            super(Event.class);
+        }
+
+        public Query getOlder(Date maxId) {
+            whereLessThan("createdAt", maxId);
+            return this;
+        }
+
+        // get most recent 20 posts
+        public Query getTop() {
+            setLimit(20);
+            orderByDescending(KEY_CREATED_AT);
+            return this;
+        }
+
+        public Query withHost() {
+            include("host");
+            return this;
+        }
+
+        public Query getClosest(ParseGeoPoint location) {
+            whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
+            return this;
+        }
     }
 }

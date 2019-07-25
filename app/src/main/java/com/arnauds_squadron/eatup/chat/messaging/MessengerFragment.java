@@ -1,13 +1,13 @@
 package com.arnauds_squadron.eatup.chat.messaging;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +25,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,8 @@ import butterknife.OnClick;
  */
 //TODO: typing a message in chat hides the top part of the fragment
 public class MessengerFragment extends Fragment {
+
+    private static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
 
     @BindView(R.id.tvChatName)
     TextView tvChatName;
@@ -53,6 +56,17 @@ public class MessengerFragment extends Fragment {
     private Chat chat;
     private List<Message> messages;
     private MessageAdapter messageAdapter;
+    private int totalMessageCount;
+
+    private boolean refreshRunnableNotStarted;
+    private Handler chatUpdateHandler = new Handler();
+    private Runnable refreshMessageRunnable = new Runnable() {
+        @Override
+        public void run() {
+            refreshMessages();
+            chatUpdateHandler.postDelayed(this, CHAT_UPDATE_SPEED_MILLIS);
+        }
+    };
 
     public static MessengerFragment newInstance(Chat chat) {
         Bundle args = new Bundle();
@@ -89,6 +103,17 @@ public class MessengerFragment extends Fragment {
         layoutManager.setReverseLayout(true);
         rvMessages.setLayoutManager(layoutManager);
 
+        etMessage.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    sendMessage();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         return view;
     }
 
@@ -111,21 +136,23 @@ public class MessengerFragment extends Fragment {
         mListener.goToDashboard();
     }
 
+    /**
+     * Method called by the parent fragment to set the new chat that the user is in. Also
+     * clears the original message list in case we are replacing an old chat.
+     *
+     * @param chat The new chat object
+     */
     public void setChat(Chat chat) {
         this.chat = chat;
-        initializeChat();
-    }
+        messages.clear();
+        messageAdapter.notifyDataSetChanged();
+        new FetchChatNameAsyncTask(this).execute(chat);
 
-    // TODO: update messages periodically
-    private static final int POLL_INTERVAL_MILLIS = 1000;
-    Handler myHandler = new Handler();
-    Runnable mRefreshMessagesRunnable = new Runnable() {
-        @Override
-        public void run() {
-            refreshMessages();
-            myHandler.postDelayed(this, POLL_INTERVAL_MILLIS);
+        if (!refreshRunnableNotStarted) { // only one runnable
+            refreshMessageRunnable.run();
+            refreshRunnableNotStarted = false;
         }
-    };
+    }
 
     /**
      * Saves the message typed by the user to the chat and saves the Message object to the
@@ -135,23 +162,33 @@ public class MessengerFragment extends Fragment {
         String data = etMessage.getText().toString();
 
         if (!data.isEmpty()) {
-            Message message = new Message();
-            //TODO: move to new thread
+            final Message message = new Message();
             message.setSender(ParseUser.getCurrentUser());
             message.setContent(data);
-            message.setChat(chat);
+            message.setChatId(chat.getObjectId());
             message.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-                    Toast.makeText(getContext(), "Successfully created message on Parse",
-                            Toast.LENGTH_SHORT).show();
+                    if (e == null) {
+                        chat.addMessageId(message.getObjectId(), chat.getMessages() == null);
+                        chat.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    appendMessage(message);
+                                    etMessage.setText(null);
+
+                                    Toast.makeText(getContext(), "Created message on Parse",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Could not send message",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
-
-            messages.add(0, message);
-            messageAdapter.notifyItemInserted(0);
-            rvMessages.scrollToPosition(0);
-            etMessage.setText(null);
         }
     }
 
@@ -161,52 +198,68 @@ public class MessengerFragment extends Fragment {
      * // TODO: don't always clear, just append new messages?
      */
     private void refreshMessages() {
-        // Construct query to execute
-        Message.Query query = new Message.Query();
+        Message.Query messageQuery = new Message.Query();
+        messageQuery.newestFirst().withChat().findInBackground(new FindCallback<Message>() {
+            @Override
+            public void done(List<Message> objects, ParseException e) {
+                if (e == null && objects.size() > totalMessageCount) {
+                    int newMessageCount = objects.size() - totalMessageCount - 1;
 
-        query.setQueryLimit()
-                .inOrder()
-                .inChat(chat);
-
-        query.findInBackground(new FindCallback<Message>() {
-            public void done(List<Message> results, ParseException e) {
-                if (e == null) {
-                    messages.clear();
-                    messages.addAll(results);
-                    messageAdapter.notifyDataSetChanged(); // update adapter
-                    rvMessages.scrollToPosition(0);
-                } else {
-                    Log.e("message", "Error Loading Messages" + e);
+                    for (int i = newMessageCount; i >= 0; i--) {
+                        Message message = objects.get(i);
+                        if (chat.getObjectId().equals(message.getChatId()))
+                            appendMessage(message);
+                    }
                 }
             }
         });
     }
 
     /**
-     * Initializes all the views in the MessengerFragment after the Chat object is received
+     * Helper method to append the message to the bottom of the chat's RecyclerView
+     *
+     * @param message The message to append
      */
-    private void initializeChat() {
-        try {
-            tvChatName.setText(chat.fetchIfNeeded().get("name").toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        etMessage.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    sendMessage();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        refreshMessages();
+    private void appendMessage(Message message) {
+        messages.add(0, message);
+        messageAdapter.notifyItemInserted(0);
+        rvMessages.scrollToPosition(0);
+        totalMessageCount++;
     }
 
     public interface OnFragmentInteractionListener {
         void goToDashboard();
+    }
+
+    /**
+     * AsyncTask to get the chat name from the ParseServer
+     */
+    private static class FetchChatNameAsyncTask extends AsyncTask<Chat, Void, Void> {
+
+        private WeakReference<MessengerFragment> context;
+        private String chatName;
+
+        FetchChatNameAsyncTask(MessengerFragment context) {
+            this.context = new WeakReference<>(context);
+        }
+
+        @Override
+        protected Void doInBackground(Chat... chats) {
+            Chat chat = chats[0];
+            try {
+                chatName = chat.fetchIfNeeded().get("name").toString();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            MessengerFragment fragment = context.get();
+
+            if (fragment != null)
+                fragment.tvChatName.setText(chatName);
+        }
     }
 }

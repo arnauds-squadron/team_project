@@ -66,6 +66,7 @@ import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
+import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
 import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
 
@@ -190,20 +191,13 @@ public class VisitorFragment extends Fragment {
             }
         };
 
-//        // initialize search services
-//        // Get the SearchView and set the searchable configuration
-//        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-//        // Assumes current activity is the searchable activity
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-//        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
         // TODO tag previous locations with latitude and longitude. default (0, 0)
         tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
         tvPrevLocation2.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
 
         // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.search_categories, android.R.layout.simple_spinner_item);
+                R.array.search_categories_visitor, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner_text_view
@@ -239,7 +233,7 @@ public class VisitorFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // TODO what does this entail
+                // don't do anything
             }
         });
     }
@@ -257,8 +251,8 @@ public class VisitorFragment extends Fragment {
     @OnClick(R.id.tvDisplayName)
     public void viewUserProfile() {
         Intent i = new Intent(getActivity(), ProfileActivity.class);
-//        ParseUser user = ParseUser.getCurrentUser();
-//        i.putExtra("user", user);
+        ParseUser user = ParseUser.getCurrentUser();
+        i.putExtra("user", user);
         getActivity().startActivity(i);
     }
 
@@ -513,10 +507,10 @@ public class VisitorFragment extends Fragment {
                 addressOutput = "";
             }
 
-//            // display current address to user if found.
-//            if (resultCode == SUCCESS_RESULT) {
-//                tvCurrentLocation.setText(addressOutput);
-//            }
+            // display current address to user if found.
+            if (resultCode == SUCCESS_RESULT) {
+                tvCurrentLocation.setText(addressOutput);
+            }
 
         }
     }

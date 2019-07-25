@@ -1,6 +1,7 @@
 package com.arnauds_squadron.eatup.home;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,9 +18,13 @@ import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,29 +87,9 @@ public class HomeFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        final Event.Query query = new Event.Query();
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    ParseUser parseUser = ParseUser.getCurrentUser();
-                    String username = null;
-                    for (int i = 0; i < objects.size(); i++) {
-                        Event event = objects.get(i);
-                        try {
-                            username = event.getHost().fetchIfNeeded().getUsername();
-                        } catch (ParseException e1) {
-                            e1.printStackTrace();
-                        }
-                        if (username.equals(parseUser.getUsername())) {
-                            agenda.add(event);
-                            homeAdapter.notifyItemInserted(agenda.size() - 1);
-                        }
-                    }
-                }
-            }
-        });
+        // TODO: change to progress bar in the middle?
+        swipeContainer.setRefreshing(true);
+        fetchTimelineAsync();
     }
 
     /**
@@ -121,28 +106,14 @@ public class HomeFragment extends Fragment {
     }
 
     public void fetchTimelineAsync() {
-        agenda.clear();
-        final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
+        final Event.Query query = new Event.Query();
         query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
-                    ParseUser parseUser = ParseUser.getCurrentUser();
-                    String username = null;
-                    for (int i = 0; i < objects.size(); i++) {
-                        Event event = objects.get(i);
-                        try {
-                            username = event.getHost().fetchIfNeeded().getUsername();
-                        } catch (ParseException e1) {
-                            e1.printStackTrace();
-                        }
-                        if (username.equals(parseUser.getUsername())) {
-                            agenda.add(event);
-                            homeAdapter.notifyItemInserted(agenda.size() - 1);
-                        }
-                    }
-                    swipeContainer.setRefreshing(false);
+                    new UpdateTimeLineAsyncTask(HomeFragment.this)
+                            .execute((objects.toArray(new Event[0])));
                 } else {
                     e.printStackTrace();
                 }
@@ -160,5 +131,61 @@ public class HomeFragment extends Fragment {
     //TODO: documentation
     public interface OnFragmentInteractionListener {
         void switchToChatFragment(Chat chat);
+    }
+
+    /**
+     * AsyncTask to update the timeline since fetchIfNeeded() was hanging the application on the
+     * main thread
+     */
+    private static class UpdateTimeLineAsyncTask extends AsyncTask<Event, Void, Void> {
+
+        private WeakReference<HomeFragment> context;
+        private List<Event> usersEvents;
+
+        UpdateTimeLineAsyncTask(HomeFragment context) {
+            this.context = new WeakReference<>(context);
+        }
+
+        @Override
+        protected final Void doInBackground(Event... params) {
+            usersEvents = new ArrayList<>();
+            String currentUserId = ParseUser.getCurrentUser().getObjectId();
+
+            for (Event event : params) {
+                try {
+                    String hostId = event.getHost().fetchIfNeeded().getObjectId();
+                    if (currentUserId.equals(hostId)) {
+                        usersEvents.add(event);
+                    } else {
+                        JSONArray acceptedGuests = event.getAcceptedGuests();
+
+                        if (acceptedGuests != null) {
+                            for (int i = 0; i < acceptedGuests.length(); i++) {
+                                JSONObject object = acceptedGuests.getJSONObject(i);
+                                String acceptedGuestId = object.getString("objectId");
+
+                                if (currentUserId.equals(acceptedGuestId))
+                                    usersEvents.add(event);
+                            }
+                        }
+                    }
+                } catch (ParseException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            HomeFragment fragment = context.get();
+
+            if (fragment != null) {
+                fragment.agenda.clear();
+                fragment.agenda.addAll(usersEvents);
+                fragment.homeAdapter.notifyDataSetChanged();
+                fragment.swipeContainer.setRefreshing(false);
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.google.android.libraries.places.api.Places;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -39,6 +41,11 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser == null) {
+            gotoLoginActivity();
+        }
+
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager()));
 
@@ -51,11 +58,11 @@ public class MainActivity extends AppCompatActivity implements
 
         // TODO: change visitor meal icon, profile icon, and chat icon
         int[] icons = {
-                R.drawable.chat_icon,
+                R.drawable.chat_tab,
                 R.drawable.host_create_tab,
                 R.drawable.home_tab,
                 R.drawable.visitor_meal_tab,
-                R.drawable.profile_icon
+                R.drawable.profile_tab
         };
 
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
@@ -137,5 +144,11 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         return null;
+    }
+
+    private void gotoLoginActivity() {
+        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(i);
+        finish();
     }
 }

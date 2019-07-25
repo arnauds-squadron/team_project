@@ -9,7 +9,7 @@ import com.parse.ParseUser;
 public class Message extends ParseObject {
     private static final String KEY_SENDER = "sender";
     private static final String KEY_CONTENT = "content";
-    private static final String KEY_CHAT = "chat";
+    private static final String KEY_CHAT = "chatId";
     private static final String KEY_CREATED_AT = "createdAt";
 
     public ParseUser getSender() {
@@ -28,30 +28,23 @@ public class Message extends ParseObject {
         put(KEY_CONTENT, content);
     }
 
-    public Chat getChat() { return (Chat) get(KEY_CHAT); }
+    public String getChatId() { return getString(KEY_CHAT); }
 
-    public void setChat(Chat chat) { put(KEY_CHAT, chat); }
+    public void setChatId(String chat) { put(KEY_CHAT, chat); }
 
+    // inner class to query event model
     public static class Query extends ParseQuery<Message> {
-        private final static int MAX_MESSAGES = 25;
-
         public Query() {
             super(Message.class);
         }
 
-        public Query setQueryLimit() {
-            setLimit(MAX_MESSAGES);
-            return this;
-        }
-
-        // get the latest messages first
-        public Query inOrder() {
+        public Query newestFirst() {
             orderByDescending(KEY_CREATED_AT);
             return this;
         }
 
-        public Query inChat(Chat chat) {
-            whereEqualTo("chat", chat);
+        public Query withChat() {
+            include("chat");
             return this;
         }
     }

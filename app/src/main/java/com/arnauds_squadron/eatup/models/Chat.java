@@ -8,8 +8,6 @@ import com.parse.ParseUser;
 
 import org.json.JSONArray;
 
-import java.util.List;
-
 @ParseClassName("Chat")
 public class Chat extends ParseObject {
     private static final String KEY_NAME = "name";
@@ -42,21 +40,21 @@ public class Chat extends ParseObject {
         add(KEY_MEMBERS, member);
     }
 
-    public void addMembers(List<ParseUser> members) {
-        addAll(KEY_MEMBERS, members);
-    }
-
     public JSONArray getMessages() {
         return getJSONArray(KEY_MESSAGES);
     }
 
-    public void addMessage(String message) {
-        add(KEY_NAME, message);
+    public void addMessageId(String messageId, boolean isFirstMessage) {
+        if (isFirstMessage)
+            put(KEY_MESSAGES, new JSONArray());
+
+        add(KEY_MESSAGES, messageId);
     }
 
     // inner class to query event model
     public static class Query extends ParseQuery<Chat> {
-        private final static int QUERY_LIMIT = 25;
+        // Number of chat objects loaded at a time
+        private final static int QUERY_LIMIT = 10;
 
         public Query() {
             super(Chat.class);
