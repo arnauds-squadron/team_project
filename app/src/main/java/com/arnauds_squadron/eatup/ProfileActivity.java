@@ -56,7 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-        user = getIntent().getParcelableExtra("user");
+        user = ParseUser.getCurrentUser();
 
         // load user rating
         Number rating = user.getNumber(AVERAGE_RATING);

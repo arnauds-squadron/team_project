@@ -31,6 +31,10 @@ import butterknife.ButterKnife;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 public class HomeDetailsActivity extends AppCompatActivity {
 
@@ -65,6 +69,11 @@ public class HomeDetailsActivity extends AppCompatActivity {
 
         String secretKey = getString(R.string.yelp_api_key);
         final OkHttpClient client = new OkHttpClient();
+        //todo figure out the retrofit stuff
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://api.yelp.com/v3/businesses/search?term=food&categories=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
         final Request request = new Request.Builder()
                 .url("https://api.yelp.com/v3/businesses/search?term=food&categories=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
                 //.url("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco")
