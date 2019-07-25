@@ -32,27 +32,15 @@ public class Message extends ParseObject {
 
     public void setChat(Chat chat) { put(KEY_CHAT, chat); }
 
+    // inner class to query event model
     public static class Query extends ParseQuery<Message> {
-        // Number of messages loaded at a time
-        private final static int MAX_MESSAGES = 25;
-
         public Query() {
             super(Message.class);
         }
 
-        public Query setQueryLimit() {
-            setLimit(MAX_MESSAGES);
-            return this;
-        }
-
-        // get the latest messages first
-        public Query inOrder() {
+        // Only get the first 10 chats
+        public Query newestFirst() {
             orderByDescending(KEY_CREATED_AT);
-            return this;
-        }
-
-        public Query inChat(Chat chat) {
-            whereEqualTo("chat", chat);
             return this;
         }
     }

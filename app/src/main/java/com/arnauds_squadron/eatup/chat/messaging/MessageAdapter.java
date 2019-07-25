@@ -15,6 +15,7 @@ import com.arnauds_squadron.eatup.models.Message;
 import com.bumptech.glide.Glide;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -67,9 +68,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         message.getSender().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                Glide.with(context)
-                        .load(object.getParseFile("profilePicture").getUrl())
-                        .into(profileView);
+                ParseFile profilePicture = object.getParseFile("profilePicture");
+                if (profilePicture != null) {
+                    Glide.with(context)
+                            .load(profilePicture.getUrl())
+                            .into(profileView);
+                }
             }
         });
     }

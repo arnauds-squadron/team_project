@@ -20,6 +20,10 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,18 +149,29 @@ public class HomeFragment extends Fragment {
         @Override
         protected final Void doInBackground(Event... params) {
             usersEvents = new ArrayList<>();
-            String currentUsername = ParseUser.getCurrentUser().getUsername();
+            String currentUserId = ParseUser.getCurrentUser().getObjectId();
 
             for (Event event : params) {
-                String username = null;
                 try {
-                    username = event.getHost().fetchIfNeeded().getUsername();
-                } catch (ParseException e1) {
-                    e1.printStackTrace();
-                }
+                    String hostId = event.getHost().fetchIfNeeded().getObjectId();
+                    if (currentUserId.equals(hostId)) {
+                        usersEvents.add(event);
+                    } else {
+                        JSONArray acceptedGuests = event.getAcceptedGuests();
 
-                if (username.equals(currentUsername))
-                    usersEvents.add(event);
+                        if (acceptedGuests != null) {
+                            for (int i = 0; i < acceptedGuests.length(); i++) {
+                                JSONObject object = acceptedGuests.getJSONObject(i);
+                                String acceptedGuestId = object.getString("objectId");
+
+                                if (currentUserId.equals(acceptedGuestId))
+                                    usersEvents.add(event);
+                            }
+                        }
+                    }
+                } catch (ParseException | JSONException e) {
+                    e.printStackTrace();
+                }
             }
             return null;
         }
@@ -165,7 +180,7 @@ public class HomeFragment extends Fragment {
         protected void onPostExecute(Void result) {
             HomeFragment fragment = context.get();
 
-            if(fragment != null) {
+            if (fragment != null) {
                 fragment.agenda.clear();
                 fragment.agenda.addAll(usersEvents);
                 fragment.homeAdapter.notifyDataSetChanged();
