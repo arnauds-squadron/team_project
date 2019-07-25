@@ -3,9 +3,9 @@ package com.arnauds_squadron.eatup.visitor;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,8 +24,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -41,11 +39,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
+import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
+import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
 
 public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -58,9 +56,15 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private SwipeRefreshLayout swipeContainer;
     private EndlessRecyclerViewScrollListener scrollListener;
     private ProgressBar progressBar;
-    private ParseUser user;
-    private final static Double DEFAULT_COORD = 0.0;
+    private ParseUser currentUser;
+
+    // variables to keep track of current query
     private int searchCategory;
+    private ParseUser queriedUser;
+    private String queriedCuisine;
+    private ParseGeoPoint queriedGeoPoint;
+
+    private final static Double DEFAULT_COORD = 0.0;
     private int AUTOCOMPLETE_REQUEST_CODE = 17;
 
     @BindView(R.id.rvSearchResults)
@@ -99,14 +103,15 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         resultsSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String arg0) {
-                // don't do anything
                 return false;
             }
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                int spinnerPosition = searchSpinner.getSelectedItemPosition();
-                if(spinnerPosition != NO_SEARCH) {
+                mEvents.clear();
+                eventAdapter.notifyDataSetChanged();
+                searchCategory = searchSpinner.getSelectedItemPosition();
+                if(searchCategory != NO_SEARCH) {
                     Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
                     searchIntent.putExtra(SearchManager.QUERY, query);
                     searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
@@ -126,27 +131,80 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             }
         });
 
-        // initialize spinner for search filtering
+        // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.search_categories, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //c Apply the adapter to the spinner
+        //c Apply the adapter to the spinner_text_view
         searchSpinner.setAdapter(adapter);
         searchSpinner.setOnItemSelectedListener(this);
 
-        // Get the intent, verify the action and get the query
-        Intent intent = getIntent();
+        // handle search intent
+        handleIntent(getIntent());
+
+        // load data entries
+        // retain instance so can call "resetStates" for fresh searches
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Date maxEventId = getMaxDate();
+                Log.d("DATE", maxEventId.toString());
+                handleRecyclerEvents(getMaxDate());
+            }
+        };
+        // add endless scroll listener to RecyclerView and load items
+        rvEvents.addOnScrollListener(scrollListener);
+
+        // set up refresh listener that triggers new data loading
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                handleRecyclerEvents(new Date(0));
+            }
+        });
+        // configure refreshing colors
+        swipeContainer.setColorSchemeColors(getResources().getColor(android.R.color.holo_blue_bright),
+                getResources().getColor(android.R.color.holo_green_light),
+                getResources().getColor(android.R.color.holo_orange_light),
+                getResources().getColor(android.R.color.holo_red_light));
+
+    }
+
+    private void handleRecyclerEvents(Date maxDate) {
+        switch(searchCategory) {
+            case USER_SEARCH:
+                loadTopEvents(queriedUser, maxDate);
+                break;
+            case CUISINE_SEARCH:
+                loadTopEvents(queriedCuisine, maxDate);
+                break;
+            case LOCATION_SEARCH:
+                // TODO load top events for a refreshed location search
+                break;
+        }
+    }
+
+    // Get the intent, verify the action and get the query
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
-            // TODO keep search term in the search bar
+            Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
             switch(newSearchCategory) {
                 case USER_SEARCH:
                     userSearch(query);
                     break;
                 case CUISINE_SEARCH:
-                    loadTopEvents(query);
+                    queriedCuisine = query;
+                    loadTopEvents(queriedCuisine, new Date(0));
                     // TODO get search suggestions of cuisines from the Yelp Search API
                     break;
             }
@@ -158,52 +216,22 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             if (searchCategory == NO_SEARCH) {
                 Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
                 Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
-                ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
-                locationSearch(location);
+                queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
+                locationSearch(queriedGeoPoint, new Date(0));
             } else if (searchCategory == LOCATION_SEARCH) {
                 startLocationSearchActivity();
             }
             else {
-                // display user's choice in the spinner
+                // display user's choice in the spinner_text_view
                 searchSpinner.setSelection(searchCategory);
             }
         }
-
-/*
-        // load data entries
-        // retain instance so can call "resetStates" for fresh searches
-        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                Date maxEventId = getMaxDate();
-                Log.d("DATE", maxEventId.toString());
-                loadTopEvents(getMaxDate());
-            }
-        };
-        // add endless scroll listener to RecyclerView and load items
-        rvEvents.addOnScrollListener(scrollListener);
-
-        // loadTopEvents(new Date(0));
-
-        // set up refresh listener that triggers new data loading
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadTopEvents(new Date(0));
-            }
-        });
-        // configure refreshing colors
-        swipeContainer.setColorSchemeColors(getResources().getColor(android.R.color.holo_blue_bright),
-                getResources().getColor(android.R.color.holo_green_light),
-                getResources().getColor(android.R.color.holo_orange_light),
-                getResources().getColor(android.R.color.holo_red_light));
-*/
     }
 
-
-    // methods for the search category spinner
+    // Methods for search category spinner
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        mEvents.clear();
+        eventAdapter.notifyDataSetChanged();
         searchCategory = pos;
         if(searchCategory == LOCATION_SEARCH) {
             startLocationSearchActivity();
@@ -214,7 +242,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // TODO what does this entail
     }
 
-    // search methods
+    // Methods to query parse server
     private void userSearch(String userQuery) {
         // query for user, then query for events containing user
         ParseQuery<ParseUser> query = ParseUser.getQuery();
@@ -223,8 +251,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             public void done(List<ParseUser> objects, ParseException e) {
                 if (e == null) {
                     if(objects.size() != 0) {
-                        ParseUser foundUser = objects.get(0);
-                        loadTopEvents(foundUser);
+                        Log.d("VisitorSearchActivity", "found user");
+                        queriedUser = objects.get(0);
+                        loadTopEvents(queriedUser, new Date(0));
                     } else {
                         Toast.makeText(getApplicationContext(), "No users found with that username.", Toast.LENGTH_SHORT).show();
                     }
@@ -244,7 +273,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 Double latitude = place.getLatLng().latitude;
                 Double longitude = place.getLatLng().longitude;
                 ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
-                locationSearch(location);
+                locationSearch(location, new Date(0));
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 Toast.makeText(this, "Location search error. Try again.", Toast.LENGTH_SHORT).show();
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -267,107 +296,32 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         startActivityForResult(locationIntent, AUTOCOMPLETE_REQUEST_CODE);
     }
 
-    private void locationSearch(ParseGeoPoint geoPoint) {
+    private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
         final Event.Query eventsQuery = new Event.Query();
-        eventsQuery.getClosest(geoPoint).getTop().withHost();
-        eventsQuery.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    if(objects.size() != 0) {
-                        for (int i = 0; i < objects.size(); ++i) {
-                            mEvents.add(objects.get(i));
-                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                            // on successful reload, signal that refresh has completed
-                            // swipeContainer.setRefreshing(false);
-                        }
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    e.printStackTrace();
-                }
-//                progressBar.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
-
-    protected void loadTopEvents(ParseUser user) {
-        final Event.Query eventsQuery = new Event.Query();
-        // if opening app for the first time, get top 20 and clear old items
-        // otherwise, query for posts older than the oldest
-        eventsQuery.getTop().withHost().whereEqualTo("host", user);
-        eventsQuery.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    if(objects.size() != 0) {
-                        for (int i = 0; i < objects.size(); ++i) {
-                            mEvents.add(objects.get(i));
-                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                            // on successful reload, signal that refresh has completed
-                            // swipeContainer.setRefreshing(false);
-                        }
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    protected void loadTopEvents(String cuisineQuery) {
-        final Event.Query eventsQuery = new Event.Query();
-        // if opening app for the first time, get top 20 and clear old items
-        // otherwise, query for posts older than the oldest
-        eventsQuery.getTop().withHost().whereEqualTo("foodType", cuisineQuery);
-        eventsQuery.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    if(objects.size() != 0) {
-                        for (int i = 0; i < objects.size(); ++i) {
-                            mEvents.add(objects.get(i));
-                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                            // on successful reload, signal that refresh has completed
-                            // swipeContainer.setRefreshing(false);
-                        }
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    protected void loadTopEvents(Date maxDate) {
-//        progressBar.setVisibility(View.VISIBLE);
-        final Event.Query eventsQuery = new Event.Query();
-        // if opening app for the first time, get top 20 and clear old items
-        // otherwise, query for posts older than the oldest
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withHost();
+            eventsQuery.getClosest(geoPoint).getTop().withHost();
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withHost();
+            eventsQuery.getOlder(maxDate).getClosest(geoPoint).getTop().withHost();
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
-                    for (int i = 0; i < objects.size(); ++i) {
-                        mEvents.add(objects.get(i));
-                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                        // on successful reload, signal that refresh has completed
-//                        swipeContainer.setRefreshing(false);
+                    if(objects.size() != 0) {
+                        for (int i = 0; i < objects.size(); ++i) {
+                            mEvents.add(objects.get(i));
+                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                            // on successful reload, signal that refresh has completed
+                            swipeContainer.setRefreshing(false);
+                        }
+                    }
+                    else {
+                        // only notify user if no events to show
+                        if(mEvents.size() == 0) {
+                            Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 } else {
                     e.printStackTrace();
@@ -377,10 +331,80 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         });
     }
 
+    protected void loadTopEvents(ParseUser user, Date maxDate) {
+        final Event.Query eventsQuery = new Event.Query();
+        // if opening app for the first time, get top 20 and clear old items
+        // otherwise, query for posts older than the oldest
+        if (maxDate.equals(new Date(0))) {
+            eventAdapter.clear();
+            eventsQuery.getTop().withHost().whereEqualTo("host", user);
+        } else {
+            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo("host", user);
+        }
+        eventsQuery.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                if (e == null) {
+                    if(objects.size() != 0) {
+                        for (int i = 0; i < objects.size(); ++i) {
+                            mEvents.add(objects.get(i));
+                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                            // on successful reload, signal that refresh has completed
+                            swipeContainer.setRefreshing(false);
+                        }
+                    }
+                    else {
+                        // only notify user if no events to show
+                        if(mEvents.size() == 0) {
+                            Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    protected void loadTopEvents(String cuisineQuery, Date maxDate) {
+        final Event.Query eventsQuery = new Event.Query();
+        // if opening app for the first time, get top 20 and clear old items
+        // otherwise, query for events older than the oldest
+        if (maxDate.equals(new Date(0))) {
+            eventAdapter.clear();
+            eventsQuery.getTop().withHost().whereEqualTo("foodType", cuisineQuery);
+        } else {
+            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo("foodType", cuisineQuery);
+        }
+        eventsQuery.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                if (e == null) {
+                    if(objects.size() != 0) {
+                        for (int i = 0; i < objects.size(); ++i) {
+                            mEvents.add(objects.get(i));
+                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                            // on successful reload, signal that refresh has completed
+                            swipeContainer.setRefreshing(false);
+                        }
+                    }
+                    else {
+                        // only notify user if no events to show
+                        if(mEvents.size() == 0) {
+                            Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     // get date of oldest post
     protected Date getMaxDate() {
-        int postsSize = mEvents.size();
-        if (postsSize == 0) {
+        int eventsSize = mEvents.size();
+        if (eventsSize == 0) {
             return (new Date(0));
         } else {
             Event oldest = mEvents.get(mEvents.size() - 1);

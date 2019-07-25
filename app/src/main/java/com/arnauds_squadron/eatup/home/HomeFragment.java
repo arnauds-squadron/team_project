@@ -1,6 +1,6 @@
 package com.arnauds_squadron.eatup.home;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,37 +8,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 
-import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
-import com.bumptech.glide.Glide;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseImageView;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
-import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
-import static com.parse.Parse.LOG_LEVEL_DEBUG;
-import static com.parse.Parse.getApplicationContext;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,44 +34,41 @@ import static com.parse.Parse.getApplicationContext;
 public class HomeFragment extends Fragment {
 
     private HomeAdapter homeAdapter;
-    private Unbinder unbinder;
+    private OnFragmentInteractionListener mListener;
 
-    ArrayList<Event> agenda;
+    private ArrayList<Event> agenda;
+
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeContainer;
+
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
 
     public static HomeFragment newInstance() {
-        Bundle args = new Bundle();
-        HomeFragment fragment = new HomeFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        return new HomeFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        ButterKnife.bind(this, view);
         return view;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // initialize data source
         agenda = new ArrayList<>();
         // construct adapter from data source
-        homeAdapter = new HomeAdapter(agenda);
+        homeAdapter = new HomeAdapter(this, agenda);
         // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
+
+        // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -123,6 +106,20 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * Attaches the listener to the MainActivity
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (OnFragmentInteractionListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement the interface");
+        }
+    }
+
     public void fetchTimelineAsync() {
         agenda.clear();
         final ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
@@ -151,5 +148,17 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    /**
+     * Called by the HomeAdapter to open an event's chat
+     */
+    public void openChat(Chat chat) {
+        mListener.switchToChatFragment(chat);
+    }
+
+    //TODO: documentation
+    public interface OnFragmentInteractionListener {
+        void switchToChatFragment(Chat chat);
     }
 }

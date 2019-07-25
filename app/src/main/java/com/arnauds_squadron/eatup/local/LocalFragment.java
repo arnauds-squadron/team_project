@@ -15,17 +15,14 @@ import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.StartFragment;
-import com.arnauds_squadron.eatup.local.setup.tags.TagFragment;
+import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
-import com.arnauds_squadron.eatup.navigation.SetupFragmentPagerAdapter;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,13 +35,13 @@ import butterknife.ButterKnife;
 public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
-        TagFragment.OnFragmentInteractionListener,
+        TagsFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener,
         ReviewFragment.OnFragmentInteractionListener {
 
     private final static String TAG = "LocalFragment";
 
-    @BindView(R.id.viewPager)
+    @BindView(R.id.frameLayout)
     NoSwipingPagerAdapter setupViewPager;
 
     // Listener that communicates with the parent activity to switch back to the HomeFragment
@@ -55,10 +52,7 @@ public class LocalFragment extends Fragment implements
     private Event event;
 
     public static LocalFragment newInstance() {
-        Bundle args = new Bundle();
-        LocalFragment fragment = new LocalFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new LocalFragment();
     }
 
     @Override
@@ -97,17 +91,14 @@ public class LocalFragment extends Fragment implements
         advanceViewPager();
     }
 
-
     /**
-     * Overrides the TagFragment interface
+     * Overrides the TagsFragment interface
      *
-     * Updates the food type parameter of this fragment's event variable
+     * Updates some of the initial fields of the newly created event (tags, 21+, restauraunt, etc)
      */
     @Override
-    public void updateTags(List<String> tags) {
-        event = new Event();
-//        event.setHost(ParseUser.getCurrentUser());
-        event.setTags(tags);
+    public void updateTags(Event newEvent) {
+        event = newEvent;
         advanceViewPager();
     }
 
@@ -153,7 +144,8 @@ public class LocalFragment extends Fragment implements
      * fragment
      */
     @Override
-    public void createEvent() {
+    public void createEvent(String eventTitle) {
+        event.setTitle(eventTitle);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -161,7 +153,7 @@ public class LocalFragment extends Fragment implements
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_SHORT).show();
                     Log.d("LocalFragment", "create post success");
                     mListener.switchToHomeFragment();
-                    advanceViewPager(); // move viewpager to the first setup fragment
+                    setupViewPager.setCurrentItem(0);
                 } else {
                     Toast.makeText(getActivity(), "Could not create post",
                             Toast.LENGTH_LONG).show();
@@ -173,11 +165,11 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Method to be called by the parent activity to handle back presses. Moves the pager one
-     * fragment backwards
+     * fragment backwards if possible
      * @return true if the view pager was moved backwards, false if we were already on the first
      * item
      */
-    public boolean retreatViewPager() {
+    public boolean onBackPressed() {
         if (setupViewPager.getCurrentItem() == 0) {
             return false;
         } else {
@@ -200,7 +192,15 @@ public class LocalFragment extends Fragment implements
         setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() + 1);
     }
 
+
+    /**
+     * Interface to communicate with the parent activity so the HomeFragment is navigated to
+     * after an event is created
+     */
     public interface OnFragmentInteractionListener {
+        /**
+         * Callback to the parent's listener to switch to the home fragment
+         */
         void switchToHomeFragment();
     }
 }

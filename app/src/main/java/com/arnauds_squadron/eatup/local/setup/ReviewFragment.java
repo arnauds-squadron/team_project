@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
@@ -43,13 +44,13 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.tvSelectedTime)
     TextView tvSelectedTime;
 
+    @BindView(R.id.etEventTitle)
+    EditText etEventTitle;
+
     private Event event;
 
     public static ReviewFragment newInstance() {
-        Bundle args = new Bundle();
-        ReviewFragment fragment = new ReviewFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new ReviewFragment();
     }
 
     @Override
@@ -67,8 +68,8 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Method to create the date picker only when the date fragment is actually visible
-     * to the users
+     * Method to only initialize the vies when this fragment is visible (don't initialize views
+     * before the dates are selected)
      */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -103,7 +104,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
-        mListener.createEvent();
+        mListener.createEvent(etEventTitle.getText().toString());
     }
 
     /**
@@ -148,6 +149,6 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         /**
          * Method that triggers the event creation method in the parent fragment
          */
-        void createEvent();
+        void createEvent(String eventTitle);
     }
 }

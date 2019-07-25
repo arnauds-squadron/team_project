@@ -6,8 +6,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.arnauds_squadron.eatup.chat.ChatFragment;
+import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.google.android.libraries.places.api.Places;
 
 import java.util.List;
@@ -16,13 +20,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements
-        LocalFragment.OnFragmentInteractionListener {
+        HomeFragment.OnFragmentInteractionListener,
+        LocalFragment.OnFragmentInteractionListener,
+        ChatFragment.OnFragmentInteractionListener {
 
-    @BindView(R.id.viewPager)
+    @BindView(R.id.frameLayout)
     ViewPager viewPager;
 
     @BindView(R.id.tab_bar)
     TabLayout tabLayout;
+
+    // Chat selected in the HomeFragment, stored to be accessed by the ChatFragment
+    private Chat chat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,36 +40,14 @@ public class MainActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager(),
-                MainActivity.this));
+        viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager()));
 
-        // Detect page switch and clear the back stack if the user switches to
-        // a different fragment so the back button can exit the app
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-            }
+        // All the tabs in this viewpager will be loaded (4 neighboring tabs)
+        viewPager.setOffscreenPageLimit(4);
+        viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
 
-            @Override
-            public void onPageSelected(int index) {
-                if (index != 0) { // switched to a fragment other than the local fragment
-                    LocalFragment localFragment = getLocalFragment();
-                    if (localFragment != null) {
-                        localFragment.resetSetupViewPager();
-                    }
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-            }
-        });
-
-        // Give the TabLayout the ViewPage
+        // Give the TabLayout the ViewPager
         tabLayout.setupWithViewPager(viewPager);
-
-        // Set home fragment as the first screen
-        viewPager.setCurrentItem(1);
 
         // TODO: change visitor meal icon, profile icon, and chat icon
         int[] icons = {
@@ -80,33 +67,75 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Handle back button pressed so it goes through the fragment stack first before going
-     * through the activity stack
+     * through the activity stack. Checks the selected index and notifies the selected fragment
+     * to handle the back pressed if needed
      */
     @Override
     public void onBackPressed() {
-        LocalFragment localFragment = getLocalFragment();
+        int currentFragmentIndex = viewPager.getCurrentItem();
 
-        if (localFragment == null) { // no local fragment
+        if(currentFragmentIndex == 0) { // chat fragment
+            ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
+
+            if (!chatFragment.onBackPressed())
+                finish();
+
+        } else if(currentFragmentIndex == 1) { // local fragment
+            LocalFragment localFragment = (LocalFragment) getTypedFragment(LocalFragment.class);
+
+            if (!localFragment.onBackPressed())
+                finish();
+
+        } else {
             super.onBackPressed();
-        } else if (!localFragment.retreatViewPager()) {
-            finish();
         }
     }
 
+    /**
+     * Overrides the LocalFragment interface
+     *
+     * Switches to the HomeFragment when the user finishes creating the event
+     */
     @Override
     public void switchToHomeFragment() {
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
     }
 
-    private LocalFragment getLocalFragment() {
+    /**
+     * Overrides the HomeFragment interface
+     *
+     * Switches to the ChatFragment when the user clicks on a chat
+     */
+    @Override
+    public void switchToChatFragment(Chat chat) {
+        this.chat = chat;
+        viewPager.setCurrentItem(0);
+    }
+
+    /**
+     * Overrides the ChatFragment interface
+     *
+     * Accessor for the chat object, DELETES the local copy of chat. Chat should not be null only
+     * when the user just clicked on an event's chat in the HomeFragment
+     *
+     * @effects Deletes the local copy of the chat
+     * @return The chat object selected through the HomeFragment
+     */
+    @Override
+    public Chat getSelectedChat() {
+        Chat temp = chat;
+        chat = null;
+        return temp;
+    }
+
+    private Fragment getTypedFragment(Class clazz) {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        LocalFragment localFragment = null;
 
         for (Fragment fragment : fragments) {
-            if (fragment.getClass().equals(LocalFragment.class)) {
-                localFragment = (LocalFragment) fragment;
+            if (fragment.getClass().equals(clazz)) {
+                return fragment;
             }
         }
-        return localFragment;
+        return null;
     }
 }

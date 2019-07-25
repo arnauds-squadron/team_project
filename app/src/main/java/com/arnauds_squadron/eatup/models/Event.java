@@ -33,14 +33,11 @@ public class Event extends ParseObject {
     private static final String KEY_MAX_GUESTS = "maxGuests";
     private static final String KEY_21 = "over21";
     private static final String KEY_RESTAURANT = "isRestaurant";
-    private static final String KEY_CONVERSATION = "conversation";
+    private static final String KEY_CHAT = "chat";
     private static final String KEY_PENDING_GUESTS = "pendingGuests";
     private static final String KEY_UPDATED_GUESTS = "updatedGuests";
     private static final String KEY_CREATED_AT = "createdAt";
     private static final Double MAX_DISTANCE = 0.1;
-
-    public Event() {
-    }
 
     // ParseFile - class in SDK that allows accessing files stored with Parse
     public ParseFile getEventImage() {
@@ -156,6 +153,15 @@ public class Event extends ParseObject {
     }
 
     // TODO how to access conversation/do we actually need to use the create/update at methods
+
+    public Chat getChat() {
+        return (Chat) get(KEY_CHAT);
+    }
+
+    public void addChat(Chat chat) {
+        put(KEY_CHAT, chat);
+    }
+
 
     // inner class to query event model
     public static class Query extends ParseQuery<Event> {

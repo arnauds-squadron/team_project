@@ -2,7 +2,9 @@ package com.arnauds_squadron.eatup;
 
 import android.app.Application;
 
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Message;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -11,8 +13,9 @@ public class ParseApp extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // tell Parse that Post is a custom Parse model created to encapsulate data
         ParseObject.registerSubclass(Event.class);
+        ParseObject.registerSubclass(Chat.class);
+        ParseObject.registerSubclass(Message.class);
 
         final Parse.Configuration configuration = new Parse.Configuration.Builder(this)
                 .applicationId("eat_up")

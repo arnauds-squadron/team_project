@@ -10,4 +10,9 @@
         <item>Brazilian</item>
         <item>Pasta</item>
     </array>
+
+    <array name="isRestaurantSpinnerData">
+        <item>Restaurant</item>
+        <item>Home-cooked</item>
+    </array>
 </resources>

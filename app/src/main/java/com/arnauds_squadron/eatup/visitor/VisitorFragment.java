@@ -2,8 +2,6 @@ package com.arnauds_squadron.eatup.visitor;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
@@ -27,10 +25,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,12 +62,11 @@ import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
+import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
-import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
 import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
-import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 
 public class VisitorFragment extends Fragment {
@@ -206,12 +201,12 @@ public class VisitorFragment extends Fragment {
         tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
         tvPrevLocation2.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
 
-        // initialize spinner for search filtering
+        // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.search_categories, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
+        // Apply the adapter to the spinner_text_view
         searchSpinner.setAdapter(adapter);
         searchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             // when item selected, bring user to the new search activity with search bar and search category packaged as intent extra
@@ -235,7 +230,7 @@ public class VisitorFragment extends Fragment {
                         break;
                 }
                 if(searchCategoryCode != 0) {
-                    searchSpinner.setSelection(0);
+                    searchSpinner.setSelection(NO_SEARCH);
                     Intent i = new Intent(getContext(), VisitorSearchActivity.class);
                     i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
                     getContext().startActivity(i);
@@ -500,7 +495,7 @@ public class VisitorFragment extends Fragment {
 
     // ResultReceiver to set current location field based on address of lat/long
     class AddressResultReceiver extends ResultReceiver {
-        public AddressResultReceiver(Handler handler) {
+        AddressResultReceiver(Handler handler) {
             super(handler);
         }
 
@@ -518,10 +513,10 @@ public class VisitorFragment extends Fragment {
                 addressOutput = "";
             }
 
-            // display current address to user if found.
-            if (resultCode == SUCCESS_RESULT) {
-                tvCurrentLocation.setText(addressOutput);
-            }
+//            // display current address to user if found.
+//            if (resultCode == SUCCESS_RESULT) {
+//                tvCurrentLocation.setText(addressOutput);
+//            }
 
         }
     }

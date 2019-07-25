@@ -1,6 +1,5 @@
 package com.arnauds_squadron.eatup.home;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,14 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
-import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
@@ -31,10 +32,12 @@ import butterknife.ButterKnife;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
-    ArrayList<Event>mAgenda;
-    Context context;
+    private ArrayList<Event> mAgenda;
+    private Context context;
+    private HomeFragment homeFragment;
 
-    public HomeAdapter(ArrayList<Event> mAgenda) {
+    HomeAdapter(HomeFragment homeFragment, ArrayList<Event> mAgenda) {
+        this.homeFragment = homeFragment;
         this.mAgenda = mAgenda;
     }
 
@@ -44,32 +47,31 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         context = viewGroup.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View postView = inflater.inflate(R.layout.item_agenda, viewGroup, false);
-        ViewHolder viewHolder = new ViewHolder(postView);
-        return viewHolder;
+        return new ViewHolder(postView);
     }
 
-//    @SuppressLint("ResourceType")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
-        Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
-        if(event.getDate() != null) {
-            if(event.getDate().before(localCalendar.getTime())) {
-                viewHolder.tvDate.setTextColor(Color.RED);
-            } else {
-                viewHolder.tvDate.setTextColor(Color.BLACK);
+        if (event.getDate() != null) {
+            Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+            if (event.getDate() != null) {
+                if (event.getDate().before(localCalendar.getTime())) {
+                    viewHolder.tvDate.setTextColor(Color.RED);
+                } else {
+                    viewHolder.tvDate.setTextColor(Color.BLACK);
+                }
+                viewHolder.tvDate.setText(event.getDate().toString());
             }
-            viewHolder.tvDate.setText(event.getDate().toString());
+            if (event.getTitle() != null) {
+                viewHolder.tvTitle.setText(event.getTitle());
+            }
+            if (event.getEventImage() != null) {
+                viewHolder.ivProfile.setParseFile(event.getEventImage());
+                viewHolder.ivProfile.loadInBackground();
+            }
+            //       viewHolder.tvPlace.setText(event.getAddress());
         }
-        if(event.getTitle() != null) {
-            viewHolder.tvTitle.setText(event.getTitle());
-        }
-        if(event.getEventImage() != null) {
-            viewHolder.ivProfile.setParseFile(event.getEventImage());
-            viewHolder.ivProfile.loadInBackground();
-        }
-//        viewHolder.tvPlace.setText(event.getAddress());
-
     }
 
     @Override
@@ -77,18 +79,26 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return mAgenda.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.ivProfile)
         ParseImageView ivProfile;
+
+        @BindView(R.id.ibOpenChat)
+        ImageButton ibOpenChat;
+
         @BindView(R.id.btnCancel)
         Button btnCancel;
+
         @BindView(R.id.tvDate)
         TextView tvDate;
+
         @BindView(R.id.tvTitle)
         TextView tvTitle;
+
         @BindView(R.id.tvPlace)
         TextView tvPlace;
-        public ViewHolder(@NonNull View itemView) {
+
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +110,54 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 }
             });
 
+            ibOpenChat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Event event = mAgenda.get(getAdapterPosition());
+
+                    boolean isNewChat = event.getChat() == null;
+                    final Chat chat = isNewChat ? new Chat() : event.getChat();
+
+                    if (isNewChat) {
+                        chat.setName(event.getTitle() + " Chat");
+
+                        if (event.getEventImage() != null)
+                            chat.setImage(event.getEventImage());
+
+                        // TODO: move get current user to new thread
+                        chat.addMember(ParseUser.getCurrentUser());
+
+                        // TODO: add accepted guests
+                        //newChat.addMembers(event.get);
+                    }
+
+                    chat.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) { // Register chat to the current event
+                                event.addChat(chat);
+                                event.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            // Must save chat first before opening otherwise
+                                            // we get an IllegalStateException
+                                            homeFragment.openChat(chat);
+                                        } else {
+                                            Log.e("HomeAdapter", "Could not save the chat");
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            } else {
+                                Log.e("HomeAdapter", "Could not save the chat");
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            });
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -108,7 +166,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         Event event = mAgenda.get(position);
                         Intent intent = new Intent(context, HomeDetailsActivity.class);
                         intent.putExtra(Event.class.getSimpleName(), Parcels.wrap(event));
-                        context.startActivities(new Intent[]{intent});
+                        context.startActivity(intent);
                     }
                 }
             });

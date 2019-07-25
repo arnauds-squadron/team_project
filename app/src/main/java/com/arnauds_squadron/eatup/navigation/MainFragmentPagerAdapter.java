@@ -1,6 +1,5 @@
 package com.arnauds_squadron.eatup.navigation;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,12 +11,12 @@ import com.arnauds_squadron.eatup.profile.ProfileFragment;
 import com.arnauds_squadron.eatup.visitor.VisitorFragment;
 
 /**
- * Pager Adapter to handle the 3 main fragments we have in the MainActivity
+ * Pager Adapter to handle the 5 main fragments we have in the MainActivity
  */
 public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
-    final int PAGE_COUNT = 5;
+    private final static int PAGE_COUNT = 5;
 
-    public MainFragmentPagerAdapter(FragmentManager fm, Context context) {
+    public MainFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -39,12 +38,5 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
         if (position == 4)
             return ProfileFragment.newInstance();
         return HomeFragment.newInstance();
-    }
-
-    // TODO: Remove unnecessary titles?
-    @Override
-    public CharSequence getPageTitle(int position) {
-        // Generate title based on item position
-        return null;
     }
 }
