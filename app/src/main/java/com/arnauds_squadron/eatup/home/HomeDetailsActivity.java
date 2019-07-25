@@ -13,12 +13,16 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.YelpApi.YelpApiResponse;
+import com.arnauds_squadron.eatup.YelpApi.YelpService;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonObject;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,11 +32,17 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
@@ -65,63 +75,128 @@ public class HomeDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_details);
         ButterKnife.bind(this);
-        event = Parcels.unwrap(getIntent().getParcelableExtra(Event.class.getSimpleName()));
 
-        String secretKey = getString(R.string.yelp_api_key);
-        final OkHttpClient client = new OkHttpClient();
+
+        final String secretKey = getString(R.string.yelp_api_key);
         //todo figure out the retrofit stuff
+        OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @NotNull
+                    @Override
+                    public Response intercept(@NotNull Chain chain) throws IOException {
+                        Request request = chain.request();
+                        Request.Builder requestBuilder = request.newBuilder()
+                                .header("Authorization", "Bearer " + secretKey)
+                                .method(request.method(), request.body());
+
+//                Request request = requestBuilder.build();
+                        return chain.proceed(requestBuilder.build());
+                    }
+                });
+//            @Override
+//            public Response intercept(@NotNull Chain chain) throws IOException {
+
+//                HttpUrl url = request.url().newBuilder()
+//                        //.url("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco")
+//                        .addQueryParameter("Authorization", "Bearer " + secretKey)
+//                        .build();
+//                Request newRequest = chain.request().newBuilder().url(url).build();
+//                return chain.proceed(newRequest);
+//            }
+//        });
+        event = Parcels.unwrap(getIntent().getParcelableExtra(Event.class.getSimpleName()));
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl("https://api.yelp.com/v3/")
+                .client(okHttpClient.build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        YelpService service = retrofit.create(YelpService.class);
+        Call<YelpApiResponse> meetUp = service.getLocation("food", event.getCuisine(), event.getAddress().getLatitude(), event.getAddress().getLongitude());
+
+        meetUp.enqueue(new Callback<YelpApiResponse>() {
+            @Override
+            public void onResponse(Call<YelpApiResponse> call, retrofit2.Response<YelpApiResponse> response) {
+                if (response.isSuccessful()) {
+
+                    response.body().businessList.get(0);
+//                    try {
+//                        final String imageURL = response.get("image_url").getAsString();
+//                        tvYelp.setText(post.get("name").getAsString());
+//                        Glide.with(HomeDetailsActivity.this)
+//                                .load(imageURL)
+//                                .override(100,100)
+//                                .into(ivImage);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+                    //ResponseBody responseString = response.body();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YelpApiResponse> call, Throwable t) {
+
+            }
+        });
 //        Retrofit retrofit = new Retrofit.Builder()
 //                .baseUrl("https://api.yelp.com/v3/businesses/search?term=food&categories=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
 //                .addConverterFactory(GsonConverterFactory.create())
 //                .build();
-        final Request request = new Request.Builder()
-                .url("https://api.yelp.com/v3/businesses/search?term=food&categories=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
-                //.url("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco")
-                .addHeader("Authorization", "Bearer " + secretKey)
-                .build();
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-            try {
-                Response response = client.newCall(request).execute();
-                JSONObject data = new JSONObject(response.body().string().trim());
-                JSONArray business = data.getJSONArray("businesses");
-                final JSONObject jsonObject = business.getJSONObject(0);
 
-                //JSONArray myResponse = (JSONArray)jsonObject.get("id");
-                final String imageURL = jsonObject.getString("image_url");
-                final String url = jsonObject.getString("url");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            tvYelp.setText(jsonObject.getString("name"));
-                          Glide.with(HomeDetailsActivity.this)
-                                 .load(imageURL)
-                                 .override(100,100)
-                                 .into(ivImage);
-                            btnLink.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent i = new Intent(Intent.ACTION_VIEW);
-                                    i.setData(Uri.parse(url));
-                                    startActivity(i);
-                                    finish();
-                                }
-                            });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            } catch (IOException | JSONException e) {
-                // TODO Auto-generated catch block
-                Log.e("HomeDetailsActivity", "Didn't respond");
-                e.printStackTrace();
-            }
-            }
-        });
-        thread.start();
+
+        /**PREVIOUS KNOWLEDGE USING THREAD */
+//        final Request request = new Request.Builder()
+//                .url("https://api.yelp.com/v3/businesses/search?term=food&categories=" + event.getCuisine() + "&latitude=" + event.getAddress().getLatitude() + "&longitude=" + event.getAddress().getLongitude() +"")
+//                //.url("https://api.yelp.com/v3/businesses/north-india-restaurant-san-francisco")
+//                .addHeader("Authorization", "Bearer " + secretKey)
+//                .build();
+//        Thread thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//            try {
+//                Response response = client.newCall(request).execute();
+//                JSONObject data = new JSONObject(response.body().string().trim());
+//                JSONArray business = data.getJSONArray("businesses");
+//                final JSONObject jsonObject = business.getJSONObject(0);
+//
+//                //JSONArray myResponse = (JSONArray)jsonObject.get("id");
+//                final String imageURL = jsonObject.getString("image_url");
+//                final String url = jsonObject.getString("url");
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            tvYelp.setText(jsonObject.getString("name"));
+//                          Glide.with(HomeDetailsActivity.this)
+//                                 .load(imageURL)
+//                                 .override(100,100)
+//                                 .into(ivImage);
+//                            btnLink.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    Intent i = new Intent(Intent.ACTION_VIEW);
+//                                    i.setData(Uri.parse(url));
+//                                    startActivity(i);
+//                                    finish();
+//                                }
+//                            });
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
+//            } catch (IOException | JSONException e) {
+//                // TODO Auto-generated catch block
+//                Log.e("HomeDetailsActivity", "Didn't respond");
+//                e.printStackTrace();
+//            }
+//            }
+//        });
+//        thread.start();
+
+
         if(event.getTitle() != null) {
             tvTitle.setText(event.getTitle());
         }

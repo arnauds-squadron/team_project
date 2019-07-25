@@ -1,9 +1,12 @@
 package com.arnauds_squadron.eatup.YelpApi;
 
+import android.database.Observable;
+
 import com.arnauds_squadron.eatup.home.HomeDetailsActivity;
 import com.arnauds_squadron.eatup.models.Event;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -13,12 +16,13 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface YelpService {
-    @GET("/businesses/search?term=food&categories=")
-    Call<Event> getFood(@Query("categories") String cuisine);
-    @GET("&latitude=")
-    Call<Event> getLatitude(@Query("latitude") String latitude);
-    @GET("&longitude=")
-    Call<Event> getLongitude(@Query("longitude") String longitude);
+    @GET("businesses/search?")
+    Call<YelpApiResponse> getLocation(@Query("terms") String food, @Query("categories") String cuisine, @Query("latitude") Double latitude, @Query("longitude") Double longitude);
+
+//    @GET("&latitude=")
+//    Call<Event> getLatitude(@Query("latitude") String latitude);
+//    @GET("&longitude=")
+//    Call<Event> getLongitude(@Query("longitude") String longitude);
 //
 //    RequestInterceptor requestInterceptor = new RequestInterceptor() {
 //        @Override
@@ -33,7 +37,7 @@ public interface YelpService {
 //            .baseUrl("https://api.yelp.com/v3")
 //            .addConverterFactory(GsonConverterFactory.create())
 //            .build();
-//
+
 //    YelpService service = retrofit.create(YelpService.class);
 //
 //    Call<YelpApiResponse> call = service.listEvents();
