@@ -513,10 +513,10 @@ public class VisitorFragment extends Fragment {
                 addressOutput = "";
             }
 
-//            // display current address to user if found.
-//            if (resultCode == SUCCESS_RESULT) {
-//                tvCurrentLocation.setText(addressOutput);
-//            }
+            // display current address to user if found.
+            if (resultCode == SUCCESS_RESULT) {
+                tvCurrentLocation.setText(addressOutput);
+            }
 
         }
     }
