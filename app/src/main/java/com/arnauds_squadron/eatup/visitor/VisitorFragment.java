@@ -191,13 +191,6 @@ public class VisitorFragment extends Fragment {
             }
         };
 
-//        // initialize search services
-//        // Get the SearchView and set the searchable configuration
-//        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-//        // Assumes current activity is the searchable activity
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-//        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
         // TODO tag previous locations with latitude and longitude. default (0, 0)
         tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
         tvPrevLocation2.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
@@ -240,7 +233,7 @@ public class VisitorFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // TODO what does this entail
+                // don't do anything
             }
         });
     }
@@ -258,8 +251,8 @@ public class VisitorFragment extends Fragment {
     @OnClick(R.id.tvDisplayName)
     public void viewUserProfile() {
         Intent i = new Intent(getActivity(), ProfileActivity.class);
-//        ParseUser user = ParseUser.getCurrentUser();
-//        i.putExtra("user", user);
+        ParseUser user = ParseUser.getCurrentUser();
+        i.putExtra("user", user);
         getActivity().startActivity(i);
     }
 
