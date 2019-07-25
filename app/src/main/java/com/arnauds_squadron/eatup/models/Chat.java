@@ -56,7 +56,7 @@ public class Chat extends ParseObject {
 
     // inner class to query event model
     public static class Query extends ParseQuery<Chat> {
-        private final static int QUERY_LIMIT = 10;
+        private final static int QUERY_LIMIT = 25;
 
         public Query() {
             super(Chat.class);

@@ -46,28 +46,6 @@ public class MainActivity extends AppCompatActivity implements
         viewPager.setOffscreenPageLimit(4);
         viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
 
-        // Detect page switch and clear the back stack if the user switches to
-        // a different fragment so the back button can exit the app
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-            }
-
-            @Override
-            public void onPageSelected(int index) {
-                if (index != 0) { // switched to a fragment other than the local fragment
-                    LocalFragment localFragment = getLocalFragment();
-                    if (localFragment != null) {
-                        localFragment.resetSetupViewPager();
-                    }
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-            }
-        });
-
         // Give the TabLayout the ViewPager
         tabLayout.setupWithViewPager(viewPager);
 
@@ -89,16 +67,27 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Handle back button pressed so it goes through the fragment stack first before going
-     * through the activity stack
+     * through the activity stack. Checks the selected index and notifies the selected fragment
+     * to handle the back pressed if needed
      */
     @Override
     public void onBackPressed() {
-        LocalFragment localFragment = getLocalFragment();
+        int currentFragmentIndex = viewPager.getCurrentItem();
 
-        if (localFragment == null) { // no local fragment
+        if(currentFragmentIndex == 0) { // chat fragment
+            ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
+
+            if (!chatFragment.onBackPressed())
+                finish();
+
+        } else if(currentFragmentIndex == 1) { // local fragment
+            LocalFragment localFragment = (LocalFragment) getTypedFragment(LocalFragment.class);
+
+            if (!localFragment.onBackPressed())
+                finish();
+
+        } else {
             super.onBackPressed();
-        } else if (!localFragment.retreatViewPager()) {
-            finish();
         }
     }
 
@@ -139,15 +128,14 @@ public class MainActivity extends AppCompatActivity implements
         return temp;
     }
 
-    private LocalFragment getLocalFragment() {
+    private Fragment getTypedFragment(Class clazz) {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        LocalFragment localFragment = null;
 
         for (Fragment fragment : fragments) {
-            if (fragment.getClass().equals(LocalFragment.class)) {
-                localFragment = (LocalFragment) fragment;
+            if (fragment.getClass().equals(clazz)) {
+                return fragment;
             }
         }
-        return localFragment;
+        return null;
     }
 }

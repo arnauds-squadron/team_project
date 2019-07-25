@@ -86,6 +86,7 @@ public class MessengerFragment extends Fragment {
         rvMessages.setAdapter(messageAdapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        layoutManager.setReverseLayout(true);
         rvMessages.setLayoutManager(layoutManager);
 
         return view;
@@ -126,6 +127,10 @@ public class MessengerFragment extends Fragment {
         }
     };
 
+    /**
+     * Saves the message typed by the user to the chat and saves the Message object to the
+     * Parse server
+     */
     private void sendMessage() {
         String data = etMessage.getText().toString();
 
@@ -143,8 +148,9 @@ public class MessengerFragment extends Fragment {
                 }
             });
 
-            messages.add(message);
-            messageAdapter.notifyItemInserted(messages.size() - 1);
+            messages.add(0, message);
+            messageAdapter.notifyItemInserted(0);
+            rvMessages.scrollToPosition(0);
             etMessage.setText(null);
         }
     }
@@ -180,7 +186,11 @@ public class MessengerFragment extends Fragment {
      * Initializes all the views in the MessengerFragment after the Chat object is received
      */
     private void initializeChat() {
-        tvChatName.setText(chat.getName());
+        try {
+            tvChatName.setText(chat.fetchIfNeeded().get("name").toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         etMessage.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override

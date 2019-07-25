@@ -165,11 +165,11 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Method to be called by the parent activity to handle back presses. Moves the pager one
-     * fragment backwards
+     * fragment backwards if possible
      * @return true if the view pager was moved backwards, false if we were already on the first
      * item
      */
-    public boolean retreatViewPager() {
+    public boolean onBackPressed() {
         if (setupViewPager.getCurrentItem() == 0) {
             return false;
         } else {

@@ -53,9 +53,10 @@
 
         <activity android:name=".home.HomeDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
-        <activity android:name=".visitor.VisitorSearchActivity"
-            android:windowSoftInputMode="stateVisible"
-            android:launchMode="singleTop">
+        <activity
+            android:name=".visitor.VisitorSearchActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="stateVisible">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -66,8 +67,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
-        <activity android:name=".LoginActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+        <activity
+            android:name=".LoginActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -75,12 +77,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-             <!--<intent-filter> -->
-             <!--<action android:name="android.intent.action.MAIN" /> -->
-
-
-             <!--<category android:name="android.intent.category.LAUNCHER" /> -->
-             <!--</intent-filter> -->
     </application>
 
 </manifest>

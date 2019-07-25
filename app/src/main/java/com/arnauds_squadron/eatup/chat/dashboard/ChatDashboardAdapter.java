@@ -13,6 +13,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
+import com.parse.ParseFile;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
     private List<Chat> chatList;
     private ChatDashboardFragment parentFragment;
 
-    public ChatDashboardAdapter(ChatDashboardFragment parent, List<Chat> chatList) {
+    ChatDashboardAdapter(ChatDashboardFragment parent, List<Chat> chatList) {
         this.chatList = chatList;
         this.parentFragment = parent;
     }
@@ -45,9 +46,13 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
         viewHolder.tvName.setText(chat.getName());
         viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt()));
 
-        Glide.with(context)
-                .load(chat.getImage().getUrl())
-                .into(viewHolder.ivImage);
+        ParseFile image = chat.getImage();
+
+        if (image != null) {
+            Glide.with(context)
+                    .load(chat.getImage().getUrl())
+                    .into(viewHolder.ivImage);
+        }
     }
 
     @Override
