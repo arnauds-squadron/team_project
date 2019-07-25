@@ -129,6 +129,10 @@ public class HomeFragment extends Fragment {
         void switchToChatFragment(Chat chat);
     }
 
+    /**
+     * AsyncTask to update the timeline since fetchIfNeeded() was hanging the application on the
+     * main thread
+     */
     private static class UpdateTimeLineAsyncTask extends AsyncTask<Event, Void, Void> {
 
         private WeakReference<HomeFragment> context;
@@ -141,17 +145,18 @@ public class HomeFragment extends Fragment {
         @Override
         protected final Void doInBackground(Event... params) {
             usersEvents = new ArrayList<>();
-            ParseUser parseUser = ParseUser.getCurrentUser();
-            String username = null;
+            String currentUsername = ParseUser.getCurrentUser().getUsername();
+
             for (Event event : params) {
+                String username = null;
                 try {
                     username = event.getHost().fetchIfNeeded().getUsername();
                 } catch (ParseException e1) {
                     e1.printStackTrace();
                 }
-                if (username.equals(parseUser.getUsername())) {
+
+                if (username.equals(currentUsername))
                     usersEvents.add(event);
-                }
             }
             return null;
         }
@@ -161,9 +166,8 @@ public class HomeFragment extends Fragment {
             HomeFragment fragment = context.get();
 
             if(fragment != null) {
-                List<Event> agenda = fragment.agenda;
-                agenda.clear();
-                agenda.addAll(usersEvents);
+                fragment.agenda.clear();
+                fragment.agenda.addAll(usersEvents);
                 fragment.homeAdapter.notifyDataSetChanged();
                 fragment.swipeContainer.setRefreshing(false);
             }
