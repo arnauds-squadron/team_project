@@ -36,6 +36,7 @@ import butterknife.OnClick;
  * Fragment to display a single chat with messages from different users. Also allows sending of
  * messages and periodically updates the messages in real time
  */
+//TODO: typing a message in chat hides the top part of the fragment
 public class MessengerFragment extends Fragment {
 
     @BindView(R.id.tvChatName)

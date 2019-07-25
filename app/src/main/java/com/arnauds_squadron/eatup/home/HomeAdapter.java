@@ -133,7 +133,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                                 event.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        if (e != null) {
+                                        if (e == null) {
+                                            // Must save chat first before opening otherwise
+                                            // we get an IllegalStateException
+                                            homeFragment.openChat(chat);
+                                        } else {
                                             Log.e("HomeAdapter", "Could not save the chat");
                                             e.printStackTrace();
                                         }
@@ -145,7 +149,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                             }
                         }
                     });
-                    homeFragment.openChat(chat);
                 }
             });
 
