@@ -21,6 +21,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
@@ -73,6 +74,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     SearchView resultsSearchView;
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,7 +220,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
                 locationSearch(queriedGeoPoint, new Date(0));
             } else if (searchCategory == LOCATION_SEARCH) {
-                startLocationSearchActivity();
+                // TODO how to start google places autocomplete fragment on launch?
+                startLocationSearchFragment();
             }
             else {
                 // display user's choice in the spinner
@@ -233,7 +236,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         eventAdapter.notifyDataSetChanged();
         searchCategory = pos;
         if(searchCategory == LOCATION_SEARCH) {
-            startLocationSearchActivity();
+            startLocationSearchFragment();
         }
     }
 
@@ -263,36 +266,33 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         });
     }
 
-    // handle results from a location search
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                Place place = Autocomplete.getPlaceFromIntent(data);
+    private void startLocationSearchFragment() {
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+
                 Double latitude = place.getLatLng().latitude;
                 Double longitude = place.getLatLng().longitude;
                 ParseGeoPoint location = new ParseGeoPoint(latitude, longitude);
                 locationSearch(location, new Date(0));
-            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                Toast.makeText(this, "Location search error. Try again.", Toast.LENGTH_SHORT).show();
-                Status status = Autocomplete.getStatusFromIntent(data);
-                Log.i("VisitorSearchActivity", status.getStatusMessage());
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
-                Toast.makeText(this, "Location search canceled", Toast.LENGTH_SHORT).show();
+                searchSpinner.setSelection(NO_SEARCH);
+                Log.i("VisitorSearchActivity", "Place: " + place.getName() + ", " + place.getId());
             }
-            searchSpinner.setSelection(NO_SEARCH);
-        }
-    }
 
-    private void startLocationSearchActivity() {
-        // for location searches, return latlng place data after user makes a selection
-        List<Place.Field> fields = Arrays.asList(Place.Field.LAT_LNG);
-        // Start the location autocomplete intent.
-        Intent locationIntent = new Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.FULLSCREEN, fields)
-                .build(this);
-        startActivityForResult(locationIntent, AUTOCOMPLETE_REQUEST_CODE);
+            @Override
+            public void onError(Status status) {
+                Toast.makeText(getApplicationContext(), "An error occurred.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
