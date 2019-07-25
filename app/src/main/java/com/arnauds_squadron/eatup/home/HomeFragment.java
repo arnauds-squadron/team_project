@@ -153,6 +153,7 @@ public class HomeFragment extends Fragment {
     /**
      * Called by the HomeAdapter to open an event's chat
      */
+    // TODO: create event and instantly open chat, unsaved ParseObject?
     public void openChat(Chat chat) {
         mListener.switchToChatFragment(chat);
     }

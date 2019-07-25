@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -38,7 +39,7 @@ public class TagsFragment extends Fragment {
     ListView lvTagList;
 
     @BindView(R.id.swIs21Plus)
-    Spinner swIs21Plus;
+    Switch swIs21Plus;
 
     @BindView(R.id.spIsRestaurant)
     Spinner spIsRestaurant;
@@ -111,6 +112,7 @@ public class TagsFragment extends Fragment {
             event.setTags(tagList);
             event.setOver21(swIs21Plus.isActivated());
             event.setRestaurant(spIsRestaurant.getSelectedItem().toString().equals("Restaurant"));
+            mListener.updateTags(event);
         } else {
             Toast.makeText(activity, "Select at least 1 tag for your event",
                     Toast.LENGTH_SHORT).show();

@@ -85,7 +85,6 @@ public class MessengerFragment extends Fragment {
         rvMessages.setAdapter(messageAdapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-        layoutManager.setReverseLayout(true);
         rvMessages.setLayoutManager(layoutManager);
 
         return view;

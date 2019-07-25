@@ -128,7 +128,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     chat.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            if (e == null) { // Save event if we are able to save the chats
+                            if (e == null) { // Register chat to the current event
                                 event.addChat(chat);
                                 event.saveInBackground(new SaveCallback() {
                                     @Override

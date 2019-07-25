@@ -3,9 +3,9 @@ package com.arnauds_squadron.eatup.visitor;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,8 +24,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -41,11 +39,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
+import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
+import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
 
 public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -229,7 +227,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             }
         }
     }
-    
+
     // Methods for search category spinner
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         mEvents.clear();
