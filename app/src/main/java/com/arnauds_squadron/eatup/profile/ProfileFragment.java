@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.LoginActivity;
 import com.arnauds_squadron.eatup.ProfileImageActivity;
 import com.arnauds_squadron.eatup.R;
 import com.bumptech.glide.Glide;
@@ -193,10 +194,20 @@ public class ProfileFragment extends Fragment {
         btnCancel.setVisibility(View.INVISIBLE);
         btnSave.setVisibility(View.INVISIBLE);
     }
-    //todo figure out if this should be a hollywood house
-//    @OnClick(R.id.ivLogout)
-//    public void logout () {
-//        Intent i = new Intent(getActivity(), LoginActivity.class);
-//        startActivity(i);
-//    }
+
+    @OnClick(R.id.ivLogout)
+    public void logout () {
+        logoutUser();
+        gotoLoginActivity();
+    }
+
+    private void logoutUser() {
+        ParseUser.logOut();
+    }
+
+    private void gotoLoginActivity() {
+        Intent i = new Intent(getActivity(), LoginActivity.class);
+        startActivity(i);
+        getActivity().finish();
+    }
 }
