@@ -151,7 +151,6 @@ public class MessengerFragment extends Fragment {
             messages.add(0, message);
             messageAdapter.notifyItemInserted(0);
             rvMessages.scrollToPosition(0);
-            Log.i("asdfasdfasdf", messages.size() + "");
             etMessage.setText(null);
         }
     }

@@ -109,6 +109,20 @@ public class ChatFragment extends Fragment implements
         showDashboardFragment();
     }
 
+    /**
+     * Method to be called by the parent activity to handle back presses. Goes back to the
+     * dashboard fragment if the messenger fragment is selected.
+     * @return true if we moved back to the dashboard fragment, false if we were already on it
+     */
+    public boolean onBackPressed() {
+        if(flMessenger.getVisibility() == View.VISIBLE) {
+            showDashboardFragment();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void showMessengerFragment() {
         flMessenger.setVisibility(View.VISIBLE);
         flDashboard.setVisibility(View.INVISIBLE);
