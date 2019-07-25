@@ -3,9 +3,9 @@ package com.arnauds_squadron.eatup.visitor;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,6 +24,8 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -39,16 +41,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
+import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
-import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
 
 public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-    // TODO styling for location search activity - how to get rid of the action bar?
 
     // initialize adapter, views, scroll listener
     private SearchEventAdapter eventAdapter;
@@ -76,8 +76,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // TODO make searches case insensitive
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_visitor_search);
@@ -119,11 +117,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     startActivity(searchIntent);
                     // clear focus so search doesn't fire twice
                     resultsSearchView.clearFocus();
-                    finish();
+                    resultsSearchView.setQuery(query, false);
                     return true;
                 }
                 else {
-                    // TODO prevent submission if no category selected
+                    // prevent submission if no category selected
                     resultsSearchView.setQuery(query, false);
                     Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
                     return true;
@@ -131,12 +129,12 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             }
         });
 
-        // initialize spinner_text_view for search filtering
+        // initialize spinner for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.search_categories, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //c Apply the adapter to the spinner_text_view
+        //c Apply the adapter to the spinner
         searchSpinner.setAdapter(adapter);
         searchSpinner.setOnItemSelectedListener(this);
 
@@ -196,6 +194,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
             int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
             Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
             switch(newSearchCategory) {
@@ -222,7 +221,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 startLocationSearchActivity();
             }
             else {
-                // display user's choice in the spinner_text_view
+                // display user's choice in the spinner
                 searchSpinner.setSelection(searchCategory);
             }
         }
