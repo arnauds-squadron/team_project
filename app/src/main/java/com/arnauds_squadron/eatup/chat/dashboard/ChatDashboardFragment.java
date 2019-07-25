@@ -3,6 +3,7 @@ package com.arnauds_squadron.eatup.chat.dashboard;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +63,7 @@ public class ChatDashboardFragment extends Fragment {
         chatList = new ArrayList<>();
         chatAdapter = new ChatDashboardAdapter(this, chatList);
         rvChats.setAdapter(chatAdapter);
+        rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
 
         getChats();
 

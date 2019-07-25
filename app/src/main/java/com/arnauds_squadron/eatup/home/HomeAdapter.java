@@ -114,16 +114,22 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     final Event event = mAgenda.get(getAdapterPosition());
-                    final Chat chat = event.getChat() == null ? new Chat() : event.getChat();
 
-                    chat.setName(event.getTitle() + " Chat");
-                    if (event.getEventImage() != null) {
-                        chat.setImage(event.getEventImage());
+                    boolean isNewChat = event.getChat() == null;
+                    final Chat chat = isNewChat ? new Chat() : event.getChat();
+
+                    if (isNewChat) {
+                        chat.setName(event.getTitle() + " Chat");
+
+                        if (event.getEventImage() != null)
+                            chat.setImage(event.getEventImage());
+
+                        // TODO: move get current user to new thread
+                        chat.addMember(ParseUser.getCurrentUser());
+
+                        // TODO: add accepted guests
+                        //newChat.addMembers(event.get);
                     }
-                    // TODO: move get current user to new thread
-                    chat.addMember(ParseUser.getCurrentUser());
-                    // TODO: add accepted guests
-                    //newChat.addMembers(event.get);
 
                     chat.saveInBackground(new SaveCallback() {
                         @Override

@@ -17,8 +17,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.List;
 
 import butterknife.BindView;
@@ -29,7 +27,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private Context context;
     private ParseUser sender;
 
-    public MessageAdapter(Context context, ParseUser sender, List<Message> messages) {
+    MessageAdapter(Context context, ParseUser sender, List<Message> messages) {
         this.messages = messages;
         this.sender = sender;
         this.context = context;
@@ -48,7 +46,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Message message = messages.get(position);
-        boolean isMe = message.getSender().equals(sender);
+        String senderId = message.getSender().getObjectId();
+        boolean isMe = senderId.equals(sender.getObjectId());
 
         if (isMe) {
             holder.ivProfileMe.setVisibility(View.VISIBLE);
@@ -75,21 +74,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
 
         holder.tvContent.setText(message.getContent());
-    }
-
-    // Change gravity of image based on the hash value obtained from userId
-    private static String getProfileUrl(final String userId) {
-        String hex = "";
-        try {
-            final MessageDigest digest = MessageDigest.getInstance("MD5");
-            final byte[] hash = digest.digest(userId.getBytes());
-            final BigInteger bigInt = new BigInteger(hash);
-            hex = bigInt.abs().toString(16);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //TODO: change icon to user's profile image
-        return "https://www.gravatar.com/avatar/" + hex + "?d=identicon";
     }
 
     @Override
