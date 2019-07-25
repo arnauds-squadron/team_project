@@ -118,10 +118,10 @@ public class MessengerFragment extends Fragment {
         initializeChat();
     }
 
-    // TODO: update messages periodically
+    // TODO: confirm it works and move to the top
     private static final int POLL_INTERVAL_MILLIS = 1000;
     Handler myHandler = new Handler();
-    Runnable mRefreshMessagesRunnable = new Runnable() {
+    Runnable refreshMessageRunnable = new Runnable() {
         @Override
         public void run() {
             refreshMessages();
@@ -163,20 +163,18 @@ public class MessengerFragment extends Fragment {
      * // TODO: don't always clear, just append new messages?
      */
     private void refreshMessages() {
-        // Construct query to execute
         Message.Query query = new Message.Query();
 
         query.setQueryLimit()
                 .inOrder()
-                .inChat(chat);
+                .inChat(chat)
+                .setSkip(messages.size());
 
         query.findInBackground(new FindCallback<Message>() {
             public void done(List<Message> results, ParseException e) {
                 if (e == null) {
-                    messages.clear();
                     messages.addAll(results);
-                    messageAdapter.notifyDataSetChanged(); // update adapter
-                    rvMessages.scrollToPosition(0);
+                    messageAdapter.notifyItemRangeInserted(messages.size(), results.size());
                 } else {
                     Log.e("message", "Error Loading Messages" + e);
                 }
@@ -200,6 +198,7 @@ public class MessengerFragment extends Fragment {
         });
 
         new InitializeChatAsyncTask(this).execute(chat);
+        refreshMessageRunnable.run();
     }
 
     public interface OnFragmentInteractionListener {
@@ -207,8 +206,7 @@ public class MessengerFragment extends Fragment {
     }
 
     /**
-     * AsyncTask to update the timeline since fetchIfNeeded() was hanging the application on the
-     * main thread
+     * AsyncTask to get the chat name from the ParseServer
      */
     private static class InitializeChatAsyncTask extends AsyncTask<Chat, Void, Void> {
 
@@ -234,7 +232,7 @@ public class MessengerFragment extends Fragment {
         protected void onPostExecute(Void result) {
             MessengerFragment fragment = context.get();
 
-            if(fragment != null) {
+            if (fragment != null) {
                 fragment.tvChatName.setText(chatName);
                 fragment.refreshMessages();
             }

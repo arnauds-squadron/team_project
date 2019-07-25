@@ -33,6 +33,7 @@ public class Message extends ParseObject {
     public void setChat(Chat chat) { put(KEY_CHAT, chat); }
 
     public static class Query extends ParseQuery<Message> {
+        // Number of messages loaded at a time
         private final static int MAX_MESSAGES = 25;
 
         public Query() {
