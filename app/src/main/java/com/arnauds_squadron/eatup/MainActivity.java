@@ -51,11 +51,11 @@ public class MainActivity extends AppCompatActivity implements
 
         // TODO: change visitor meal icon, profile icon, and chat icon
         int[] icons = {
-                R.drawable.chat_icon,
+                R.drawable.chat_tab,
                 R.drawable.host_create_tab,
                 R.drawable.home_tab,
                 R.drawable.visitor_meal_tab,
-                R.drawable.profile_icon
+                R.drawable.profile_tab
         };
 
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
