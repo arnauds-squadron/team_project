@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="search_categories">
+    <string-array name="search_categories_visitor">
         <item>Choose a category</item>
         <item>User</item>
         <item>Cuisine</item>
+        <item>Location</item>
     </string-array>
 </resources>

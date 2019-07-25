@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -48,6 +49,11 @@ public class EventDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_details);
         ButterKnife.bind(this);
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser == null) {
+            gotoLoginActivity();
+        }
+
         eventId = getIntent().getStringExtra("event_id");
 
         ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
@@ -95,13 +101,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         }
     }
 
-    //    private void logoutUser() {
-//        ParseUser.logOut();
-//    }
-//
-//    private void gotoLoginActivity() {
-//        Intent i = new Intent(EventDetailsActivity.this, LoginActivity.class);
-//        startActivity(i);
-//        finish();
-//    }
+    private void gotoLoginActivity() {
+        Intent i = new Intent(EventDetailsActivity.this, LoginActivity.class);
+        startActivity(i);
+        finish();
+    }
 }

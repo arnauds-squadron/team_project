@@ -121,7 +121,6 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return position;
     }
 
-    // TODO fix this method
     @Override
     public int getItemCount() {
         return CARD_COUNT;
