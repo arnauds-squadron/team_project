@@ -27,6 +27,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <activity android:name=".RateHostActivity"></activity>
         <activity android:name=".ProfileImageActivity" />
         <activity android:name=".EventDetailsRestaurantActivity" />
         <activity android:name=".EventDetailsActivity" />
