@@ -15,6 +15,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Event;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,9 @@ public class TagsFragment extends Fragment {
 
     @BindView(R.id.lvTagList)
     ListView lvTagList;
+
+    @BindView(R.id.swIs21Plus)
+    Spinner swIs21Plus;
 
     @BindView(R.id.spIsRestaurant)
     Spinner spIsRestaurant;
@@ -100,11 +105,16 @@ public class TagsFragment extends Fragment {
      */
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
-        if (!tagList.isEmpty())
-            mListener.updateTags(tagList);
-        else
+        if (!tagList.isEmpty()) {
+            Event event = new Event();
+            event.setHost(ParseUser.getCurrentUser());
+            event.setTags(tagList);
+            event.setOver21(swIs21Plus.isActivated());
+            event.setRestaurant(spIsRestaurant.getSelectedItem().toString().equals("Restaurant"));
+        } else {
             Toast.makeText(activity, "Select at least 1 tag for your event",
                     Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -183,6 +193,6 @@ public class TagsFragment extends Fragment {
          * When called by the parent fragment, it should switch to the next fragment in the
          * setup queue
          */
-        void updateTags(List<String> tags);
+        void updateTags(Event event);
     }
 }

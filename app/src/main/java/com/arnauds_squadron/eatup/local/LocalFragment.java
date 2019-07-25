@@ -20,11 +20,9 @@ import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -96,14 +94,11 @@ public class LocalFragment extends Fragment implements
     /**
      * Overrides the TagsFragment interface
      *
-     * Updates the food type parameter of this fragment's event variable
+     * Updates some of the initial fields of the newly created event (tags, 21+, restauraunt, etc)
      */
     @Override
-    public void updateTags(List<String> tags) {
-        event = new Event();
-        // TODO new thread?
-        event.setHost(ParseUser.getCurrentUser());
-        event.setTags(tags);
+    public void updateTags(Event newEvent) {
+        event = newEvent;
         advanceViewPager();
     }
 
