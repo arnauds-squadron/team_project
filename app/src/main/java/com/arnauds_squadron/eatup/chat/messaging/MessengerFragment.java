@@ -45,7 +45,7 @@ import butterknife.OnClick;
 //TODO: typing a message in chat hides the top part of the fragment
 public class MessengerFragment extends Fragment {
 
-    private static final int CHAT_UPDATE_SPEED_MILLIS = 3000;
+    private static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
 
     @BindView(R.id.tvChatName)
     TextView tvChatName;
@@ -232,23 +232,6 @@ public class MessengerFragment extends Fragment {
                 }
             }
         });
-
-
-//        query.setQueryLimit()
-//                .inOrder()
-//                .inChat(chat)
-//                .setSkip(messages.size());
-//
-//        query.findInBackground(new FindCallback<Message>() {
-//            public void done(List<Message> results, ParseException e) {
-//                if (e == null) {
-//                    messages.addAll(results);
-//                    messageAdapter.notifyItemRangeInserted(messages.size(), results.size());
-//                } else {
-//                    Log.e("message", "Error Loading Messages" + e);
-//                }
-//            }
-//        });
     }
 
     public interface OnFragmentInteractionListener {
