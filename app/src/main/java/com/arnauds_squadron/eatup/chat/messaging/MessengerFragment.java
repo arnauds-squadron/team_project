@@ -56,9 +56,11 @@ public class MessengerFragment extends Fragment {
     private Chat chat;
     private List<Message> messages;
     private MessageAdapter messageAdapter;
+
+    // Total message count, including other chats
     private int totalMessageCount;
 
-    private boolean refreshRunnableNotStarted;
+    private boolean refreshRunnableNotStarted = false;
     private Handler chatUpdateHandler = new Handler();
     private Runnable refreshMessageRunnable = new Runnable() {
         @Override
@@ -143,14 +145,16 @@ public class MessengerFragment extends Fragment {
      * @param chat The new chat object
      */
     public void setChat(Chat chat) {
+        if (this.chat != null) { // only clear if there was a chat loaded before
+            messages.clear();
+            messageAdapter.notifyDataSetChanged();
+        }
         this.chat = chat;
-        messages.clear();
-        messageAdapter.notifyDataSetChanged();
         new FetchChatNameAsyncTask(this).execute(chat);
 
         if (!refreshRunnableNotStarted) { // only one runnable
             refreshMessageRunnable.run();
-            refreshRunnableNotStarted = false;
+            refreshRunnableNotStarted = true;
         }
     }
 
@@ -175,6 +179,7 @@ public class MessengerFragment extends Fragment {
                             @Override
                             public void done(ParseException e) {
                                 if (e == null) {
+                                    totalMessageCount++;
                                     appendMessage(message);
                                     etMessage.setText(null);
 
@@ -210,6 +215,7 @@ public class MessengerFragment extends Fragment {
                         if (chat.getObjectId().equals(message.getChatId()))
                             appendMessage(message);
                     }
+                    totalMessageCount = objects.size();
                 }
             }
         });
@@ -224,7 +230,6 @@ public class MessengerFragment extends Fragment {
         messages.add(0, message);
         messageAdapter.notifyItemInserted(0);
         rvMessages.scrollToPosition(0);
-        totalMessageCount++;
     }
 
     public interface OnFragmentInteractionListener {
