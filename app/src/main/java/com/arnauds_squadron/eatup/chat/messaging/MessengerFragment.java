@@ -21,14 +21,9 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Message;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -45,7 +40,7 @@ import butterknife.OnClick;
 //TODO: typing a message in chat hides the top part of the fragment
 public class MessengerFragment extends Fragment {
 
-    private static final int CHAT_UPDATE_SPEED_MILLIS = 3000;
+    private static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
 
     @BindView(R.id.tvChatName)
     TextView tvChatName;
@@ -61,7 +56,9 @@ public class MessengerFragment extends Fragment {
     private Chat chat;
     private List<Message> messages;
     private MessageAdapter messageAdapter;
+    private int totalMessageCount;
 
+    private boolean refreshRunnableNotStarted;
     private Handler chatUpdateHandler = new Handler();
     private Runnable refreshMessageRunnable = new Runnable() {
         @Override
@@ -139,16 +136,22 @@ public class MessengerFragment extends Fragment {
         mListener.goToDashboard();
     }
 
+    /**
+     * Method called by the parent fragment to set the new chat that the user is in. Also
+     * clears the original message list in case we are replacing an old chat.
+     *
+     * @param chat The new chat object
+     */
     public void setChat(Chat chat) {
         this.chat = chat;
-        new FetchChatNameAsyncTask(this).execute(chat);
-        resetChat();
-        refreshMessageRunnable.run();
-    }
-
-    private void resetChat() {
         messages.clear();
         messageAdapter.notifyDataSetChanged();
+        new FetchChatNameAsyncTask(this).execute(chat);
+
+        if (!refreshRunnableNotStarted) { // only one runnable
+            refreshMessageRunnable.run();
+            refreshRunnableNotStarted = false;
+        }
     }
 
     /**
@@ -162,7 +165,7 @@ public class MessengerFragment extends Fragment {
             final Message message = new Message();
             message.setSender(ParseUser.getCurrentUser());
             message.setContent(data);
-            message.setChat(chat);
+            message.setChatId(chat.getObjectId());
             message.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
@@ -172,9 +175,7 @@ public class MessengerFragment extends Fragment {
                             @Override
                             public void done(ParseException e) {
                                 if (e == null) {
-                                    messages.add(0, message);
-                                    messageAdapter.notifyItemInserted(0);
-                                    rvMessages.scrollToPosition(0);
+                                    appendMessage(message);
                                     etMessage.setText(null);
 
                                     Toast.makeText(getContext(), "Created message on Parse",
@@ -197,58 +198,33 @@ public class MessengerFragment extends Fragment {
      * // TODO: don't always clear, just append new messages?
      */
     private void refreshMessages() {
-        chat.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+        Message.Query messageQuery = new Message.Query();
+        messageQuery.newestFirst().withChat().findInBackground(new FindCallback<Message>() {
             @Override
-            public void done(final ParseObject object, ParseException e) {
-                if (e == null) {
-                    JSONArray messageArray = object.getJSONArray("messages");
-                    List<String> idList = new ArrayList<>();
-                    if (messageArray != null) {
+            public void done(List<Message> objects, ParseException e) {
+                if (e == null && objects.size() > totalMessageCount) {
+                    int newMessageCount = objects.size() - totalMessageCount - 1;
 
-                        for (int i = 0; i < messageArray.length(); i++) {
-                            try {
-                                idList.add(messageArray.getString(i));
-                            } catch (JSONException e1) {
-                                e1.printStackTrace();
-                            }
-                        }
-
-                        Message.Query messageQuery = new Message.Query();
-                        messageQuery
-                                .newestFirst()
-                                .whereContainedIn("objectId", idList);
-
-                        messageQuery.findInBackground(new FindCallback<Message>() {
-                            @Override
-                            public void done(List<Message> objects, ParseException e) {
-                                if (e == null && objects.size() > messages.size()) {
-                                    messages.clear();
-                                    messages.addAll(objects);
-                                    messageAdapter.notifyDataSetChanged();
-                                }
-                            }
-                        });
+                    for (int i = newMessageCount; i >= 0; i--) {
+                        Message message = objects.get(i);
+                        if (chat.getObjectId().equals(message.getChatId()))
+                            appendMessage(message);
                     }
                 }
             }
         });
+    }
 
-
-//        query.setQueryLimit()
-//                .inOrder()
-//                .inChat(chat)
-//                .setSkip(messages.size());
-//
-//        query.findInBackground(new FindCallback<Message>() {
-//            public void done(List<Message> results, ParseException e) {
-//                if (e == null) {
-//                    messages.addAll(results);
-//                    messageAdapter.notifyItemRangeInserted(messages.size(), results.size());
-//                } else {
-//                    Log.e("message", "Error Loading Messages" + e);
-//                }
-//            }
-//        });
+    /**
+     * Helper method to append the message to the bottom of the chat's RecyclerView
+     *
+     * @param message The message to append
+     */
+    private void appendMessage(Message message) {
+        messages.add(0, message);
+        messageAdapter.notifyItemInserted(0);
+        rvMessages.scrollToPosition(0);
+        totalMessageCount++;
     }
 
     public interface OnFragmentInteractionListener {
