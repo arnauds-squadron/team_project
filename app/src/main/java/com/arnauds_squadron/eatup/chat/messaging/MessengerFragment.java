@@ -1,6 +1,7 @@
 package com.arnauds_squadron.eatup.chat.messaging;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -25,6 +26,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,12 +188,6 @@ public class MessengerFragment extends Fragment {
      * Initializes all the views in the MessengerFragment after the Chat object is received
      */
     private void initializeChat() {
-        try {
-            tvChatName.setText(chat.fetchIfNeeded().get("name").toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
         etMessage.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -203,10 +199,45 @@ public class MessengerFragment extends Fragment {
             }
         });
 
-        refreshMessages();
+        new InitializeChatAsyncTask(this).execute(chat);
     }
 
     public interface OnFragmentInteractionListener {
         void goToDashboard();
+    }
+
+    /**
+     * AsyncTask to update the timeline since fetchIfNeeded() was hanging the application on the
+     * main thread
+     */
+    private static class InitializeChatAsyncTask extends AsyncTask<Chat, Void, Void> {
+
+        private WeakReference<MessengerFragment> context;
+        private String chatName;
+
+        InitializeChatAsyncTask(MessengerFragment context) {
+            this.context = new WeakReference<>(context);
+        }
+
+        @Override
+        protected Void doInBackground(Chat... chats) {
+            Chat chat = chats[0];
+            try {
+                chatName = chat.fetchIfNeeded().get("name").toString();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            MessengerFragment fragment = context.get();
+
+            if(fragment != null) {
+                fragment.tvChatName.setText(chatName);
+                fragment.refreshMessages();
+            }
+        }
     }
 }
