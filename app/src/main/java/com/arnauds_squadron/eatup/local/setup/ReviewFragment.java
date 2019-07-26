@@ -30,6 +30,7 @@ import butterknife.OnClick;
  * Fragment that displays all the selected fields and will create the event when confirmed
  */
 public class ReviewFragment extends Fragment implements OnMapReadyCallback {
+    // TODO: add scroll view or something, when user types a name the view is messed up
 
     @BindView(R.id.tvCuisine)
     TextView tvCuisine;
@@ -107,10 +108,10 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      */
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
-        String eventTitle = etEventTitle.getText().toString();
+        String eventTitle = etEventTitle.getText().toString().trim();
 
-        if (!eventTitle.trim().isEmpty())
-            mListener.createEvent(etEventTitle.getText().toString());
+        if (!eventTitle.isEmpty())
+            mListener.createEvent(eventTitle);
         else
             Toast.makeText(getActivity(), "Give your event a name!", Toast.LENGTH_SHORT).show();
     }

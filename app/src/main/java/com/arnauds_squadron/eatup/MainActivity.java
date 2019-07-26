@@ -124,8 +124,17 @@ public class MainActivity extends AppCompatActivity implements
      * Switches to the HomeFragment when the user finishes creating the event
      */
     @Override
-    public void switchToHomeFragment() {
+    public void onEventCreated() {
         viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
+
+        HomeFragment homeFragment = (HomeFragment) getTypedFragment(HomeFragment.class);
+        ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
+
+        if (homeFragment != null)
+            homeFragment.fetchTimelineAsync();
+
+        if (chatFragment != null)
+            chatFragment.updateDashboardChats();
     }
 
     /**
@@ -155,11 +164,11 @@ public class MainActivity extends AppCompatActivity implements
         return temp;
     }
 
-    private Fragment getTypedFragment(Class clazz) {
+    private Fragment getTypedFragment(Class fragmentClass) {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
 
         for (Fragment fragment : fragments) {
-            if (fragment.getClass().equals(clazz)) {
+            if (fragment.getClass().equals(fragmentClass)) {
                 return fragment;
             }
         }
