@@ -91,12 +91,10 @@ public class VisitorFragment extends Fragment {
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
 
-
     private Unbinder unbinder;
     private EndlessRecyclerViewScrollListener scrollListener;
     private BrowseEventAdapter eventAdapter;
     private ArrayList<Event> mEvents;
-
 
     //Define fields for Google API Client
     private FusedLocationProviderClient mFusedLocationClient;

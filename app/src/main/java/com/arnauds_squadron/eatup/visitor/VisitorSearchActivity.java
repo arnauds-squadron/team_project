@@ -85,7 +85,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private ParseGeoPoint queriedGeoPoint;
 
     private final static Double DEFAULT_COORD = 0.0;
-    private int AUTOCOMPLETE_REQUEST_CODE = 17;
 
     String[] SEARCH_SUGGEST_COLUMNS = {
             BaseColumns._ID,
@@ -167,7 +166,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 resultsSearchView.setQuery(queryText, false);
 
                 String locationQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
-
+                if(locationQueryId.equals(CURRENT_LOCATION_ID)) {
+                    // TODO get users current location again
+                }
 
                 List<Place.Field> placeFields = Arrays.asList(Place.Field.LAT_LNG);
                 FetchPlaceRequest request = FetchPlaceRequest.builder(locationQueryId, placeFields).build();
