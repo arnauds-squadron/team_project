@@ -93,7 +93,6 @@ public class MessengerFragment extends Fragment {
 
         Context context = getContext();
         messages = new ArrayList<>();
-        //TODO move to new thread?
         messageAdapter = new MessageAdapter(context, ParseUser.getCurrentUser(), messages);
         rvMessages.setAdapter(messageAdapter);
 

@@ -17,8 +17,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.arnauds_squadron.eatup.LoginActivity;
-import com.arnauds_squadron.eatup.ProfileImageActivity;
+import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.R;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;

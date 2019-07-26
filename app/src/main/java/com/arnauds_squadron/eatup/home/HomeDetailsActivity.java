@@ -4,40 +4,33 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.arnauds_squadron.eatup.ProfileActivity;
+import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.YelpApi.YelpApiResponse;
-import com.arnauds_squadron.eatup.YelpApi.YelpService;
+import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
+import com.arnauds_squadron.eatup.yelp_api.YelpService;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
-import com.google.gson.JsonObject;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;

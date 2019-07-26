@@ -151,14 +151,6 @@ public class TagsFragment extends Fragment {
         tvEventFoodType.setAdapter(adapter);
         tvEventFoodType.setThreshold(1); // show results after one letter
 
-        // Show the dropdown of cuisines once the user selects the view
-        tvEventFoodType.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                tvEventFoodType.showDropDown();
-            }
-        });
-
         // Add the item immediately after they select a preset (no button press required)
         tvEventFoodType.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

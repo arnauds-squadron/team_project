@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
@@ -30,8 +31,6 @@ import butterknife.OnClick;
  */
 public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
-    private OnFragmentInteractionListener mListener;
-
     @BindView(R.id.tvCuisine)
     TextView tvCuisine;
 
@@ -47,6 +46,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.etEventTitle)
     EditText etEventTitle;
 
+    private OnFragmentInteractionListener mListener;
     private Event event;
 
     public static ReviewFragment newInstance() {
@@ -90,21 +90,29 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     /**
      * Called in onCreate to bind the this child fragment to its parent, so the listener
      * can be used
+     *
      * @param fragment The parent fragment
      */
-    public void onAttachToParentFragment(Fragment fragment)
-    {
+    public void onAttachToParentFragment(Fragment fragment) {
         try {
             mListener = (OnFragmentInteractionListener) fragment;
-        }
-        catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(fragment.toString() + " must implement the interface");
         }
     }
 
+    /**
+     * Communicates with the LocalFragment with the listener to create the event with the
+     * given event name. Requires the name to not be empty or just spaces.
+     */
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
-        mListener.createEvent(etEventTitle.getText().toString());
+        String eventTitle = etEventTitle.getText().toString();
+
+        if (!eventTitle.trim().isEmpty())
+            mListener.createEvent(etEventTitle.getText().toString());
+        else
+            Toast.makeText(getActivity(), "Give your event a name!", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -123,6 +131,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
     /**
      * Called whenever getMapAsync() is called, and sets up the map
+     *
      * @param googleMap The map obtained from the maps API
      */
     @Override

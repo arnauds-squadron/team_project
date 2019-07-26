@@ -1,12 +1,5 @@
-package com.arnauds_squadron.eatup.YelpApi;
+package com.arnauds_squadron.eatup.yelp_api;
 
-import android.database.Observable;
-
-import com.arnauds_squadron.eatup.home.HomeDetailsActivity;
-import com.arnauds_squadron.eatup.models.Event;
-
-import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
