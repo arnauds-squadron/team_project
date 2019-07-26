@@ -9,7 +9,7 @@ import com.parse.ParseUser;
 public class Message extends ParseObject {
     private static final String KEY_SENDER = "sender";
     private static final String KEY_CONTENT = "content";
-    private static final String KEY_CHAT = "chatId";
+    private static final String KEY_CHAT_ID = "chatId";
     private static final String KEY_CREATED_AT = "createdAt";
 
     public ParseUser getSender() {
@@ -28,9 +28,7 @@ public class Message extends ParseObject {
         put(KEY_CONTENT, content);
     }
 
-    public String getChatId() { return getString(KEY_CHAT); }
-
-    public void setChatId(String chat) { put(KEY_CHAT, chat); }
+    public void setChatId(String chat) { put(KEY_CHAT_ID, chat); }
 
     // inner class to query event model
     public static class Query extends ParseQuery<Message> {
@@ -43,8 +41,8 @@ public class Message extends ParseObject {
             return this;
         }
 
-        public Query withChat() {
-            include("chat");
+        public Query matchesChat(Chat chat) {
+            whereEqualTo(KEY_CHAT_ID, chat.getObjectId());
             return this;
         }
     }
