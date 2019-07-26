@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.parse.ParseException;
 import com.parse.ParseImageView;
 
 import org.parceler.Parcels;
