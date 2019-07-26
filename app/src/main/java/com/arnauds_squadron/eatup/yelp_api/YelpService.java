@@ -11,6 +11,6 @@ import retrofit2.http.Query;
 public interface YelpService {
     //the endpoint businesses/search? and you must query all of the necessary attributes for the call to work
     @GET("businesses/search?")
-    Call<YelpApiResponse> getLocation(@Query("terms") String food, @Query("categories") String cuisine, @Query("latitude") Double latitude, @Query("longitude") Double longitude);
+    Call<YelpApiResponse> getLocation(@Query("latitude") Double latitude, @Query("longitude") Double longitude, @Query("terms") String cuisine, @Query("radius") int radius);
 
 }
