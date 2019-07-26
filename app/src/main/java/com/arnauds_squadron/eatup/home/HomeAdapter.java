@@ -70,7 +70,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 viewHolder.ivProfile.setParseFile(event.getEventImage());
                 viewHolder.ivProfile.loadInBackground();
             }
-            //       viewHolder.tvPlace.setText(event.getAddress());
+
+            try {
+                viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
     }
 

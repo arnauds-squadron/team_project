@@ -154,6 +154,12 @@ public class HomeFragment extends Fragment {
             for (Event event : params) {
                 try {
                     String hostId = event.getHost().fetchIfNeeded().getObjectId();
+                    JSONArray jsonArray = event.getAcceptedGuests();
+                    if (jsonArray != null) {
+                        if(jsonArray.toString().contains(hostId)) {
+                            usersEvents.add(event);
+                        }
+                    }
                     if (currentUserId.equals(hostId)) {
                         usersEvents.add(event);
                     } else {

@@ -101,7 +101,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         YelpService service = retrofit.create(YelpService.class);
-        Call<YelpApiResponse> meetUp = service.getLocation("food", event.getCuisine(), event.getAddress().getLatitude(), event.getAddress().getLongitude());
+        Call<YelpApiResponse> meetUp = service.getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 15);
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @Override
