@@ -38,16 +38,15 @@ import butterknife.ButterKnife;
  */
 public class HomeFragment extends Fragment {
 
-    private HomeAdapter homeAdapter;
-    private OnFragmentInteractionListener mListener;
-
-    private ArrayList<Event> agenda;
-
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeContainer;
 
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
+
+    private OnFragmentInteractionListener mListener;
+    private List<Event> agenda;
+    private HomeAdapter homeAdapter;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -63,11 +62,8 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // initialize data source
         agenda = new ArrayList<>();
-        // construct adapter from data source
         homeAdapter = new HomeAdapter(this, agenda);
-        // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
@@ -156,7 +152,7 @@ public class HomeFragment extends Fragment {
                     String hostId = event.getHost().fetchIfNeeded().getObjectId();
                     JSONArray jsonArray = event.getAcceptedGuests();
                     if (jsonArray != null) {
-                        if(jsonArray.toString().contains(hostId)) {
+                        if (jsonArray.toString().contains(hostId)) {
                             usersEvents.add(event);
                         }
                     }

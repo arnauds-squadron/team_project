@@ -13,6 +13,7 @@ import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -161,6 +162,10 @@ public class Event extends ParseObject {
         put(KEY_CHAT, chat);
     }
 
+    public List<ParseUser> getPendingRequests() {
+        return getList(KEY_PENDING_GUESTS);
+    }
+
     public List<ParseUser> getAllRequests() {
         return getList(KEY_ALL_REQUESTS);
     }
@@ -197,6 +202,18 @@ public class Event extends ParseObject {
             }
         }
         return false;
+    }
+
+    public void handleRequest(ParseUser user, boolean isAccepted) {
+        List<ParseUser> tempList = new ArrayList<>();
+        tempList.add(user);
+        removeAll(KEY_PENDING_GUESTS, tempList);
+
+        if (isAccepted) {
+            if (getAcceptedGuests() == null)
+                put(KEY_ACCEPTED_GUESTS, new JSONArray());
+            add(KEY_ACCEPTED_GUESTS, user);
+        }
     }
 
     // inner class to query event model

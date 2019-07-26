@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +14,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
+import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import butterknife.BindView;
@@ -28,11 +32,14 @@ import butterknife.ButterKnife;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
-    private ArrayList<Event> mAgenda;
+    private List<Event> mAgenda;
     private Context context;
     private HomeFragment homeFragment;
 
-    HomeAdapter(HomeFragment homeFragment, ArrayList<Event> mAgenda) {
+    private List<ParseUser> requests;
+    private RequestAdapter requestAdapter;
+
+    HomeAdapter(HomeFragment homeFragment, List<Event> mAgenda) {
         this.homeFragment = homeFragment;
         this.mAgenda = mAgenda;
     }
@@ -59,20 +66,31 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 }
                 viewHolder.tvDate.setText(event.getDate().toString());
             }
-            if (event.getTitle() != null) {
-                viewHolder.tvTitle.setText(event.getTitle());
-            }
-            if (event.getEventImage() != null) {
-                viewHolder.ivProfile.setParseFile(event.getEventImage());
-                viewHolder.ivProfile.loadInBackground();
-            }
-
-            try {
-                viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
         }
+
+        if (event.getTitle() != null) {
+            viewHolder.tvTitle.setText(event.getTitle());
+        }
+        if (event.getEventImage() != null) {
+            viewHolder.ivImage.setParseFile(event.getEventImage());
+            viewHolder.ivImage.loadInBackground();
+        }
+
+        try {
+            viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        requests = new ArrayList<>();
+        requestAdapter = new RequestAdapter(event, requests);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        layoutManager.setReverseLayout(true);
+        viewHolder.rvRequests.setLayoutManager(layoutManager);
+        viewHolder.rvRequests.setAdapter(requestAdapter);
+
+        getPendingRequests(event);
+
     }
 
     @Override
@@ -80,9 +98,21 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return mAgenda.size();
     }
 
+    /**
+     * Queries the Parse Server to get the list of pending request for this particular event
+     */
+    private void getPendingRequests(Event event) {
+        List<ParseUser> pending = event.getPendingRequests();
+        if (pending != null && pending.size() > requests.size()) {
+            requests.clear();
+            requests.addAll(pending);
+            requestAdapter.notifyDataSetChanged();
+        }
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.ivProfile)
-        ParseImageView ivProfile;
+        @BindView(R.id.ivImage)
+        ParseImageView ivImage;
 
         @BindView(R.id.ibOpenChat)
         ImageButton ibOpenChat;
@@ -98,6 +128,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         @BindView(R.id.tvPlace)
         TextView tvPlace;
+
+        @BindView(R.id.rvRequests)
+        RecyclerView rvRequests;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
