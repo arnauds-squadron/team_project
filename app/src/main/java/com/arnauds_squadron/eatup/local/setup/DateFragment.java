@@ -34,8 +34,6 @@ import butterknife.OnClick;
  */
 public class DateFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-
     @BindView(R.id.tvSelectedDate)
     TextView tvSelectedDate;
 
@@ -48,8 +46,11 @@ public class DateFragment extends Fragment {
     @BindView(R.id.ivClock)
     ImageView clock;
 
+
+    private OnFragmentInteractionListener mListener;
     // Calendar object that holds the date and time that the user selects
     private Calendar selectedTime;
+    // Booleans to make sure the user selects a time before moving on
     private boolean dateSet;
     private boolean timeSet;
 
@@ -143,11 +144,18 @@ public class DateFragment extends Fragment {
         datePicker.show();
     }
 
+    /**
+     * Allows the user to change the time they already set.
+     */
     @OnClick(R.id.tvSelectedTime)
     public void updateTime() {
         showTimePickerDialog();
     }
 
+    /**
+     * Communicates with the LocalFragment to move to the next fragment once the date and time are
+     * set.
+     */
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         if (dateSet && timeSet)
@@ -165,24 +173,26 @@ public class DateFragment extends Fragment {
         int currentMonth = selectedTime.get(Calendar.MONTH);
         int currentDay = selectedTime.get(Calendar.DAY_OF_MONTH);
 
-        final DatePickerDialog datePicker = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-                selectedTime.set(Calendar.YEAR, year);
-                selectedTime.set(Calendar.MONTH, month);
-                selectedTime.set(Calendar.DAY_OF_MONTH, day);
-                dateSet = true;
-                showTimePickerDialog();
-            }
-        }, currentYear, currentMonth, currentDay);
+        DatePickerDialog datePicker = new DatePickerDialog(getActivity(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int day) {
+                        selectedTime.set(Calendar.YEAR, year);
+                        selectedTime.set(Calendar.MONTH, month);
+                        selectedTime.set(Calendar.DAY_OF_MONTH, day);
+                        dateSet = true;
+                        showTimePickerDialog();
+                    }
+                }, currentYear, currentMonth, currentDay);
 
-        datePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int buttonId) {
-                dateSet = false;
-                showTimePickerDialog();
-            }
-        });
+        datePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int buttonId) {
+                        dateSet = false;
+                        showTimePickerDialog();
+                    }
+                });
         datePicker.show();
     }
 
@@ -194,24 +204,25 @@ public class DateFragment extends Fragment {
         int currentHour = selectedTime.get(Calendar.HOUR_OF_DAY);
         int currentMinute = selectedTime.get(Calendar.MINUTE);
 
-        TimePickerDialog timePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hour, int minute) {
-                selectedTime.set(Calendar.HOUR_OF_DAY, hour);
-                selectedTime.set(Calendar.MINUTE, minute);
-                timeSet = true;
-                updateTimeTextViews();
-            }
-        }, currentHour, currentMinute, true);
+        TimePickerDialog timePicker = new TimePickerDialog(getActivity(),
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hour, int minute) {
+                        selectedTime.set(Calendar.HOUR_OF_DAY, hour);
+                        selectedTime.set(Calendar.MINUTE, minute);
+                        timeSet = true;
+                        updateTimeTextViews();
+                    }
+                }, currentHour, currentMinute, true);
 
-        timePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int buttonId) {
-                timeSet = false;
-                updateTimeTextViews();
-            }
-        });
-
+        timePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int buttonId) {
+                        timeSet = false;
+                        updateTimeTextViews();
+                    }
+                });
         timePicker.show();
     }
 

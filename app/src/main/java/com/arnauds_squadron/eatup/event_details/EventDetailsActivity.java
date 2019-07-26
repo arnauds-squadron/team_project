@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.event_details;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,11 +11,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import butterknife.BindView;
@@ -49,8 +51,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_details);
         ButterKnife.bind(this);
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser == null) {
+        if (Constants.CURRENT_USER == null) {
             gotoLoginActivity();
         }
 
@@ -88,15 +89,15 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btRequest)
-    public void eventRSVP(Button btRequest) {
+    public void eventRSVP() {
         // TODO send request to Parse server to RSVP to the event
         Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
         // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
         // otherwise, create request/add to "allRequests" and send back to home screen
-        if (currentEvent.checkRequest(ParseUser.getCurrentUser(), currentEvent)) {
+        if (currentEvent.checkRequest(Constants.CURRENT_USER, currentEvent)) {
             Toast.makeText(this, "RSVP already requested", Toast.LENGTH_SHORT).show();
         } else {
-            currentEvent.createRequest(ParseUser.getCurrentUser(), currentEvent);
+            currentEvent.createRequest(Constants.CURRENT_USER, currentEvent);
             Toast.makeText(this, "RSVP requested", Toast.LENGTH_SHORT).show();
         }
     }

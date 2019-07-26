@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.parse.ParseUser;
+import com.arnauds_squadron.eatup.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +108,7 @@ public class TagsFragment extends Fragment {
     public void goToNextFragment() {
         if (!tagList.isEmpty()) {
             Event event = new Event();
-            event.setHost(ParseUser.getCurrentUser());
+            event.setHost(Constants.CURRENT_USER);
             event.setTags(tagList);
             event.setOver21(swIs21Plus.isActivated());
             event.setRestaurant(spIsRestaurant.getSelectedItem().toString().equals("Restaurant"));
@@ -150,14 +150,6 @@ public class TagsFragment extends Fragment {
 
         tvEventFoodType.setAdapter(adapter);
         tvEventFoodType.setThreshold(1); // show results after one letter
-
-        // Show the dropdown of cuisines once the user selects the view
-        tvEventFoodType.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                tvEventFoodType.showDropDown();
-            }
-        });
 
         // Add the item immediately after they select a preset (no button press required)
         tvEventFoodType.setOnItemClickListener(new AdapterView.OnItemClickListener() {

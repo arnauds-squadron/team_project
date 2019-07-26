@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.event_details;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,9 +13,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.arnauds_squadron.eatup.EventDetailsRestaurantActivity;
-import com.arnauds_squadron.eatup.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;

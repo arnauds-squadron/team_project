@@ -16,9 +16,9 @@ import android.view.ViewGroup;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -149,11 +149,17 @@ public class HomeFragment extends Fragment {
         @Override
         protected final Void doInBackground(Event... params) {
             usersEvents = new ArrayList<>();
-            String currentUserId = ParseUser.getCurrentUser().getObjectId();
+            String currentUserId = Constants.CURRENT_USER.getObjectId();
 
             for (Event event : params) {
                 try {
                     String hostId = event.getHost().fetchIfNeeded().getObjectId();
+                    JSONArray jsonArray = event.getAcceptedGuests();
+                    if (jsonArray != null) {
+                        if(jsonArray.toString().contains(hostId)) {
+                            usersEvents.add(event);
+                        }
+                    }
                     if (currentUserId.equals(hostId)) {
                         usersEvents.add(event);
                     } else {

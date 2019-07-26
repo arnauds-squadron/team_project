@@ -6,14 +6,15 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 
 import com.arnauds_squadron.eatup.chat.ChatFragment;
 import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
+import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.google.android.libraries.places.api.Places;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -35,6 +36,14 @@ public class MainActivity extends AppCompatActivity implements
     // Chat selected in the HomeFragment, stored to be accessed by the ChatFragment
     private Chat chat;
 
+    private final int[] tabIcons = {
+            R.drawable.chat_tab,
+            R.drawable.host_create_tab,
+            R.drawable.home_tab,
+            R.drawable.visitor_meal_tab,
+            R.drawable.profile_tab
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,25 +60,36 @@ public class MainActivity extends AppCompatActivity implements
 
         // All the tabs in this viewpager will be loaded (4 neighboring tabs)
         viewPager.setOffscreenPageLimit(4);
+
+        // Start on the HomeFragment
         viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
 
-        // Give the TabLayout the ViewPager
+        // Set the correct keyboard layout for the MessengerFragment
+        // (show the toolbar while typing)
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                getWindow().setSoftInputMode(i == 0 ?
+                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE :
+                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
         tabLayout.setupWithViewPager(viewPager);
 
-        // TODO: change visitor meal icon, profile icon, and chat icon
-        int[] icons = {
-                R.drawable.chat_tab,
-                R.drawable.host_create_tab,
-                R.drawable.home_tab,
-                R.drawable.visitor_meal_tab,
-                R.drawable.profile_tab
-        };
-
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(icons[i]);
+            tabLayout.getTabAt(i).setIcon(tabIcons[i]);
         }
-
-        Places.initialize(getApplicationContext(), getString(R.string.google_api_key));
     }
 
     /**
@@ -81,13 +101,13 @@ public class MainActivity extends AppCompatActivity implements
     public void onBackPressed() {
         int currentFragmentIndex = viewPager.getCurrentItem();
 
-        if(currentFragmentIndex == 0) { // chat fragment
+        if (currentFragmentIndex == 0) { // chat fragment
             ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
 
             if (!chatFragment.onBackPressed())
                 finish();
 
-        } else if(currentFragmentIndex == 1) { // local fragment
+        } else if (currentFragmentIndex == 1) { // local fragment
             LocalFragment localFragment = (LocalFragment) getTypedFragment(LocalFragment.class);
 
             if (!localFragment.onBackPressed())
@@ -100,17 +120,26 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Overrides the LocalFragment interface
-     *
+     * <p>
      * Switches to the HomeFragment when the user finishes creating the event
      */
     @Override
-    public void switchToHomeFragment() {
+    public void onEventCreated() {
         viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
+
+        HomeFragment homeFragment = (HomeFragment) getTypedFragment(HomeFragment.class);
+        ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
+
+        if (homeFragment != null)
+            homeFragment.fetchTimelineAsync();
+
+        if (chatFragment != null)
+            chatFragment.updateDashboardChats();
     }
 
     /**
      * Overrides the HomeFragment interface
-     *
+     * <p>
      * Switches to the ChatFragment when the user clicks on a chat
      */
     @Override
@@ -121,12 +150,12 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Overrides the ChatFragment interface
-     *
+     * <p>
      * Accessor for the chat object, DELETES the local copy of chat. Chat should not be null only
      * when the user just clicked on an event's chat in the HomeFragment
      *
-     * @effects Deletes the local copy of the chat
      * @return The chat object selected through the HomeFragment
+     * @effects Deletes the local copy of the chat
      */
     @Override
     public Chat getSelectedChat() {
@@ -135,11 +164,11 @@ public class MainActivity extends AppCompatActivity implements
         return temp;
     }
 
-    private Fragment getTypedFragment(Class clazz) {
+    private Fragment getTypedFragment(Class fragmentClass) {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
 
         for (Fragment fragment : fragments) {
-            if (fragment.getClass().equals(clazz)) {
+            if (fragment.getClass().equals(fragmentClass)) {
                 return fragment;
             }
         }

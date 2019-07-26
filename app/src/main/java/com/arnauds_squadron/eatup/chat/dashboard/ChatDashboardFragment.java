@@ -16,9 +16,6 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,24 +26,12 @@ import butterknife.ButterKnife;
  * Fragment that displays the list of active chats the user is part of
  */
 public class ChatDashboardFragment extends Fragment {
-
-    private OnFragmentInteractionListener mListener;
-
     @BindView(R.id.rvChats)
     RecyclerView rvChats;
 
-    // List of the different active conversations
+    private OnFragmentInteractionListener mListener;
     private List<Chat> chatList;
-
-    // Adapter instance to handle adding tag items to the ListView
     private ChatDashboardAdapter chatAdapter;
-
-    public static ChatDashboardFragment newInstance() {
-        Bundle args = new Bundle();
-        ChatDashboardFragment fragment = new ChatDashboardFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,9 +49,7 @@ public class ChatDashboardFragment extends Fragment {
         chatAdapter = new ChatDashboardAdapter(this, chatList);
         rvChats.setAdapter(chatAdapter);
         rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
-
         getChats();
-
         return view;
     }
 
@@ -90,37 +73,27 @@ public class ChatDashboardFragment extends Fragment {
         }
     }
 
+    /**
+     * Communicates with the parent ChatFragment through the listener to open the selected Chat
+     */
     public void openChat(Chat chat) {
         mListener.openChatFragment(chat);
     }
 
-    // TODO: caching
-    private void getChats() {
+    /**
+     * Queries the ParseServer for all the chats that the current user is a member of, adding
+     * them to the chatList and notifying the adapter
+     */
+    public void getChats() {
         Chat.Query query = new Chat.Query();
-        query.setQueryLimit().getTop();
-        query.findInBackground(new FindCallback<Chat>() {
+        String userId = ParseUser.getCurrentUser().getObjectId();
+        query.newestFirst().matchesUserId(userId).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
                 if (e == null) {
-                    String userId = ParseUser.getCurrentUser().getObjectId();
-                    for (int i = 0; i < objects.size(); i++) {
-                        Chat chat = objects.get(i);
-                        JSONArray members = chat.getMembers();
-
-                        for (int j = 0; j < members.length(); j++) {
-                            try {
-                                // TODO: move to new thread?
-                                if (chat.getMembers().getJSONObject(j).getString("objectId")
-                                        .equals(userId)) {
-                                    chatList.add(chat);
-                                    chatAdapter.notifyItemInserted(chatList.size() - 1);
-                                }
-                            } catch (JSONException e1) {
-                                e1.printStackTrace();
-                            }
-                        }
-                    }
-
+                    chatList.clear();
+                    chatList.addAll(objects);
+                    chatAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getActivity(), "Could not load chats",
                             Toast.LENGTH_SHORT).show();
@@ -128,9 +101,7 @@ public class ChatDashboardFragment extends Fragment {
                 }
             }
         });
-
     }
-
 
     public interface OnFragmentInteractionListener {
         /**

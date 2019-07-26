@@ -1,5 +1,7 @@
 package com.arnauds_squadron.eatup.utils;
 
+import com.parse.ParseUser;
+
 public final class Constants {
     public static final int SUCCESS_RESULT = 0;
     public static final int FAILURE_RESULT = 1;
@@ -25,4 +27,6 @@ public final class Constants {
 
     // PagerAdapter constants
     public static final int MAIN_PAGER_START_PAGE = 2;
+
+    public static ParseUser CURRENT_USER;
 }

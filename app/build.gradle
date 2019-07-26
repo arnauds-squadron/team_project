@@ -50,7 +50,7 @@ dependencies {
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
     //http request
-    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.0.1'
 
     // Places API for autocompletion
     implementation 'com.google.android.libraries.places:places:1.1.0'
@@ -61,4 +61,13 @@ dependencies {
 
     // page indicator for recyclerview
     implementation 'com.ryanjeffreybrooks:indefinitepagerindicator:1.0.10'
+
+    //yelp retrofit
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
+    implementation 'se.akerfeldt:okhttp-signpost:1.1.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.0.0-RC1'
+    implementation 'oauth.signpost:signpost-core:1.2.1.2'
 }

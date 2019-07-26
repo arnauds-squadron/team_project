@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.profile;
 
 import android.content.Intent;
 import android.media.Image;
@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.ParseImageView;
 import com.bumptech.glide.Glide;
@@ -56,7 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-        user = getIntent().getParcelableExtra("user");
+        user = ParseUser.getCurrentUser();
 
         // load user rating
         Number rating = user.getNumber(AVERAGE_RATING);

@@ -32,11 +32,8 @@ public class ChatFragment extends Fragment implements
     FrameLayout flDashboard;
 
     private OnFragmentInteractionListener mListener;
-
-    private MessengerFragment messengerFragment;
     private ChatDashboardFragment dashboardFragment;
-
-    private Chat chat;
+    private MessengerFragment messengerFragment;
 
     public static ChatFragment newInstance() {
         return new ChatFragment();
@@ -58,7 +55,7 @@ public class ChatFragment extends Fragment implements
     }
 
     /**
-     * Attaches the listener to the MainActivity
+     * Attaches the MainActivity listener to the MainActivity
      */
     @Override
     public void onAttach(Context context) {
@@ -83,18 +80,21 @@ public class ChatFragment extends Fragment implements
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if(mListener != null) {
+        if (mListener != null) {
             Chat newChat = mListener.getSelectedChat();
-            if(newChat != null)
+            if (newChat != null)
                 openChatFragment(newChat);
         }
     }
 
     /**
      * Overrides the ChatDashboardFragment interface
+     * <p>
+     * If the user selects a chat in the ChatDashboardFragment, it sets the MessengerFragment's
+     * open chat to the selected one, and displays the MessengerFragment.
+     *
      * @param chat The chat object that the messenger fragment might display
      */
-    //TODO : still lags
     @Override
     public void openChatFragment(Chat chat) {
         messengerFragment.setChat(chat);
@@ -103,6 +103,9 @@ public class ChatFragment extends Fragment implements
 
     /**
      * Overrides the MessengerFragment interface
+     * <p>
+     * If the user hits the back button on the MessengerFragment, the ChatDashboardFragment is
+     * shown
      */
     @Override
     public void goToDashboard() {
@@ -110,12 +113,21 @@ public class ChatFragment extends Fragment implements
     }
 
     /**
+     * Updates the chat list in the ChatDashboardFragment. Called after a new event is created,
+     * since a new chat is also created
+     */
+    public void updateDashboardChats() {
+        dashboardFragment.getChats();
+    }
+
+    /**
      * Method to be called by the parent activity to handle back presses. Goes back to the
      * dashboard fragment if the messenger fragment is selected.
+     *
      * @return true if we moved back to the dashboard fragment, false if we were already on it
      */
     public boolean onBackPressed() {
-        if(flMessenger.getVisibility() == View.VISIBLE) {
+        if (flMessenger.getVisibility() == View.VISIBLE) {
             showDashboardFragment();
             return true;
         } else {
@@ -123,17 +135,33 @@ public class ChatFragment extends Fragment implements
         }
     }
 
+    /**
+     * Sets the FrameLayout holding the MessengerFragment to visible and the FrameLayout holding
+     * the DashboardFragment to invisible
+     */
     private void showMessengerFragment() {
         flMessenger.setVisibility(View.VISIBLE);
         flDashboard.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Sets the FrameLayout holding the DashboardFragment to visible and the FrameLayout holding
+     * the MessengerFragment to invisible
+     */
     private void showDashboardFragment() {
         flDashboard.setVisibility(View.VISIBLE);
         flMessenger.setVisibility(View.INVISIBLE);
     }
 
     public interface OnFragmentInteractionListener {
+        /**
+         * Communicates with the MainActivity so when the user clicks on a chat and the ChatFragment
+         * is visible, it can receive the selected Chat and open the MessengerFragment with the
+         * correct Chat.
+         *
+         * @return The chat selected by the user in the HomeFragment, null if the user swiped
+         * normally to the ChatFragment
+         */
         Chat getSelectedChat();
     }
 }
