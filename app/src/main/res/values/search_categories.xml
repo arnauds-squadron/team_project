@@ -4,5 +4,6 @@
         <item>Choose a category</item>
         <item>User</item>
         <item>Cuisine</item>
+        <item>Location</item>
     </string-array>
 </resources>

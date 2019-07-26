@@ -204,7 +204,7 @@ public class VisitorFragment extends Fragment {
 
         // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.search_categories_visitor, android.R.layout.simple_spinner_item);
+                R.array.search_categories, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner_text_view
