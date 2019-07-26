@@ -265,15 +265,21 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 eventAdapter.notifyDataSetChanged();
                 searchCategory = searchSpinner.getSelectedItemPosition();
                 if(searchCategory != NO_SEARCH) {
-                    Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
-                    searchIntent.putExtra(SearchManager.QUERY, query);
-                    searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
-                    searchIntent.setAction(Intent.ACTION_SEARCH);
-                    startActivity(searchIntent);
-                    // clear focus so search doesn't fire twice
-                    resultsSearchView.clearFocus();
-                    resultsSearchView.setQuery(query, false);
-                    return true;
+                    if(searchCategory == LOCATION_SEARCH) {
+                        Toast.makeText(getApplicationContext(), "Select an address.", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    else {
+                        Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
+                        searchIntent.putExtra(SearchManager.QUERY, query);
+                        searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
+                        searchIntent.setAction(Intent.ACTION_SEARCH);
+                        startActivity(searchIntent);
+                        // clear focus so search doesn't fire twice
+                        resultsSearchView.clearFocus();
+                        resultsSearchView.setQuery(query, false);
+                        return true;
+                    }
                 }
                 else {
                     // prevent submission if no category selected
@@ -334,7 +340,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 loadTopEvents(queriedCuisine, maxDate);
                 break;
             case LOCATION_SEARCH:
-                // TODO load top events for a refreshed location search
                 break;
         }
     }
@@ -362,7 +367,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     // TODO get search suggestions of cuisines from the Yelp Search API
                     break;
                 case LOCATION_SEARCH:
-                    // TODO implement location search
+                    // handled in the automatic search suggestion
+                    break;
             }
         }
         // otherwise called by a click on something in VisitorFragment
