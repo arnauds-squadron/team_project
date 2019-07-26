@@ -13,8 +13,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arnauds_squadron.eatup.EventDetailsActivity;
-import com.arnauds_squadron.eatup.ProfileActivity;
+import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
+import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;

@@ -1,6 +1,6 @@
-package com.arnauds_squadron.eatup.YelpApi;
+package com.arnauds_squadron.eatup.yelp_api;
 
-import com.arnauds_squadron.eatup.Business;
+import com.arnauds_squadron.eatup.models.Business;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.event_details;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.GetCallback;
 import com.parse.ParseException;

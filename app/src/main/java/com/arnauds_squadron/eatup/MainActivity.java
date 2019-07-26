@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import com.arnauds_squadron.eatup.chat.ChatFragment;
 import com.arnauds_squadron.eatup.home.HomeFragment;
 import com.arnauds_squadron.eatup.local.LocalFragment;
+import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
 import com.arnauds_squadron.eatup.utils.Constants;

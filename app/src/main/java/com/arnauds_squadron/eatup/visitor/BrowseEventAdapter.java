@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.arnauds_squadron.eatup.EventDetailsActivity;
+import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;

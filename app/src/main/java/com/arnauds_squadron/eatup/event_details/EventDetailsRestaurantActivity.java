@@ -1,25 +1,18 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.event_details;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 
-import java.util.Locale;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
-import static com.arnauds_squadron.eatup.utils.Constants.BIO;
-import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
-import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
 
 public class EventDetailsRestaurantActivity extends AppCompatActivity {
 

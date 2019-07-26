@@ -1,9 +1,7 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
 
 public class Business {
     @SerializedName("name")
