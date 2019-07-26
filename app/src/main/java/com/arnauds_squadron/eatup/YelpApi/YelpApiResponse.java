@@ -9,6 +9,7 @@ import java.util.List;
 //todo understand how to user retrofit
 public class YelpApiResponse {
 
+    //This is the list of businesses the YelpService class will get back
     @SerializedName("businesses")
     @Expose
     public List<Business> businessList;

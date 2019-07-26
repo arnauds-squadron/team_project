@@ -16,41 +16,8 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface YelpService {
+    //the endpoint businesses/search? and you must query all of the necessary attributes for the call to work
     @GET("businesses/search?")
     Call<YelpApiResponse> getLocation(@Query("terms") String food, @Query("categories") String cuisine, @Query("latitude") Double latitude, @Query("longitude") Double longitude);
 
-//    @GET("&latitude=")
-//    Call<Event> getLatitude(@Query("latitude") String latitude);
-//    @GET("&longitude=")
-//    Call<Event> getLongitude(@Query("longitude") String longitude);
-//
-//    RequestInterceptor requestInterceptor = new RequestInterceptor() {
-//        @Override
-//        public void intercept(RequestFacade request) {
-//            request.addQueryParam("apikey", apiKey);
-//        }
-//    };
-//    OkHttpClient client = new OkHttpClient();
-//    client.interceptors().add(requestInterceptor);
-//    Retrofit retrofit = new Retrofit.Builder()
-//            .client(client)
-//            .baseUrl("https://api.yelp.com/v3")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build();
-
-//    YelpService service = retrofit.create(YelpService.class);
-//
-//    Call<YelpApiResponse> call = service.listEvents();
-//    call.enqueue(new Callback<YelpApiResponse>() {
-//        @Override
-//        public void onResponse(Call<YelpApiResponse> call, Response response) {
-//            // handle response here
-//            YelpApiResponse boxOfficeMovieResponse = response.body();
-//        }
-//
-//        @Override
-//        public void onFailure(Throwable t) {
-//
-//        }
-//    });
 }
