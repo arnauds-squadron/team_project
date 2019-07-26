@@ -92,7 +92,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             SearchManager.SUGGEST_COLUMN_TEXT_2,
                                 SearchManager.SUGGEST_COLUMN_INTENT_DATA
     };
-    private String CURRENT_LOCATION_ID;
+
+    private String CURRENT_LOCATION_ID = "currentLocation";
 
     @BindView(R.id.rvSearchResults)
     RecyclerView rvEvents;
@@ -114,16 +115,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         Places.initialize(this, getString(R.string.google_api_key));
         placesClient = Places.createClient(this);
 
-        // adapter for search suggestions
-        final CursorAdapter suggestionAdapter = new SimpleCursorAdapter(this,
-                R.layout.location_search_suggestion_item,
-                null,
-                new String[]{SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2, SearchManager.SUGGEST_COLUMN_INTENT_DATA},
-                new int[]{R.id.tvLocationPrimary, R.id.tvLocationSecondary},
-                0);
 
-        // TODO use this for clicking on a suggestion
-        // final List<String> locationSuggestions = new ArrayList<>();
 
 //        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         // initialize data source
@@ -141,154 +133,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // Assumes current activity is the searchable activity
         resultsSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         resultsSearchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
-        resultsSearchView.setSuggestionsAdapter(suggestionAdapter);
-        resultsSearchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-            @Override
-            public boolean onSuggestionSelect(int position) {
-                // if user scrolls through results using some sort of trackpad
-                Cursor cursor = (Cursor) suggestionAdapter.getItem(position);
-                String queryText = String.format(Locale.getDefault(),
-                        "%s, %s",
-                        cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)),
-                        cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_2)));
-                resultsSearchView.setQuery(queryText, false);
-                return true;
-            }
-
-            @Override
-            public boolean onSuggestionClick(int position) {
-                Cursor cursor = (Cursor) suggestionAdapter.getItem(position);
-                String queryText = String.format(Locale.getDefault(),
-                        "%s, %s",
-                        cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)),
-                        cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_2)));
-                resultsSearchView.setQuery(queryText, false);
-
-                String locationQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
-                if(locationQueryId.equals(CURRENT_LOCATION_ID)) {
-                    // TODO get users current location again
-                }
-
-                List<Place.Field> placeFields = Arrays.asList(Place.Field.LAT_LNG);
-                FetchPlaceRequest request = FetchPlaceRequest.builder(locationQueryId, placeFields).build();
-                placesClient.fetchPlace(request).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
-                    @Override
-                    public void onSuccess(FetchPlaceResponse response) {
-                        Place place = response.getPlace();
-                        Double latitude = place.getLatLng().latitude;
-                        Double longitude = place.getLatLng().longitude;
-                        Log.i("Fetch Place Request", "Successful call");
-                        locationSearch(new ParseGeoPoint(latitude, longitude), new Date(0));
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        if (exception instanceof ApiException) {
-                            ApiException apiException = (ApiException) exception;
-                            int statusCode = apiException.getStatusCode();
-                            // Handle error with given status code.
-                            Log.e("Fetch Place Request", "Place not found: " + exception.getMessage());
-                        }
-                    }
-                });
-                return true;
-            }
-        });
-
-        resultsSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextChange(String incompleteQuery) {
-                // TODO set different search suggestions for cuisine and location
-
-                AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-
-                // Use the builder to create a FindAutocompletePredictionsRequest.
-                FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                        //.setLocationRestriction(bounds)
-                        .setCountry("us")
-                        .setTypeFilter(TypeFilter.ADDRESS)
-                        .setSessionToken(token)
-                        .setQuery(incompleteQuery)
-                        .build();
-
-                placesClient.findAutocompletePredictions(request).addOnSuccessListener(new OnSuccessListener<FindAutocompletePredictionsResponse>() {
-                    @Override
-                    public void onSuccess(FindAutocompletePredictionsResponse response) {
-                        MatrixCursor cursor = new MatrixCursor(SEARCH_SUGGEST_COLUMNS);
-                        cursor.addRow(new String[] {
-                                "1",
-                                "Current Location",
-                                "Use my current location",
-                                CURRENT_LOCATION_ID
-                        });
-
-                        int predictionCounter = 2;
-                        for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                            Log.i("findPlaceSuggestions", prediction.getPlaceId());
-                            Log.i("findPlaceSuggestions", prediction.getPrimaryText(null).toString());
-                            cursor.addRow(new String[] {
-                                    Integer.toString(predictionCounter),
-                                    prediction.getPrimaryText(null).toString(),
-                                    prediction.getSecondaryText(null).toString(),
-                                    prediction.getPlaceId()
-                            });
-                            predictionCounter++;
-                        }
-                        suggestionAdapter.swapCursor(cursor);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-
-                        MatrixCursor cursor = new MatrixCursor(SEARCH_SUGGEST_COLUMNS);
-                        cursor.addRow(new String[] {
-                                "2",
-                                "No places found",
-                                "Try searching again",
-                                "No results"
-                        });
-
-                        if (exception instanceof ApiException) {
-                            ApiException apiException = (ApiException) exception;
-                            Log.e("findPlaceSuggestions", "Place not found: " + apiException.getStatusCode());
-                        }
-                        suggestionAdapter.swapCursor(cursor);
-                    }
-                });
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mEvents.clear();
-                eventAdapter.notifyDataSetChanged();
-                searchCategory = searchSpinner.getSelectedItemPosition();
-                if(searchCategory != NO_SEARCH) {
-                    if(searchCategory == LOCATION_SEARCH) {
-                        Toast.makeText(getApplicationContext(), "Select an address.", Toast.LENGTH_SHORT).show();
-                        return true;
-                    }
-                    else {
-                        Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
-                        searchIntent.putExtra(SearchManager.QUERY, query);
-                        searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
-                        searchIntent.setAction(Intent.ACTION_SEARCH);
-                        startActivity(searchIntent);
-                        // clear focus so search doesn't fire twice
-                        resultsSearchView.clearFocus();
-                        resultsSearchView.setQuery(query, false);
-                        return true;
-                    }
-                }
-                else {
-                    // prevent submission if no category selected
-                    resultsSearchView.setQuery(query, false);
-                    Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-            }
-        });
 
         // initialize spinner for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -380,7 +224,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
                 queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
                 locationSearch(queriedGeoPoint, new Date(0));
-            } else {
+            } else if (searchCategory == LOCATION_SEARCH) {
+                setSuggestionsView(resultsSearchView);
+                searchSpinner.setSelection(searchCategory);
+            }
+            else {
                 // display user's choice in the spinner
                 searchSpinner.setSelection(searchCategory);
             }
@@ -392,6 +240,10 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         mEvents.clear();
         eventAdapter.notifyDataSetChanged();
         searchCategory = pos;
+
+        if(searchCategory == LOCATION_SEARCH) {
+            setSuggestionsView(resultsSearchView);
+        }
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
@@ -534,5 +386,169 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             Event oldest = mEvents.get(mEvents.size() - 1);
             return oldest.getCreatedAt();
         }
+    }
+
+    private void setSuggestionsView(final SearchView searchView) {
+        // adapter for search suggestions
+        final CursorAdapter locationSuggestionAdapter = new SimpleCursorAdapter(this,
+                R.layout.location_search_suggestion_item,
+                null,
+                new String[]{SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2, SearchManager.SUGGEST_COLUMN_INTENT_DATA},
+                new int[]{R.id.tvLocationPrimary, R.id.tvLocationSecondary},
+                0);
+
+        searchView.setSuggestionsAdapter(locationSuggestionAdapter);
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                // if user scrolls through results using some sort of trackpad
+                Cursor cursor = (Cursor) locationSuggestionAdapter.getItem(position);
+                String queryText = String.format(Locale.getDefault(),
+                        "%s, %s",
+                        cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)),
+                        cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_2)));
+                searchView.setQuery(queryText, false);
+                return true;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Cursor cursor = (Cursor) locationSuggestionAdapter.getItem(position);
+                String locationQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
+                String queryText;
+                if(locationQueryId.equals(CURRENT_LOCATION_ID)) {
+                    // TODO get users current location again
+                    Toast.makeText(getApplicationContext(), "search by user current location", Toast.LENGTH_SHORT).show();
+                    queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                } else {
+                    queryText = String.format(Locale.getDefault(),
+                            "%s, %s",
+                            cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)),
+                            cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_2)));
+                }
+                searchView.setQuery(queryText, false);
+
+                List<Place.Field> placeFields = Arrays.asList(Place.Field.LAT_LNG);
+                FetchPlaceRequest request = FetchPlaceRequest.builder(locationQueryId, placeFields).build();
+                placesClient.fetchPlace(request).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
+                    @Override
+                    public void onSuccess(FetchPlaceResponse response) {
+                        Place place = response.getPlace();
+                        Double latitude = place.getLatLng().latitude;
+                        Double longitude = place.getLatLng().longitude;
+                        Log.i("Fetch Place Request", "Successful call");
+                        locationSearch(new ParseGeoPoint(latitude, longitude), new Date(0));
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        if (exception instanceof ApiException) {
+                            ApiException apiException = (ApiException) exception;
+                            int statusCode = apiException.getStatusCode();
+                            // Handle error with given status code.
+                            Log.e("Fetch Place Request", "Place not found: " + exception.getMessage());
+                        }
+                    }
+                });
+                searchView.clearFocus();
+                return true;
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String incompleteQuery) {
+                // TODO set different search suggestions for cuisine and location
+
+                AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+                // Use the builder to create a FindAutocompletePredictionsRequest.
+                FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                        //.setLocationRestriction(bounds)
+                        .setCountry("us")
+                        .setTypeFilter(TypeFilter.ADDRESS)
+                        .setSessionToken(token)
+                        .setQuery(incompleteQuery)
+                        .build();
+
+                placesClient.findAutocompletePredictions(request).addOnSuccessListener(new OnSuccessListener<FindAutocompletePredictionsResponse>() {
+                    @Override
+                    public void onSuccess(FindAutocompletePredictionsResponse response) {
+                        MatrixCursor cursor = new MatrixCursor(SEARCH_SUGGEST_COLUMNS);
+                        cursor.addRow(new String[] {
+                                "1",
+                                "Current Location",
+                                "Use my current location",
+                                CURRENT_LOCATION_ID
+                        });
+
+                        int predictionCounter = 2;
+                        for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                            Log.i("findPlaceSuggestions", prediction.getPlaceId());
+                            Log.i("findPlaceSuggestions", prediction.getPrimaryText(null).toString());
+                            cursor.addRow(new String[] {
+                                    Integer.toString(predictionCounter),
+                                    prediction.getPrimaryText(null).toString(),
+                                    prediction.getSecondaryText(null).toString(),
+                                    prediction.getPlaceId()
+                            });
+                            predictionCounter++;
+                        }
+                        locationSuggestionAdapter.swapCursor(cursor);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+
+                        MatrixCursor cursor = new MatrixCursor(SEARCH_SUGGEST_COLUMNS);
+                        cursor.addRow(new String[] {
+                                "2",
+                                "No places found",
+                                "Try searching again",
+                                "No results"
+                        });
+
+                        if (exception instanceof ApiException) {
+                            ApiException apiException = (ApiException) exception;
+                            Log.e("findPlaceSuggestions", "Place not found: " + apiException.getStatusCode());
+                        }
+                        locationSuggestionAdapter.swapCursor(cursor);
+                    }
+                });
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mEvents.clear();
+                eventAdapter.notifyDataSetChanged();
+                searchCategory = searchSpinner.getSelectedItemPosition();
+                if(searchCategory != NO_SEARCH) {
+                    if(searchCategory == LOCATION_SEARCH) {
+                        Toast.makeText(getApplicationContext(), "Select an address.", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    else {
+                        Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
+                        searchIntent.putExtra(SearchManager.QUERY, query);
+                        searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
+                        searchIntent.setAction(Intent.ACTION_SEARCH);
+                        startActivity(searchIntent);
+                        // clear focus so search doesn't fire twice
+                        searchView.clearFocus();
+                        searchView.setQuery(query, false);
+                        return true;
+                    }
+                }
+                else {
+                    // prevent submission if no category selected
+                    searchView.setQuery(query, false);
+                    Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            }
+        });
+
     }
 }
