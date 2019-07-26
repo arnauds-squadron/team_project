@@ -17,8 +17,9 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.login.LoginActivity;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -94,7 +95,7 @@ public class ProfileFragment extends Fragment {
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ParseUser user = ParseUser.getCurrentUser();
+        ParseUser user = Constants.CURRENT_USER;
         // load user rating
         Number rating = user.getNumber(AVERAGE_RATING);
         Number numRatings = user.getNumber(NUM_RATINGS);
@@ -157,8 +158,8 @@ public class ProfileFragment extends Fragment {
     }
     @OnClick(R.id.btnSave)
     public void saveChanges () {
-        ParseUser user = ParseUser.getCurrentUser();
         //todo make changes update to ParseDashboard
+        ParseUser user = Constants.CURRENT_USER;
         if (!user.getUsername().equals(etUsername.toString())) {
             if (etUsername.toString().isEmpty()) {
                 user.setUsername(tvUsername.getText().toString());
@@ -202,6 +203,7 @@ public class ProfileFragment extends Fragment {
 
     private void logoutUser() {
         ParseUser.logOut();
+        Constants.CURRENT_USER = null;
     }
 
     private void gotoLoginActivity() {

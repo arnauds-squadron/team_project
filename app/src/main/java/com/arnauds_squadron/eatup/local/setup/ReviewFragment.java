@@ -30,7 +30,7 @@ import butterknife.OnClick;
  * Fragment that displays all the selected fields and will create the event when confirmed
  */
 public class ReviewFragment extends Fragment implements OnMapReadyCallback {
-    
+
     @BindView(R.id.tvCuisine)
     TextView tvCuisine;
 

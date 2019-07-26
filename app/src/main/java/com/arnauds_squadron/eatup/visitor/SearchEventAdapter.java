@@ -17,6 +17,7 @@ import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
 import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -100,10 +101,11 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
 
                     // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
                     // otherwise, create request/add to "allRequests" and send back to home screen
-                    if(event.checkRequest(ParseUser.getCurrentUser(), event)) {
+
+                    if(event.checkRequest(Constants.CURRENT_USER, event)) {
                         Toast.makeText(context, "RSVP already requested", Toast.LENGTH_SHORT).show();
                     } else {
-                        event.createRequest(ParseUser.getCurrentUser(), event);
+                        event.createRequest(Constants.CURRENT_USER, event);
                         Toast.makeText(context, "RSVP requested", Toast.LENGTH_SHORT).show();
                     }
                 }

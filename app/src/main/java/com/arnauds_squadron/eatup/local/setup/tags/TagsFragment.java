@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.parse.ParseUser;
+import com.arnauds_squadron.eatup.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +108,7 @@ public class TagsFragment extends Fragment {
     public void goToNextFragment() {
         if (!tagList.isEmpty()) {
             Event event = new Event();
-            event.setHost(ParseUser.getCurrentUser());
+            event.setHost(Constants.CURRENT_USER);
             event.setTags(tagList);
             event.setOver21(swIs21Plus.isActivated());
             event.setRestaurant(spIsRestaurant.getSelectedItem().toString().equals("Restaurant"));

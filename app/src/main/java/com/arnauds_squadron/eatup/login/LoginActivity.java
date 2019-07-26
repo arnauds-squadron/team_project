@@ -10,6 +10,7 @@ import android.widget.EditText;
 
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -36,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
+            Constants.CURRENT_USER = currentUser;
             goToMainActivity();
         }
         btnSignup.setOnClickListener(new View.OnClickListener() {
@@ -72,11 +74,12 @@ public class LoginActivity extends AppCompatActivity {
                     if (currentUser != null) {
                         name = username;
                         user.setUsername(username);
+                        Constants.CURRENT_USER = currentUser;
                         goToMainActivity();
                     }
 
                 } else {
-                    Log.e("LoginActivty", "Login failure");
+                    Log.e("LoginActivity", "Login failure");
                     e.printStackTrace();
                 }
             }
