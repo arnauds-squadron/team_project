@@ -26,9 +26,9 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
+import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
+import com.arnauds_squadron.eatup.yelp_api.YelpService;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -41,17 +41,15 @@ import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -60,6 +58,15 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
@@ -86,11 +93,17 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
     private final static Double DEFAULT_COORD = 0.0;
 
-    String[] SEARCH_SUGGEST_COLUMNS = {
+    String[] LOCATION_SEARCH_SUGGEST_COLUMNS = {
             BaseColumns._ID,
             SearchManager.SUGGEST_COLUMN_TEXT_1,
             SearchManager.SUGGEST_COLUMN_TEXT_2,
                                 SearchManager.SUGGEST_COLUMN_INTENT_DATA
+    };
+
+    String[] CATEGORY_SEARCH_SUGGEST_COLUMNS = {
+            BaseColumns._ID,
+            SearchManager.SUGGEST_COLUMN_TEXT_1,
+            SearchManager.SUGGEST_COLUMN_INTENT_DATA
     };
 
     private String CURRENT_LOCATION_ID = "currentLocation";
@@ -209,6 +222,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     queriedCuisine = query;
                     loadTopEvents(queriedCuisine, new Date(0));
                     // TODO get search suggestions of cuisines from the Yelp Search API
+                    // handled in the automatic search
                     break;
                 case LOCATION_SEARCH:
                     // handled in the automatic search suggestion
@@ -219,19 +233,21 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         else {
             searchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
             // if not any of the categories, user clicked on current/previous location
-            if (searchCategory == NO_SEARCH) {
-                Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
-                Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
-                queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
-                locationSearch(queriedGeoPoint, new Date(0));
-            } else if (searchCategory == LOCATION_SEARCH) {
-                setSuggestionsView(resultsSearchView);
-                searchSpinner.setSelection(searchCategory);
+            switch(searchCategory) {
+                case NO_SEARCH:
+                    Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
+                    Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
+                    queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
+                    locationSearch(queriedGeoPoint, new Date(0));
+                    break;
+                case LOCATION_SEARCH:
+                    setLocationSuggestions(resultsSearchView);
+                    break;
+                case CUISINE_SEARCH:
+                    setCategorySuggestions(resultsSearchView);
+                    break;
             }
-            else {
-                // display user's choice in the spinner
-                searchSpinner.setSelection(searchCategory);
-            }
+            searchSpinner.setSelection(searchCategory);
         }
     }
 
@@ -242,7 +258,10 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         searchCategory = pos;
 
         if(searchCategory == LOCATION_SEARCH) {
-            setSuggestionsView(resultsSearchView);
+            setLocationSuggestions(resultsSearchView);
+        }
+        else if (searchCategory == CUISINE_SEARCH) {
+            setCategorySuggestions(resultsSearchView);
         }
     }
 
@@ -270,6 +289,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 }
             }
         });
+        resultsSearchView.clearFocus();
     }
 
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
@@ -388,7 +408,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         }
     }
 
-    private void setSuggestionsView(final SearchView searchView) {
+    private void setLocationSuggestions(final SearchView searchView) {
         // adapter for search suggestions
         final CursorAdapter locationSuggestionAdapter = new SimpleCursorAdapter(this,
                 R.layout.location_search_suggestion_item,
@@ -417,7 +437,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 Cursor cursor = (Cursor) locationSuggestionAdapter.getItem(position);
                 String locationQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
                 String queryText;
-                if(locationQueryId.equals(CURRENT_LOCATION_ID)) {
+                if (locationQueryId.equals(CURRENT_LOCATION_ID)) {
                     // TODO get users current location again
                     Toast.makeText(getApplicationContext(), "search by user current location", Toast.LENGTH_SHORT).show();
                     queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
@@ -475,8 +495,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 placesClient.findAutocompletePredictions(request).addOnSuccessListener(new OnSuccessListener<FindAutocompletePredictionsResponse>() {
                     @Override
                     public void onSuccess(FindAutocompletePredictionsResponse response) {
-                        MatrixCursor cursor = new MatrixCursor(SEARCH_SUGGEST_COLUMNS);
-                        cursor.addRow(new String[] {
+                        MatrixCursor cursor = new MatrixCursor(LOCATION_SEARCH_SUGGEST_COLUMNS);
+                        cursor.addRow(new String[]{
                                 "1",
                                 "Current Location",
                                 "Use my current location",
@@ -487,7 +507,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                         for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
                             Log.i("findPlaceSuggestions", prediction.getPlaceId());
                             Log.i("findPlaceSuggestions", prediction.getPrimaryText(null).toString());
-                            cursor.addRow(new String[] {
+                            cursor.addRow(new String[]{
                                     Integer.toString(predictionCounter),
                                     prediction.getPrimaryText(null).toString(),
                                     prediction.getSecondaryText(null).toString(),
@@ -501,8 +521,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     @Override
                     public void onFailure(@NonNull Exception exception) {
 
-                        MatrixCursor cursor = new MatrixCursor(SEARCH_SUGGEST_COLUMNS);
-                        cursor.addRow(new String[] {
+                        MatrixCursor cursor = new MatrixCursor(LOCATION_SEARCH_SUGGEST_COLUMNS);
+                        cursor.addRow(new String[]{
                                 "2",
                                 "No places found",
                                 "Try searching again",
@@ -524,12 +544,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 mEvents.clear();
                 eventAdapter.notifyDataSetChanged();
                 searchCategory = searchSpinner.getSelectedItemPosition();
-                if(searchCategory != NO_SEARCH) {
-                    if(searchCategory == LOCATION_SEARCH) {
+                if (searchCategory != NO_SEARCH) {
+                    if (searchCategory == LOCATION_SEARCH) {
                         Toast.makeText(getApplicationContext(), "Select an address.", Toast.LENGTH_SHORT).show();
                         return true;
-                    }
-                    else {
+                    } else {
                         Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
                         searchIntent.putExtra(SearchManager.QUERY, query);
                         searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
@@ -540,8 +559,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                         searchView.setQuery(query, false);
                         return true;
                     }
-                }
-                else {
+                } else {
                     // prevent submission if no category selected
                     searchView.setQuery(query, false);
                     Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
@@ -549,6 +567,138 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 }
             }
         });
+    }
 
+    private void setCategorySuggestions(final SearchView searchView) {
+        // adapter for search suggestions
+        final CursorAdapter categorySuggestionAdapter = new SimpleCursorAdapter(this,
+                R.layout.category_search_suggestion_item,
+                null,
+                new String[]{SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA},
+                new int[]{R.id.tvCategory},
+                0);
+
+        searchView.setSuggestionsAdapter(categorySuggestionAdapter);
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                // if user scrolls through results using some sort of trackpad
+                Cursor cursor = (Cursor) categorySuggestionAdapter.getItem(position);
+                String queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                searchView.setQuery(queryText, false);
+                return true;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Cursor cursor = (Cursor) categorySuggestionAdapter.getItem(position);
+                String categoryQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
+                String queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                searchView.setQuery(queryText, false);
+                // TODO modify loadTopEvents to search by categoryQueryId
+                loadTopEvents(queryText, new Date(0));
+                searchView.clearFocus();
+                return true;
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String incompleteQuery) {
+
+                if(incompleteQuery.equals("")) {
+                    MatrixCursor cursor = new MatrixCursor(CATEGORY_SEARCH_SUGGEST_COLUMNS);
+                    categorySuggestionAdapter.swapCursor(cursor);
+                } else{
+                    final String yelpKey = getString(R.string.yelp_api_key);
+                    //Getting Authentication through OkHttpClient
+                    OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder()
+                            .addInterceptor(new Interceptor() {
+                                @NotNull
+                                @Override
+                                public Response intercept(@NotNull Chain chain) throws IOException {
+                                    Request request = chain.request();
+                                    Request.Builder requestBuilder = request.newBuilder()
+                                            .header("Authorization", "Bearer " + yelpKey)
+                                            .method(request.method(), request.body());
+                                    return chain.proceed(requestBuilder.build());
+                                }
+                            });
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .addConverterFactory(ScalarsConverterFactory.create())
+                            .baseUrl("https://api.yelp.com/v3/")
+                            .client(okHttpClient.build())
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+                    YelpService service = retrofit.create(YelpService.class);
+                    Call<YelpApiResponse> queryResponse = service.getSuggestion(incompleteQuery);
+
+                    queryResponse.enqueue(new Callback<YelpApiResponse>() {
+                        @Override
+                        public void onResponse(Call<YelpApiResponse> call, retrofit2.Response<YelpApiResponse> response) {
+                            if (response.isSuccessful()) {
+                                YelpApiResponse yelpApiResponse = response.body();
+
+                                MatrixCursor cursor = new MatrixCursor(CATEGORY_SEARCH_SUGGEST_COLUMNS);
+                                int categoryListSize = yelpApiResponse.categoryList.size();
+                                int predictionCounter = 1;
+                                while ((predictionCounter - 1) < (categoryListSize - 1)) {
+                                    String categoryTitle = yelpApiResponse.categoryList.get(predictionCounter - 1).title;
+                                    String categoryAlias = yelpApiResponse.categoryList.get(predictionCounter - 1).alias;
+                                    Log.i("findCategorySuggestions", categoryTitle + categoryAlias);
+                                    cursor.addRow(new String[]{
+                                            Integer.toString(predictionCounter),
+                                            categoryTitle,
+                                            categoryAlias
+                                    });
+                                    predictionCounter++;
+                                }
+                                categorySuggestionAdapter.swapCursor(cursor);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<YelpApiResponse> call, Throwable t) {
+                            MatrixCursor cursor = new MatrixCursor(LOCATION_SEARCH_SUGGEST_COLUMNS);
+                            cursor.addRow(new String[]{
+                                    "1",
+                                    "No categories found",
+                                    "No results"
+                            });
+                            categorySuggestionAdapter.swapCursor(cursor);
+                        }
+                    });
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mEvents.clear();
+                eventAdapter.notifyDataSetChanged();
+                searchCategory = searchSpinner.getSelectedItemPosition();
+                if (searchCategory != NO_SEARCH) {
+                    if (searchCategory == LOCATION_SEARCH) {
+                        Toast.makeText(getApplicationContext(), "Select an address.", Toast.LENGTH_SHORT).show();
+                        return true;
+                    } else {
+                        Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
+                        searchIntent.putExtra(SearchManager.QUERY, query);
+                        searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
+                        searchIntent.setAction(Intent.ACTION_SEARCH);
+                        startActivity(searchIntent);
+                        // clear focus so search doesn't fire twice
+                        searchView.clearFocus();
+                        searchView.setQuery(query, false);
+                        return true;
+                    }
+                } else {
+                    // prevent submission if no category selected
+                    searchView.setQuery(query, false);
+                    Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            }
+        });
     }
 }
