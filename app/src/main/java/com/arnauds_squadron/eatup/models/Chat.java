@@ -5,8 +5,6 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import org.json.JSONArray;
-
 @ParseClassName("Chat")
 public class Chat extends ParseObject {
     private static final String KEY_NAME = "name";
@@ -28,10 +26,6 @@ public class Chat extends ParseObject {
 
     public void setImage(ParseFile image) {
         put(KEY_IMAGE, image);
-    }
-
-    public JSONArray getMembers() {
-        return getJSONArray(KEY_MEMBERS);
     }
 
     public void addMember(String userId) {
