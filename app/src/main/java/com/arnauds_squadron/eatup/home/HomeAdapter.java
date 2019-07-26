@@ -125,7 +125,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                             chat.setImage(event.getEventImage());
 
                         // TODO: move get current user to new thread
-                        chat.addMember(ParseUser.getCurrentUser());
+                        chat.addMember(ParseUser.getCurrentUser().getObjectId());
 
                         // TODO: add accepted guests immediately after being accepted
                     }
