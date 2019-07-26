@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +15,12 @@ import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
@@ -39,15 +40,12 @@ public class LocalFragment extends Fragment implements
         DateFragment.OnFragmentInteractionListener,
         ReviewFragment.OnFragmentInteractionListener {
 
-    private final static String TAG = "LocalFragment";
-
     @BindView(R.id.frameLayout)
     NoSwipingPagerAdapter setupViewPager;
 
     // Listener that communicates with the parent activity to switch back to the HomeFragment
     // when the event is finally created
     private OnFragmentInteractionListener mListener;
-
     // The local event variable that is updated as the user creates their event
     private Event event;
 
@@ -83,7 +81,7 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Overrides the StartFragment interface
-     *
+     * <p>
      * Begin creating a completely new event
      */
     @Override
@@ -93,7 +91,7 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Overrides the TagsFragment interface
-     *
+     * <p>
      * Updates some of the initial fields of the newly created event (tags, 21+, restauraunt, etc)
      */
     @Override
@@ -104,7 +102,7 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Overrides the AddressFragment interface
-     *
+     * <p>
      * Updates the address of the local event with the ParseGeoPoint of the address of the event
      */
     @Override
@@ -116,7 +114,7 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Overrides the DateFragment interface
-     *
+     * <p>
      * Updates the date parameter on the event, also the last field to be called
      * so we can save the event after this method runs
      */
@@ -139,24 +137,60 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Overrides the ReviewFragment interface
-     *
+     * <p>
      * Saves the event to the parse server, resets the setup fragment, and switches to the home
      * fragment
      */
     @Override
     public void createEvent(String eventTitle) {
+        createEventChat();
         event.setTitle(eventTitle);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_SHORT).show();
-                    Log.d("LocalFragment", "create post success");
+                    Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_LONG).show();
                     mListener.switchToHomeFragment();
-                    setupViewPager.setCurrentItem(0);
+                    resetSetupViewPager();
                 } else {
-                    Toast.makeText(getActivity(), "Could not create post",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Error creating event", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    // TODO: move get current user to new thread
+    // TODO: add accepted guests immediately after being accepted
+    /**
+     * Creates the event's chat once the create event button is hit
+     */
+    private void createEventChat() {
+        final Chat chat = new Chat();
+        chat.setName(event.getTitle() + " Chat");
+        chat.addMember(ParseUser.getCurrentUser().getObjectId());
+
+        if (event.getEventImage() != null)
+            chat.setImage(event.getEventImage());
+
+        chat.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) { // Register chat to the current event
+                    event.addChat(chat);
+                    event.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e != null) {
+                                Toast.makeText(getActivity(), "Could not create the event's chat",
+                                        Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(getActivity(), "Could not create a new chat",
+                            Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
@@ -166,6 +200,7 @@ public class LocalFragment extends Fragment implements
     /**
      * Method to be called by the parent activity to handle back presses. Moves the pager one
      * fragment backwards if possible
+     *
      * @return true if the view pager was moved backwards, false if we were already on the first
      * item
      */

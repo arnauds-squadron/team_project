@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +13,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
-import com.parse.ParseException;
 import com.parse.ParseImageView;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
@@ -113,47 +108,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             ibOpenChat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Event event = mAgenda.get(getAdapterPosition());
-
-                    boolean isNewChat = event.getChat() == null;
-                    final Chat chat = isNewChat ? new Chat() : event.getChat();
-
-                    if (isNewChat) {
-                        chat.setName(event.getTitle() + " Chat");
-
-                        if (event.getEventImage() != null)
-                            chat.setImage(event.getEventImage());
-
-                        // TODO: move get current user to new thread
-                        chat.addMember(ParseUser.getCurrentUser().getObjectId());
-
-                        // TODO: add accepted guests immediately after being accepted
-                    }
-
-                    chat.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) { // Register chat to the current event
-                                event.addChat(chat);
-                                event.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            // Must save chat first before opening otherwise
-                                            // we get an IllegalStateException
-                                            homeFragment.openChat(chat);
-                                        } else {
-                                            Log.e("HomeAdapter", "Could not save the chat");
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                });
-                            } else {
-                                Log.e("HomeAdapter", "Could not save the chat");
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+                    Event event = mAgenda.get(getAdapterPosition());
+                    homeFragment.openChat(event.getChat());
                 }
             });
 
