@@ -18,6 +18,7 @@ import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.arnauds_squadron.eatup.yelp_api.YelpService;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
@@ -81,21 +82,22 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
 
                     YelpApiResponse yelpApiResponse = response.body();
-                    tvYelp.setText(yelpApiResponse.businessList.get(0).name);
-                    final String url = yelpApiResponse.businessList.get(0).url;
-                    btnLink.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent i = new Intent(Intent.ACTION_VIEW);
-                                    i.setData(Uri.parse(url));
-                                    startActivity(i);
-                                    finish();
-                                }
-                            });
+                    if (yelpApiResponse != null) {
+                        tvYelp.setText(yelpApiResponse.businessList.get(0).name);
+                        final String url = yelpApiResponse.businessList.get(0).url;
+                        btnLink.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent(Intent.ACTION_VIEW);
+                                i.setData(Uri.parse(url));
+                                startActivity(i);
+                                finish();
+                            }
+                        });
                         Glide.with(HomeDetailsActivity.this)
                                 .load(yelpApiResponse.businessList.get(0).imageUrl)
-                                .override(100,100)
                                 .into(ivImage);
+                    }
                 }
             }
             @Override
