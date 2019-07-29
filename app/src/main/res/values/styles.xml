@@ -10,7 +10,7 @@
     </style>
 
     <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:background">@color/toolbar_color</item>
+        <item name="android:background">@color/toolbar</item>
     </style>
 
     <style name="SpinnerTextViewItem" parent="@android:style/Widget.TextView" >

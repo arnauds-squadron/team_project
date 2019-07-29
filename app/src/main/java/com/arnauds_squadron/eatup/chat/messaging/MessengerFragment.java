@@ -198,6 +198,7 @@ public class MessengerFragment extends Fragment {
      * Searches the Messages table for a0ny new messages that match the current chat's objectId.
      * Appends messages, does not clear and addAll()
      */
+    // TODO: use getList to make this even better
     private void refreshMessages() {
         Message.Query messageQuery = new Message.Query();
         messageQuery.newestFirst().matchesChat(chat).findInBackground(new FindCallback<Message>() {

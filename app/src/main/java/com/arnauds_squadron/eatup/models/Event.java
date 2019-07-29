@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -127,16 +128,6 @@ public class Event extends ParseObject {
         return getJSONArray(KEY_ACCEPTED_GUESTS);
     }
 
-    /**
-     * Adds another accepted guest to the already initialized array);
-     */
-    public void addAcceptedGuest(ParseUser guest, boolean isFirstGuest) {
-        if (isFirstGuest)
-            put(KEY_ACCEPTED_GUESTS, new JSONArray());
-
-        add(KEY_ACCEPTED_GUESTS, guest);
-    }
-
     public int getMaxGuests() {
         return getInt(KEY_MAX_GUESTS);
     }
@@ -167,6 +158,10 @@ public class Event extends ParseObject {
 
     public void addChat(Chat chat) {
         put(KEY_CHAT, chat);
+    }
+
+    public List<ParseUser> getPendingRequests() {
+        return getList(KEY_PENDING_GUESTS);
     }
 
     public List<ParseUser> getAllRequests() {
@@ -205,6 +200,18 @@ public class Event extends ParseObject {
             }
         }
         return false;
+    }
+
+    public void handleRequest(ParseUser user, boolean isAccepted) {
+        List<ParseUser> tempList = new ArrayList<>();
+        tempList.add(user);
+        removeAll(KEY_PENDING_GUESTS, tempList);
+
+        if (isAccepted) {
+            if (getAcceptedGuests() == null)
+                put(KEY_ACCEPTED_GUESTS, new JSONArray());
+            add(KEY_ACCEPTED_GUESTS, user);
+        }
     }
 
     // inner class to query event model
