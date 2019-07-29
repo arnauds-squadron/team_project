@@ -90,27 +90,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 e.printStackTrace();
             }
 
-            Call<YelpApiResponse> meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 15);
-            meetUp.enqueue(new Callback<YelpApiResponse>() {
-            @Override
-            public void onResponse(Call<YelpApiResponse> call, retrofit2.Response<YelpApiResponse> response) {
-                if (response.isSuccessful()) {
-
-                    YelpApiResponse yelpApiResponse = response.body();
-                    if(yelpApiResponse.businessList.size() > 0) {
-                        Glide.with(context)
-                                .load(yelpApiResponse.businessList.get(0).imageUrl)
-                                .override(100,100)
-                                .into(viewHolder.ivProfile);
-                    }
-                }
-            }
-            @Override
-            public void onFailure(Call<YelpApiResponse> call, Throwable t) {
-
-            }
-        });
-
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
         }
@@ -153,8 +132,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.ivProfile)
-        ImageView ivProfile;
         @BindView(R.id.ivImage)
         ParseImageView ivImage;
 

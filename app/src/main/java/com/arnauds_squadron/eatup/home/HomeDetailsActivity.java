@@ -9,9 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
@@ -24,6 +26,7 @@ import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.io.IOException;
@@ -44,6 +47,8 @@ public class HomeDetailsActivity extends AppCompatActivity {
 
     Context context;
     Event event;
+    @BindView(R.id.rbYelp)
+    RatingBar rbYelp;
     @BindView(R.id.ivProfile)
     ParseImageView ivProfile;
     @BindView(R.id.cbRestaurant)
@@ -74,7 +79,12 @@ public class HomeDetailsActivity extends AppCompatActivity {
         context = getApplicationContext();
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
         // if we have a response, then get the specific information defined in the Business Class
-        Call<YelpApiResponse> meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 15);
+        Call<YelpApiResponse> meetUp = null;
+        try {
+            meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().getString(0));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @Override
@@ -83,8 +93,9 @@ public class HomeDetailsActivity extends AppCompatActivity {
 
                     YelpApiResponse yelpApiResponse = response.body();
                     if (yelpApiResponse != null) {
-                        tvYelp.setText(yelpApiResponse.businessList.get(0).name);
-                        final String url = yelpApiResponse.businessList.get(0).url;
+                        Business restaurant = yelpApiResponse.businessList.get(0);
+                        tvYelp.setText(restaurant.name);
+                        final String url = restaurant.url;
                         btnLink.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -95,8 +106,9 @@ public class HomeDetailsActivity extends AppCompatActivity {
                             }
                         });
                         Glide.with(HomeDetailsActivity.this)
-                                .load(yelpApiResponse.businessList.get(0).imageUrl)
+                                .load(restaurant.imageUrl)
                                 .into(ivImage);
+                        rbYelp.setRating(restaurant.rating);
                     }
                 }
             }

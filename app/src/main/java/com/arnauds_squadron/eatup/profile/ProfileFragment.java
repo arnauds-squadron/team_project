@@ -107,7 +107,7 @@ public class ProfileFragment extends Fragment {
         else {
             ratingBar.setRating(NO_RATING);
         }
-        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+//        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
 
         // load user profileImage
         ParseFile profileImage = user.getParseFile(KEY_PROFILE_PICTURE);
