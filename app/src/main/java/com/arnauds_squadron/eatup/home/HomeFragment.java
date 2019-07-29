@@ -66,7 +66,7 @@ public class HomeFragment extends Fragment {
         // initialize data source
         agenda = new ArrayList<>();
         // construct adapter from data source
-        homeAdapter = new HomeAdapter(this, agenda);
+        homeAdapter = new HomeAdapter(getContext(), this, agenda);
         // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setReverseLayout(true);

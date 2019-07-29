@@ -13,9 +13,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
+import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
@@ -32,7 +34,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private Context context;
     private HomeFragment homeFragment;
 
-    HomeAdapter(HomeFragment homeFragment, ArrayList<Event> mAgenda) {
+    HomeAdapter(Context context, HomeFragment homeFragment, ArrayList<Event> mAgenda) {
+        this.context = context;
         this.homeFragment = homeFragment;
         this.mAgenda = mAgenda;
     }
@@ -52,9 +55,19 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         if (event.getDate() != null) {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
             if (event.getDate() != null) {
+                // event has already passed
                 if (event.getDate().before(localCalendar.getTime())) {
                     viewHolder.tvDate.setTextColor(Color.RED);
-                } else {
+                    // check if current user is the host
+                    if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                        viewHolder.btnCancel.setText("Rate guests");
+                    }
+                    else {
+                        viewHolder.btnCancel.setText("Rate host");
+                    }
+                }
+                // event is in the future
+                else {
                     viewHolder.tvDate.setTextColor(Color.BLACK);
                 }
                 viewHolder.tvDate.setText(event.getDate().toString());
@@ -105,9 +118,22 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mAgenda.remove(getAdapterPosition());
-                    notifyItemRemoved(getAdapterPosition());
-                    notifyItemRangeChanged(getAdapterPosition(), mAgenda.size());
+                    int eventPosition = getAdapterPosition();
+                    Event event = mAgenda.get(eventPosition);
+
+                    // if past event date, rate the attending users. otherwise cancel the event
+                    Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+                    if (event.getDate() != null) {
+                        if (event.getDate().before(localCalendar.getTime())) {
+                            Intent i = new Intent(context, RateUserActivity.class);
+                            i.putExtra("event", event);
+                            context.startActivity(i);
+                        }
+                        // TODO add some sort of check to remove the user from the event in the Parse database
+                        mAgenda.remove(eventPosition);
+                        notifyItemRemoved(eventPosition);
+                        notifyItemRangeChanged(eventPosition, mAgenda.size());
+                    }
                 }
             });
 

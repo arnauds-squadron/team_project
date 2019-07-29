@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +17,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.login.LoginActivity;
+import com.arnauds_squadron.eatup.models.Rating;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -97,17 +105,38 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ParseUser user = Constants.CURRENT_USER;
         // load user rating
-        Number rating = user.getNumber(AVERAGE_RATING);
-        Number numRatings = user.getNumber(NUM_RATINGS);
+//        Number rating = user.getNumber(AVERAGE_RATING);
+//        Number numRatings = user.getNumber(NUM_RATINGS);
         tvUsername.setClickable(false);
         tvBio.setClickable(false);
-        if (rating != null) {
-            ratingBar.setRating(rating.floatValue());
-        }
-        else {
-            ratingBar.setRating(NO_RATING);
-        }
-        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+//        if (rating != null) {
+//            ratingBar.setRating(rating.floatValue());
+//        }
+//        else {
+//            ratingBar.setRating(NO_RATING);
+//        }
+//        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+
+        ParseQuery<Rating> query = new Rating.Query();
+        query.whereEqualTo("user", Constants.CURRENT_USER);
+        query.findInBackground(new FindCallback<Rating>() {
+            public void done(List<Rating> ratings, ParseException e) {
+                if (e == null) {
+                    if(ratings.size() != 0) {
+                        Rating rating = ratings.get(0);
+                        float averageRating = rating.getAvgRating().floatValue();
+                        int numRatings = rating.getNumRatings().intValue();
+                        ratingBar.setRating(averageRating);
+                        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings));
+                    }
+                    else {
+                        ratingBar.setRating(NO_RATING);
+                    }
+                } else {
+                    Toast.makeText(getContext(),"Query for rating not successful",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         // load user profileImage
         ParseFile profileImage = user.getParseFile(KEY_PROFILE_PICTURE);

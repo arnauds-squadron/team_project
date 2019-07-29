@@ -143,7 +143,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent i = new Intent(HomeDetailsActivity.this, ProfileActivity.class);
-                        i.putExtra("user",Parcels.wrap(user));
+                        i.putExtra("user",user);
                         startActivity(i);
                     }
                 });
