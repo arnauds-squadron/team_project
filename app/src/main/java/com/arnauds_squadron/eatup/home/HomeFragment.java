@@ -79,6 +79,8 @@ public class HomeFragment extends Fragment {
                 fetchTimelineAsync();
             }
         });
+
+        // TODO: standardize
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,

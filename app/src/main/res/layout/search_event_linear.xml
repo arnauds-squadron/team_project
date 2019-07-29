@@ -45,7 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvHostName" />
 
     <TextView
-        android:id="@+id/tvCuisine"
+        android:id="@+id/tvTags"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -66,7 +66,7 @@
         android:text="@string/detailview_distance"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivEventImage"
-        app:layout_constraintTop_toBottomOf="@+id/tvCuisine" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTags" />
 
     <Button
         android:id="@+id/btRequest"

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.format.DateFormat;
 
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper class to help format dates and times
@@ -33,18 +35,46 @@ public class FormatHelper {
         if (uses24HourTime)
             return DateFormat.format("HH:mm", date).toString();
         else
-            return DateFormat.format("hh:mm a", date).toString();
+            return DateFormat.format("h:mm a", date).toString();
     }
 
-    // TODO: implement this correctly (temp right now)
     /**
      * Formats a timestamp to show the time of the message if it was on the same day,
-     * or the date if it was longer ago
+     * or the date if it was longer ago.
+     * <p>
+     * Shows the time if it was sent on the same day, shows the name of the day if the message
+     * was recent, and shows the actual date for any later dates.
      *
      * @return A correctly formatted date that gives the most useful information on how
      * long ago a timestamp was
      */
-    public static String formatTimestamp(Date date) {
-        return formatDateWithMonthNames(date);
+    public static String formatTimestamp(Date date, Context context) {
+        long millis = new Date().getTime() - date.getTime();
+        long days = TimeUnit.DAYS.convert(millis, TimeUnit.MILLISECONDS);
+
+        if (days < 1) { // show the time if it was very recent
+            return formatTime(date, context);
+        } else if (days < 6) { // show the name of the day if it was this week
+            return DateFormat.format("EEE", date).toString();
+        } else if (days < 365) { // show the date without the year if it was this year
+            return DateFormat.format("MMM, dd", date).toString();
+        } else { // show a regular date
+            return formatDateWithMonthNames(date);
+        }
+    }
+
+    /**
+     * Concatenates all the elements of the given list into a comma separated String
+     *
+     * @param list A list of string elements
+     * @return A comma separated String of elements
+     */
+    public static String listToString(List<String> list) {
+        StringBuilder returnString = new StringBuilder();
+
+        for (String item : list)
+            returnString.append(", ").append(item);
+
+        return returnString.substring(2);
     }
 }

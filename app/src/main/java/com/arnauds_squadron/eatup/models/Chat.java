@@ -5,6 +5,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.Date;
+
 @ParseClassName("Chat")
 public class Chat extends ParseObject {
     private static final String KEY_NAME = "name";
@@ -26,6 +28,10 @@ public class Chat extends ParseObject {
 
     public void setImage(ParseFile image) {
         put(KEY_IMAGE, image);
+    }
+
+    public void justUpdated() {
+        put(KEY_UPDATED_AT, new Date());
     }
 
     public void addMember(String userId) {

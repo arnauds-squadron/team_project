@@ -116,8 +116,9 @@ public class ChatFragment extends Fragment implements
      * Updates the chat list in the ChatDashboardFragment. Called after a new event is created,
      * since a new chat is also created
      */
+    @Override
     public void updateDashboardChats() {
-        dashboardFragment.getChats();
+        dashboardFragment.getChatsAsync();
     }
 
     /**

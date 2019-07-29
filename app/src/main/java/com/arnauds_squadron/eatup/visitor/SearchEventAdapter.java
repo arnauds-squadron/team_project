@@ -75,7 +75,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvEventName;
         @BindView(R.id.tvHostName)
         TextView tvHostName;
-        @BindView(R.id.tvCuisine)
+        @BindView(R.id.tvTags)
         TextView tvCuisine;
         @BindView(R.id.tvDistance)
         TextView tvDistance;
@@ -102,7 +102,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                     // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
                     // otherwise, create request/add to "allRequests" and send back to home screen
 
-                    if(event.checkRequest(Constants.CURRENT_USER, event)) {
+                    if(event.checkRequest(Constants.CURRENT_USER)) {
                         Toast.makeText(context, "RSVP already requested", Toast.LENGTH_SHORT).show();
                     } else {
                         event.createRequest(Constants.CURRENT_USER, event);

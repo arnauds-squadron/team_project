@@ -32,7 +32,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @BindView(R.id.tvEventTitle)
     TextView tvEventTitle;
-    @BindView(R.id.tvCuisine)
+    @BindView(R.id.tvTags)
     TextView tvCuisine;
     @BindView(R.id.tvDistance)
     TextView tvDistance;
@@ -67,7 +67,7 @@ public class EventDetailsActivity extends AppCompatActivity {
             public void done(final Event event, ParseException e) {
                 if (e == null) {
                     currentEvent = event;
-                    eventDetailsAdapter = new EventDetailsAdapter(getApplicationContext(), EventDetailsActivity.this, event, rvEventDetails);
+                    eventDetailsAdapter = new EventDetailsAdapter(EventDetailsActivity.this, event, rvEventDetails);
                     SnapHelper pagerSnapHelper = new PagerSnapHelper();
                     pagerSnapHelper.attachToRecyclerView(rvEventDetails);
                     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1, GridLayoutManager.HORIZONTAL, false);
@@ -94,7 +94,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
         // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
         // otherwise, create request/add to "allRequests" and send back to home screen
-        if (currentEvent.checkRequest(Constants.CURRENT_USER, currentEvent)) {
+        if (currentEvent.checkRequest(Constants.CURRENT_USER)) {
             Toast.makeText(this, "RSVP already requested", Toast.LENGTH_SHORT).show();
         } else {
             currentEvent.createRequest(Constants.CURRENT_USER, currentEvent);

@@ -51,7 +51,10 @@
     <string name="event_creation_title_hint">Name</string>
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
-
+    <string name="max_guests_label">Max Guests</string>
+    <string name="over_21_label">21+</string>
+    <string name="calendar_icon_text">Calendar</string>
+    <string name="clock_icon_text">Clock</string>
 
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />

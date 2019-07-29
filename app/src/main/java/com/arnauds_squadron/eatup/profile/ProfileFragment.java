@@ -3,6 +3,7 @@ package com.arnauds_squadron.eatup.profile;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -137,20 +138,6 @@ public class ProfileFragment extends Fragment {
                     .load(profileImage.getUrl())
                     .into(ivProfile);
         }
-
-        btnNewProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
-                        Manifest.permission.CAMERA);
-                if (permissionState != PackageManager.PERMISSION_GRANTED) {
-                    shouldShowRequestPermissionRationale(Manifest.permission.CAMERA);
-                }
-                Intent cInt = new Intent(getActivity(), ProfileImageActivity.class);
-                startActivity(cInt);
-
-            }
-        });
         String username = user.getUsername();
         if(user.getUsername() != null) {
             tvUsername.setText(username);
@@ -168,6 +155,18 @@ public class ProfileFragment extends Fragment {
             tvBio.setText(R.string.no_bio);
         }
     }
+    //todo update user profile photo
+//    @OnClick(R.id.btnNewProfileImage)
+//    public void setNewProfileImage () {
+//        int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
+//                Manifest.permission.CAMERA);
+//        if (permissionState != PackageManager.PERMISSION_GRANTED) {
+//            shouldShowRequestPermissionRationale(Manifest.permission.CAMERA);
+//
+//        }
+//        Intent cInt = new Intent(getActivity(), ProfileImageActivity.class);
+//        startActivity(cInt);
+//    }
     @OnClick(R.id.ivEditUsername)
     public void editUsername () {
         tvBio.setVisibility(View.INVISIBLE);

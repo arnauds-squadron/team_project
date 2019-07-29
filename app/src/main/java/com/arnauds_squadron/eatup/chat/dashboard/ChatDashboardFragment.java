@@ -3,6 +3,7 @@ package com.arnauds_squadron.eatup.chat.dashboard;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,9 +13,9 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,10 @@ import butterknife.ButterKnife;
  * Fragment that displays the list of active chats the user is part of
  */
 public class ChatDashboardFragment extends Fragment {
+
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeContainer;
+
     @BindView(R.id.rvChats)
     RecyclerView rvChats;
 
@@ -45,11 +50,26 @@ public class ChatDashboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chat_dashboard, container, false);
         ButterKnife.bind(this, view);
 
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                getChatsAsync();
+            }
+        });
+
+        // TODO: standardize
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         chatList = new ArrayList<>();
         chatAdapter = new ChatDashboardAdapter(this, chatList);
         rvChats.setAdapter(chatAdapter);
         rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
-        getChats();
+        getChatsAsync();
+
         return view;
     }
 
@@ -84,9 +104,9 @@ public class ChatDashboardFragment extends Fragment {
      * Queries the ParseServer for all the chats that the current user is a member of, adding
      * them to the chatList and notifying the adapter
      */
-    public void getChats() {
+    public void getChatsAsync() {
         Chat.Query query = new Chat.Query();
-        String userId = ParseUser.getCurrentUser().getObjectId();
+        String userId = Constants.CURRENT_USER.getObjectId();
         query.newestFirst().matchesUserId(userId).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
@@ -99,6 +119,7 @@ public class ChatDashboardFragment extends Fragment {
                             Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
+                swipeContainer.setRefreshing(false);
             }
         });
     }
