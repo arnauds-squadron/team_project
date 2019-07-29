@@ -16,6 +16,6 @@ public class Business {
     public String url;
     @SerializedName("rating")
     @Expose
-    public String rating;
+    public Float rating;
 
 }

@@ -5,12 +5,23 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Rating;
+import com.arnauds_squadron.eatup.utils.Constants;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.parceler.Parcels;
+
+import java.io.File;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -43,18 +54,29 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-        user = ParseUser.getCurrentUser();
+        user = getIntent().getParcelableExtra("user");
 
         // load user rating
-        Number rating = user.getNumber(AVERAGE_RATING);
-        Number numRatings = user.getNumber(NUM_RATINGS);
-        if (rating != null) {
-            ratingBar.setRating(rating.floatValue());
-        }
-        else {
-            ratingBar.setRating(NO_RATING);
-        }
-        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+        ParseQuery<Rating> query = new Rating.Query();
+        query.whereEqualTo("user", user);
+        query.findInBackground(new FindCallback<Rating>() {
+            public void done(List<Rating> ratings, ParseException e) {
+                if (e == null) {
+                    if(ratings.size() != 0) {
+                        Rating rating = ratings.get(0);
+                        float averageRating = rating.getAvgRating().floatValue();
+                        int numRatings = rating.getNumRatings().intValue();
+                        ratingBar.setRating(averageRating);
+                        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings));
+                    }
+                    else {
+                        ratingBar.setRating(NO_RATING);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Query for rating not successful", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         // load user profileImage
         ParseFile profileImage = user.getParseFile(KEY_PROFILE_PICTURE);

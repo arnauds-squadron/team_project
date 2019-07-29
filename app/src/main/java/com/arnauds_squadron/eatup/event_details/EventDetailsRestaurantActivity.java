@@ -2,6 +2,7 @@ package com.arnauds_squadron.eatup.event_details;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -13,6 +14,7 @@ import com.parse.ParseFile;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class EventDetailsRestaurantActivity extends AppCompatActivity {
 
@@ -29,6 +31,8 @@ public class EventDetailsRestaurantActivity extends AppCompatActivity {
     TextView tvPhone;
     @BindView(R.id.tvURL)
     TextView tvURL;
+    @BindView(R.id.btYelp)
+    Button btYelp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,11 @@ public class EventDetailsRestaurantActivity extends AppCompatActivity {
 //            ratingBar.setRating(NO_RATING);
 //        }
 //        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+    }
+
+    @OnClick(R.id.btYelp)
+    public void goToYelp() {
+
     }
 }
 

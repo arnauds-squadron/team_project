@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
 import com.arnauds_squadron.eatup.models.Event;
 import com.parse.ParseException;
@@ -35,11 +36,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Event> mAgenda;
     private Context context;
     private HomeFragment homeFragment;
-
     private List<ParseUser> requests;
     private RequestAdapter requestAdapter;
 
-    HomeAdapter(HomeFragment homeFragment, List<Event> mAgenda) {
+
+    HomeAdapter(Context context, HomeFragment homeFragment, List<Event> mAgenda) {
+        this.context = context;
         this.homeFragment = homeFragment;
         this.mAgenda = mAgenda;
     }
@@ -54,19 +56,38 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
         if (event.getDate() != null) {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
             if (event.getDate() != null) {
+                // event has already passed
                 if (event.getDate().before(localCalendar.getTime())) {
                     viewHolder.tvDate.setTextColor(Color.RED);
-                } else {
+                    // check if current user is the host
+                    if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                        viewHolder.btnCancel.setText("Rate guests");
+                    }
+                    else {
+                        viewHolder.btnCancel.setText("Rate host");
+                    }
+                }
+                // event is in the future
+                else {
                     viewHolder.tvDate.setTextColor(Color.BLACK);
                 }
                 viewHolder.tvDate.setText(event.getDate().toString());
             }
         }
+            if (event.getTitle() != null) {
+                viewHolder.tvTitle.setText(event.getTitle());
+            }
+
+            try {
+                viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
@@ -137,9 +158,22 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mAgenda.remove(getAdapterPosition());
-                    notifyItemRemoved(getAdapterPosition());
-                    notifyItemRangeChanged(getAdapterPosition(), mAgenda.size());
+                    int eventPosition = getAdapterPosition();
+                    Event event = mAgenda.get(eventPosition);
+
+                    // if past event date, rate the attending users. otherwise cancel the event
+                    Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+                    if (event.getDate() != null) {
+                        if (event.getDate().before(localCalendar.getTime())) {
+                            Intent i = new Intent(context, RateUserActivity.class);
+                            i.putExtra("event", event);
+                            context.startActivity(i);
+                        }
+                        // TODO add some sort of check to remove the user from the event in the Parse database
+                        mAgenda.remove(eventPosition);
+                        notifyItemRemoved(eventPosition);
+                        notifyItemRangeChanged(eventPosition, mAgenda.size());
+                    }
                 }
             });
 

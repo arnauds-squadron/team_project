@@ -67,7 +67,7 @@ public class EventDetailsActivity extends AppCompatActivity {
             public void done(final Event event, ParseException e) {
                 if (e == null) {
                     currentEvent = event;
-                    eventDetailsAdapter = new EventDetailsAdapter(EventDetailsActivity.this, event, rvEventDetails);
+                    eventDetailsAdapter = new EventDetailsAdapter(getApplicationContext(), EventDetailsActivity.this, event, rvEventDetails);
                     SnapHelper pagerSnapHelper = new PagerSnapHelper();
                     pagerSnapHelper.attachToRecyclerView(rvEventDetails);
                     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1, GridLayoutManager.HORIZONTAL, false);
