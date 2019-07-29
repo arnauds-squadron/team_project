@@ -16,6 +16,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -23,6 +24,7 @@ import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
+import com.parse.ParseUser;
 
 import java.io.File;
 
@@ -74,9 +76,17 @@ public class ProfileImageActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnSave)
     public void savePhoto() {
-        Constants.CURRENT_USER.put(KEY_PROFILE_PICTURE, new ParseFile(photoFile));
-        Intent i = new Intent(ProfileImageActivity.this, ProfileActivity.class);
-        startActivity(i);
+        //todo update user profile photo
+//        Constants.CURRENT_USER.put(KEY_PROFILE_PICTURE, new ParseFile(photoFile));
+//        ivProfileImage.setDrawingCacheEnabled(true);
+//        Bitmap bitmap= ivProfileImage.getDrawingCache();
+//        Bundle bundle = new Bundle();
+//        Intent i = new Intent(ProfileImageActivity.this, ProfileFragment.class);
+//        i.putExtra("Bitmap", bitmap);
+//        startActivity(i);
+//        bundle.putParcelable("bitmapPath", bitmap);
+//        ProfileFragment fragobj = new ProfileFragment();
+//        fragobj.setArguments(bundle);
     }
     public void onPickPhoto() {
         // Create intent for picking a photo from the gallery
@@ -126,10 +136,9 @@ public class ProfileImageActivity extends AppCompatActivity {
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                 ivProfileImage.setImageBitmap(takenImage);
-//                Glide.with(getApplicationContext())
-//                        .load(takenImage)
-//                        .centerCrop()
-//                        .into(ivProfileImage);
+                Glide.with(getApplicationContext())
+                        .load(takenImage)
+                        .into(ivProfileImage);
             } else { // Result was a failure
                 Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
