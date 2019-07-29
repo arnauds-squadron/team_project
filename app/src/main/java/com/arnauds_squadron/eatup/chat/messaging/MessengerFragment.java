@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +37,6 @@ import butterknife.OnClick;
  * Fragment to display a single chat with messages from different users. Also allows sending of
  * messages and periodically updates the messages in real time
  */
-//TODO: typing a message in chat hides the top part of the fragment
 public class MessengerFragment extends Fragment {
     // 1 second
     private static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
@@ -68,8 +66,6 @@ public class MessengerFragment extends Fragment {
         @Override
         public void run() {
             refreshMessages();
-            // TODO: remove
-            Log.i("refresh thread", Thread.currentThread().toString());
             chatUpdateHandler.postDelayed(this, CHAT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -198,7 +194,6 @@ public class MessengerFragment extends Fragment {
      * Searches the Messages table for a0ny new messages that match the current chat's objectId.
      * Appends messages, does not clear and addAll()
      */
-    // TODO: use getList to make this even better
     private void refreshMessages() {
         Message.Query messageQuery = new Message.Query();
         messageQuery.newestFirst().matchesChat(chat).findInBackground(new FindCallback<Message>() {
@@ -219,7 +214,6 @@ public class MessengerFragment extends Fragment {
     /**
      * Helper method to append the message to the bottom of the chat's RecyclerView. Also scrolls
      * to the bottom of the chat.
-     * // TODO: scroll to position on new message?
      *
      * @param message The message to append
      */
