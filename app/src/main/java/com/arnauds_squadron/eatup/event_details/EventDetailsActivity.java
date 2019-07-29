@@ -94,7 +94,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
         // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
         // otherwise, create request/add to "allRequests" and send back to home screen
-        if (currentEvent.checkRequest(Constants.CURRENT_USER, currentEvent)) {
+        if (currentEvent.checkRequest(Constants.CURRENT_USER)) {
             Toast.makeText(this, "RSVP already requested", Toast.LENGTH_SHORT).show();
         } else {
             currentEvent.createRequest(Constants.CURRENT_USER, currentEvent);

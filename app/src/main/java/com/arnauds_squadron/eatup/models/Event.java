@@ -2,7 +2,6 @@ package com.arnauds_squadron.eatup.models;
 
 import android.util.Log;
 
-import com.arnauds_squadron.eatup.R;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -12,18 +11,11 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 @ParseClassName("Event")
 public class Event extends ParseObject {
@@ -155,10 +147,6 @@ public class Event extends ParseObject {
         return getList(KEY_PENDING_GUESTS);
     }
 
-    public List<ParseUser> getAllRequests() {
-        return getList(KEY_ALL_REQUESTS);
-    }
-
     /**
      * Adds the user to this event's pending guests lists, and they must be accepted or denied
      * later by the host
@@ -181,9 +169,9 @@ public class Event extends ParseObject {
         });
     }
 
-    public Boolean checkRequest(ParseUser user, Event event) {
-        if (event.getAllRequests() != null) {
-            List<ParseUser> userRequests = event.getAllRequests();
+    public Boolean checkRequest(ParseUser user) {
+        List<ParseUser> userRequests = getList(KEY_ALL_REQUESTS);
+        if (userRequests != null) {
             for (int i = 0; i < userRequests.size(); i++) {
                 if (userRequests.get(i) == user) {
                     return true;
