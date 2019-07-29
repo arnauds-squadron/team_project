@@ -32,7 +32,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @BindView(R.id.tvEventTitle)
     TextView tvEventTitle;
-    @BindView(R.id.tvCuisine)
+    @BindView(R.id.tvTags)
     TextView tvCuisine;
     @BindView(R.id.tvDistance)
     TextView tvDistance;

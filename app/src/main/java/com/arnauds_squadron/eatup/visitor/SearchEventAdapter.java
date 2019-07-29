@@ -75,7 +75,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvEventName;
         @BindView(R.id.tvHostName)
         TextView tvHostName;
-        @BindView(R.id.tvCuisine)
+        @BindView(R.id.tvTags)
         TextView tvCuisine;
         @BindView(R.id.tvDistance)
         TextView tvDistance;

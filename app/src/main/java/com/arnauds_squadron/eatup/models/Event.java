@@ -30,7 +30,6 @@ public class Event extends ParseObject {
     private static final String KEY_TAGS = "tags";
     private static final String KEY_MAX_GUESTS = "maxGuests";
     private static final String KEY_21 = "over21";
-    private static final String KEY_RESTAURANT = "isRestaurant";
     private static final String KEY_CHAT = "chat";
     private static final String KEY_ALL_REQUESTS = "allRequests";
     private static final String KEY_PENDING_GUESTS = "pendingGuests";
@@ -96,8 +95,8 @@ public class Event extends ParseObject {
         put(KEY_DESCRIPTION, description);
     }
 
-    public JSONArray getTags() {
-        return getJSONArray(KEY_TAGS);
+    public List<String> getTags() {
+        return getList(KEY_TAGS);
     }
 
     /**
@@ -134,14 +133,6 @@ public class Event extends ParseObject {
 
     public void setOver21(Boolean over21) {
         put(KEY_21, over21);
-    }
-
-    public Boolean getRestaurant() {
-        return getBoolean(KEY_RESTAURANT);
-    }
-
-    public void setRestaurant(Boolean restaurant) {
-        put(KEY_RESTAURANT, restaurant);
     }
 
     public Chat getChat() {

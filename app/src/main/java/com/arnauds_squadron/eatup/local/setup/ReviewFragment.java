@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -31,8 +34,14 @@ import butterknife.OnClick;
  */
 public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
-    @BindView(R.id.tvCuisine)
-    TextView tvCuisine;
+    @BindView(R.id.tvTags)
+    TextView tvTags;
+
+    @BindView(R.id.tvMaxGuests)
+    TextView tvMaxGuests;
+
+    @BindView(R.id.cbOver21)
+    CheckBox cbOver21;
 
     @BindView(R.id.tvAddress)
     TextView tvAddress;
@@ -119,7 +128,9 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      * Initialize all the TextViews and details of the current event
      */
     private void initializeViews() {
-        tvCuisine.setText(event.getCuisine());
+        tvTags.setText(FormatHelper.listToString(event.getTags()));
+        tvMaxGuests.setText(String.format(Locale.ENGLISH, "%d", event.getMaxGuests()));
+        cbOver21.setChecked(event.getOver21());
         tvAddress.setText(event.getAddressString());
         tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
         tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));

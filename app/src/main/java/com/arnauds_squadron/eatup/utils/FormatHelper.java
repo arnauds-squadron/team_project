@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.format.DateFormat;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Helper class to help format dates and times
@@ -37,6 +38,7 @@ public class FormatHelper {
     }
 
     // TODO: implement this correctly (temp right now)
+
     /**
      * Formats a timestamp to show the time of the message if it was on the same day,
      * or the date if it was longer ago
@@ -46,5 +48,18 @@ public class FormatHelper {
      */
     public static String formatTimestamp(Date date) {
         return formatDateWithMonthNames(date);
+    }
+
+    /**
+     *
+     */
+    public static String listToString(List<String> list) {
+        StringBuilder returnString = new StringBuilder();
+
+        for (String item : list) {
+            returnString.append(", ").append(item);
+        }
+
+        return returnString.substring(2);
     }
 }

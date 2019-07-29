@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.Switch;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -32,17 +32,19 @@ import butterknife.OnClick;
  */
 public class TagsFragment extends Fragment {
 
+    private final static int MAX_GUESTS = 100;
+
     @BindView(R.id.tvEventFoodType)
     AutoCompleteTextView tvEventFoodType;
 
     @BindView(R.id.lvTagList)
     ListView lvTagList;
 
-    @BindView(R.id.swIs21Plus)
-    Switch swIs21Plus;
+    @BindView(R.id.cbIs21Plus)
+    CheckBox cbIs21Plus;
 
-    @BindView(R.id.spIsRestaurant)
-    Spinner spIsRestaurant;
+    @BindView(R.id.npMaxGuests)
+    NumberPicker npMaxGuests;
 
     private OnFragmentInteractionListener mListener;
     private Activity activity;
@@ -68,8 +70,7 @@ public class TagsFragment extends Fragment {
 
         setupAutocompleteTextView();
         setupListView();
-        setupRestaurantSpinner();
-
+        setUpNumberPicker();
         return view;
     }
 
@@ -110,8 +111,8 @@ public class TagsFragment extends Fragment {
             Event event = new Event();
             event.setHost(Constants.CURRENT_USER);
             event.setTags(tagList);
-            event.setOver21(swIs21Plus.isActivated());
-            event.setRestaurant(spIsRestaurant.getSelectedItem().toString().equals("Restaurant"));
+            event.setOver21(cbIs21Plus.isChecked());
+            event.setMaxGuests(npMaxGuests.getValue());
             mListener.updateTags(event);
         } else {
             Toast.makeText(activity, "Select at least 1 tag for your event",
@@ -171,16 +172,13 @@ public class TagsFragment extends Fragment {
     }
 
     /**
-     * Sets up the restaurant spinner_text_view with the options in the data array, select between
-     * restaurant and home-cooked
+     * Sets up the number picker widget so the user can select the max number of guests
      */
-    //TODO: fix style
-    private void setupRestaurantSpinner() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
-                R.array.isRestaurantSpinnerData, android.R.layout.simple_spinner_dropdown_item);
-        spIsRestaurant.setAdapter(adapter);
+    private void setUpNumberPicker() {
+        npMaxGuests.setMinValue(1);
+        npMaxGuests.setMaxValue(MAX_GUESTS);
+        npMaxGuests.setWrapSelectorWheel(false);
     }
-
 
     public interface OnFragmentInteractionListener {
         /**
