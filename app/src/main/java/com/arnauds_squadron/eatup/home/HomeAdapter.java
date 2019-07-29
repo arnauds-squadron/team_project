@@ -90,7 +90,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         viewHolder.rvRequests.setAdapter(requestAdapter);
 
         getPendingRequests(event);
-
     }
 
     @Override
@@ -106,7 +105,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         if (pending != null && pending.size() > requests.size()) {
             requests.clear();
             requests.addAll(pending);
-            requestAdapter.notifyDataSetChanged();
+            requestAdapter.notifyItemRangeInserted(0, pending.size());
         }
     }
 

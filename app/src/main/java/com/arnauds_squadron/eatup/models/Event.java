@@ -120,16 +120,6 @@ public class Event extends ParseObject {
         return getJSONArray(KEY_ACCEPTED_GUESTS);
     }
 
-    /**
-     * Adds another accepted guest to the already initialized array);
-     */
-    public void addAcceptedGuest(ParseUser guest, boolean isFirstGuest) {
-        if (isFirstGuest)
-            put(KEY_ACCEPTED_GUESTS, new JSONArray());
-
-        add(KEY_ACCEPTED_GUESTS, guest);
-    }
-
     public int getMaxGuests() {
         return getInt(KEY_MAX_GUESTS);
     }

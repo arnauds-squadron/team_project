@@ -101,46 +101,51 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                final ParseUser user = requests.get(position);
+            int test = getAdapterPosition();
 
-                btnAccept.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        handleRequest(user, true);
-                    }
-                });
-
-                btnDeny.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        handleRequest(user, false);
-                    }
-                });
-
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, ProfileActivity.class);
-                        intent.putExtra("user", user);
-                        context.startActivity(intent);
-                    }
-                });
-            }
-        }
-
-        void handleRequest(ParseUser user, boolean isAccepted) {
-            event.handleRequest(user, isAccepted);
-            event.saveInBackground(new SaveCallback() {
+            btnAccept.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void done(ParseException e) {
-                    if (e == null)
-                        Log.d("RequestAdapter", "Request handled");
-                    else
-                        Log.d("RequestAdapter", "Error handling request.");
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    ParseUser user = requests.get(position);
+                    handleRequest(user, position, true);
+                }
+            });
+
+            btnDeny.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    ParseUser user = requests.get(position);
+                    handleRequest(user, position, false);
+                }
+            });
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, ProfileActivity.class);
+                    ParseUser user = requests.get(getAdapterPosition());
+                    intent.putExtra("user", user);
+                    context.startActivity(intent);
                 }
             });
         }
+    }
+
+    private void handleRequest(final ParseUser user, final int position, boolean isAccepted) {
+        event.handleRequest(user, isAccepted);
+        event.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    requests.remove(position);
+                    notifyItemRemoved(position);
+                    Log.d("RequestAdapter", "Request handled");
+                } else {
+                    Log.d("RequestAdapter", "Error handling request.");
+                }
+            }
+        });
     }
 }
