@@ -81,7 +81,11 @@ public class HomeDetailsActivity extends AppCompatActivity {
         // if we have a response, then get the specific information defined in the Business Class
         Call<YelpApiResponse> meetUp = null;
         try {
-            meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().getString(0));
+            if (event.getTags() != null){
+                meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().getString(0));
+            } else {
+                meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine());
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
