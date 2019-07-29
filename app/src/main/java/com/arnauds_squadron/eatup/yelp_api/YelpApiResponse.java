@@ -1,6 +1,7 @@
 package com.arnauds_squadron.eatup.yelp_api;
 
 import com.arnauds_squadron.eatup.models.Business;
+import com.arnauds_squadron.eatup.models.Category;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -14,4 +15,7 @@ public class YelpApiResponse {
     @Expose
     public List<Business> businessList;
 
+    @SerializedName("categories")
+    @Expose
+    public List<Category> categoryList;
 }

@@ -13,4 +13,7 @@ public interface YelpService {
     @GET("businesses/search?")
     Call<YelpApiResponse> getLocation(@Query("latitude") Double latitude, @Query("longitude") Double longitude, @Query("terms") String cuisine, @Query("radius") int radius);
 
+    // categories autocomplete endpoint
+    @GET("autocomplete")
+    Call<YelpApiResponse> getSuggestion(@Query("text") String query);
 }
