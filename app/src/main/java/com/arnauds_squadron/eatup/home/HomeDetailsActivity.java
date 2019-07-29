@@ -1,21 +1,24 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
-import com.arnauds_squadron.eatup.yelp_api.YelpService;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
+import com.arnauds_squadron.eatup.yelp_api.YelpData;
+import com.arnauds_squadron.eatup.yelp_api.YelpService;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
@@ -36,11 +39,10 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 public class HomeDetailsActivity extends AppCompatActivity {
 
+    Context context;
     Event event;
     @BindView(R.id.ivProfile)
     ParseImageView ivProfile;
@@ -69,32 +71,10 @@ public class HomeDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home_details);
         ButterKnife.bind(this);
         event = Parcels.unwrap(getIntent().getParcelableExtra(Event.class.getSimpleName()));
-
-        final String secretKey = getString(R.string.yelp_api_key);
-        //Getting Authentication through OkHttpClient
-        OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new Interceptor() {
-                    @NotNull
-                    @Override
-                    public Response intercept(@NotNull Chain chain) throws IOException {
-                        Request request = chain.request();
-                        Request.Builder requestBuilder = request.newBuilder()
-                                .header("Authorization", "Bearer " + secretKey)
-                                .method(request.method(), request.body());
-                        return chain.proceed(requestBuilder.build());
-                    }
-                });
-        //Using retrofit to call the YelpApiRepsonse on  the events Cuisine and geopoint location then checking for a response
+        context = getApplicationContext();
+        //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
         // if we have a response, then get the specific information defined in the Business Class
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .baseUrl("https://api.yelp.com/v3/")
-                .client(okHttpClient.build())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        YelpService service = retrofit.create(YelpService.class);
-        Call<YelpApiResponse> meetUp = service.getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 15);
+        Call<YelpApiResponse> meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 15);
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @Override
@@ -102,21 +82,22 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
 
                     YelpApiResponse yelpApiResponse = response.body();
-                    tvYelp.setText(yelpApiResponse.businessList.get(0).name);
-                    final String url = yelpApiResponse.businessList.get(0).url;
-                    btnLink.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent i = new Intent(Intent.ACTION_VIEW);
-                                    i.setData(Uri.parse(url));
-                                    startActivity(i);
-                                    finish();
-                                }
-                            });
+                    if (yelpApiResponse != null) {
+                        tvYelp.setText(yelpApiResponse.businessList.get(0).name);
+                        final String url = yelpApiResponse.businessList.get(0).url;
+                        btnLink.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent(Intent.ACTION_VIEW);
+                                i.setData(Uri.parse(url));
+                                startActivity(i);
+                                finish();
+                            }
+                        });
                         Glide.with(HomeDetailsActivity.this)
                                 .load(yelpApiResponse.businessList.get(0).imageUrl)
-                                .override(100,100)
                                 .into(ivImage);
+                    }
                 }
             }
             @Override

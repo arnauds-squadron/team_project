@@ -7,7 +7,7 @@
     tools:context=".profile.ProfileActivity">
 
     <ImageView
-        android:id="@+id/ivProfile"
+        android:id="@+id/ivImage"
         android:layout_width="151dp"
         android:layout_height="138dp"
         android:layout_marginStart="24dp"
@@ -33,7 +33,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/ivImage" />
 
     <TextView
         android:id="@+id/tvBio"
@@ -68,7 +68,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/ivImage" />
 
     <EditText
         android:id="@+id/etBio"
@@ -143,8 +143,8 @@
         android:layout_marginBottom="8dp"
         android:text="new pic"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/ivProfile"
-        app:layout_constraintEnd_toEndOf="@+id/ivProfile" />
+        app:layout_constraintBottom_toBottomOf="@+id/ivImage"
+        app:layout_constraintEnd_toEndOf="@+id/ivImage" />
 
     <ImageView
         android:id="@+id/ivEditUsername"

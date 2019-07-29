@@ -74,7 +74,7 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.ivLogout)
     ImageView ivLogout;
     @Nullable
-    @BindView(R.id.ivProfile)
+    @BindView(R.id.ivImage)
     ImageView ivProfile;
     @BindView(R.id.ivEditUsername)
     ImageView ivEditUsername;
