@@ -69,6 +69,7 @@ public class ChatDashboardFragment extends Fragment {
         rvChats.setAdapter(chatAdapter);
         rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
         getChatsAsync();
+
         return view;
     }
 
