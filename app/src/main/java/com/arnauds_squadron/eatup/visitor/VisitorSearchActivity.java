@@ -68,6 +68,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_ALIAS;
+import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_TITLE;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
@@ -219,9 +221,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     userSearch(query);
                     break;
                 case CUISINE_SEARCH:
-                    queriedCuisine = query;
-                    loadTopEvents(queriedCuisine, new Date(0));
-                    // TODO get search suggestions of cuisines from the Yelp Search API
                     // handled in the automatic search
                     break;
                 case LOCATION_SEARCH:
@@ -609,65 +608,28 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 if(incompleteQuery.equals("")) {
                     MatrixCursor cursor = new MatrixCursor(CATEGORY_SEARCH_SUGGEST_COLUMNS);
                     categorySuggestionAdapter.swapCursor(cursor);
-                } else{
-                    final String yelpKey = getString(R.string.yelp_api_key);
-                    //Getting Authentication through OkHttpClient
-                    OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder()
-                            .addInterceptor(new Interceptor() {
-                                @NotNull
-                                @Override
-                                public Response intercept(@NotNull Chain chain) throws IOException {
-                                    Request request = chain.request();
-                                    Request.Builder requestBuilder = request.newBuilder()
-                                            .header("Authorization", "Bearer " + yelpKey)
-                                            .method(request.method(), request.body());
-                                    return chain.proceed(requestBuilder.build());
-                                }
-                            });
-                    Retrofit retrofit = new Retrofit.Builder()
-                            .addConverterFactory(ScalarsConverterFactory.create())
-                            .baseUrl("https://api.yelp.com/v3/")
-                            .client(okHttpClient.build())
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .build();
-                    YelpService service = retrofit.create(YelpService.class);
-                    Call<YelpApiResponse> queryResponse = service.getSuggestion(incompleteQuery);
-
-                    queryResponse.enqueue(new Callback<YelpApiResponse>() {
-                        @Override
-                        public void onResponse(Call<YelpApiResponse> call, retrofit2.Response<YelpApiResponse> response) {
-                            if (response.isSuccessful()) {
-                                YelpApiResponse yelpApiResponse = response.body();
-
-                                MatrixCursor cursor = new MatrixCursor(CATEGORY_SEARCH_SUGGEST_COLUMNS);
-                                int categoryListSize = yelpApiResponse.categoryList.size();
-                                int predictionCounter = 1;
-                                while ((predictionCounter - 1) < (categoryListSize - 1)) {
-                                    String categoryTitle = yelpApiResponse.categoryList.get(predictionCounter - 1).title;
-                                    String categoryAlias = yelpApiResponse.categoryList.get(predictionCounter - 1).alias;
-                                    Log.i("findCategorySuggestions", categoryTitle + categoryAlias);
-                                    cursor.addRow(new String[]{
-                                            Integer.toString(predictionCounter),
-                                            categoryTitle,
-                                            categoryAlias
-                                    });
-                                    predictionCounter++;
-                                }
-                                categorySuggestionAdapter.swapCursor(cursor);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<YelpApiResponse> call, Throwable t) {
-                            MatrixCursor cursor = new MatrixCursor(LOCATION_SEARCH_SUGGEST_COLUMNS);
+                } else {
+                    MatrixCursor cursor = new MatrixCursor(CATEGORY_SEARCH_SUGGEST_COLUMNS);
+                    int predictionCounter = 1;
+                    for(int i = 0; i < CATEGORY_TITLE.length; i++) {
+                        if(CATEGORY_TITLE[i].toLowerCase().startsWith(incompleteQuery.toLowerCase())) {
+                            Log.i("findCategorySuggestions", CATEGORY_TITLE[i] + CATEGORY_ALIAS[i]);
                             cursor.addRow(new String[]{
-                                    "1",
-                                    "No categories found",
-                                    "No results"
+                                    Integer.toString(predictionCounter),
+                                    CATEGORY_TITLE[i],
+                                    CATEGORY_ALIAS[i]
                             });
-                            categorySuggestionAdapter.swapCursor(cursor);
+                            predictionCounter++;
                         }
-                    });
+                    }
+                    if(predictionCounter == 1) {
+                        cursor.addRow(new String[]{
+                                "1",
+                                "No categories found",
+                                "No results"
+                        });
+                    }
+                    categorySuggestionAdapter.swapCursor(cursor);
                 }
                 return false;
             }
@@ -678,8 +640,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 eventAdapter.notifyDataSetChanged();
                 searchCategory = searchSpinner.getSelectedItemPosition();
                 if (searchCategory != NO_SEARCH) {
-                    if (searchCategory == LOCATION_SEARCH) {
-                        Toast.makeText(getApplicationContext(), "Select an address.", Toast.LENGTH_SHORT).show();
+                    if ((searchCategory == LOCATION_SEARCH) || (searchCategory == CUISINE_SEARCH)) {
+                        Toast.makeText(getApplicationContext(), "Select from the dropdown.", Toast.LENGTH_SHORT).show();
                         return true;
                     } else {
                         Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);

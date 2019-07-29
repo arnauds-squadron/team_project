@@ -104,19 +104,11 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ParseUser user = Constants.CURRENT_USER;
-        // load user rating
-//        Number rating = user.getNumber(AVERAGE_RATING);
-//        Number numRatings = user.getNumber(NUM_RATINGS);
+
         tvUsername.setClickable(false);
         tvBio.setClickable(false);
-//        if (rating != null) {
-//            ratingBar.setRating(rating.floatValue());
-//        }
-//        else {
-//            ratingBar.setRating(NO_RATING);
-//        }
-//        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
 
+        // load user rating
         ParseQuery<Rating> query = new Rating.Query();
         query.whereEqualTo("user", Constants.CURRENT_USER);
         query.findInBackground(new FindCallback<Rating>() {
