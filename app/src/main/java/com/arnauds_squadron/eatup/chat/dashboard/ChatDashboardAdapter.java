@@ -44,14 +44,13 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
         Chat chat = chatList.get(i);
 
         viewHolder.tvName.setText(chat.getName());
-        viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt()));
+        viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt(), context));
 
         ParseFile image = chat.getImage();
 
+        // TODO: image should never be null
         if (image != null) {
-            Glide.with(context)
-                    .load(chat.getImage().getUrl())
-                    .into(viewHolder.ivImage);
+            Glide.with(context).load(image.getUrl()).into(viewHolder.ivImage);
         }
     }
 

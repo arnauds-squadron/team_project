@@ -80,8 +80,6 @@ public class VisitorFragment extends Fragment {
     TextView tvBrowseTitle;
     @BindView(R.id.rvBrowse)
     RecyclerView rvBrowse;
-//    @BindView(R.id.resultsSearchView)
-//    SearchView searchView;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
     @BindView(R.id.tvPrevLocation1)

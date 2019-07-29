@@ -78,17 +78,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPerson" />
 
-    <CheckBox
-        android:id="@+id/cbRestaurant"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:clickable="false"
-        android:text="Restaurant"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlace" />
 
     <CheckBox
         android:id="@+id/cbLegal"
@@ -99,9 +88,9 @@
         android:layout_marginTop="8dp"
         android:clickable="false"
         android:text="21+"
-        app:layout_constraintEnd_toEndOf="@+id/cbRestaurant"
+        app:layout_constraintEnd_toEndOf="@+id/btnLink"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cbRestaurant" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPlace" />
 
     <TextView
         android:id="@+id/tvYelp"

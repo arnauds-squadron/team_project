@@ -44,13 +44,15 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.profile_tab
     };
 
+    ParseUser currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser = ParseUser.getCurrentUser();
         if (currentUser == null) {
             gotoLoginActivity();
         }

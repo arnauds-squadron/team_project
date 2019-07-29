@@ -63,7 +63,9 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         agenda = new ArrayList<>();
-        homeAdapter = new HomeAdapter(this, agenda);
+        // construct adapter from data source
+        homeAdapter = new HomeAdapter(getContext(), this, agenda);
+        // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
@@ -77,6 +79,8 @@ public class HomeFragment extends Fragment {
                 fetchTimelineAsync();
             }
         });
+
+        // TODO: standardize
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,

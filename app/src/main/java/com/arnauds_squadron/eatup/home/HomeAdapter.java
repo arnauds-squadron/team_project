@@ -3,7 +3,6 @@ package com.arnauds_squadron.eatup.home;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,23 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
-import com.arnauds_squadron.eatup.yelp_api.YelpData;
-import com.bumptech.glide.Glide;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
-import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -36,23 +31,18 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import retrofit2.Call;
-import retrofit2.Callback;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
     private List<Event> mAgenda;
     private Context context;
     private HomeFragment homeFragment;
-
     private List<ParseUser> requests;
     private RequestAdapter requestAdapter;
 
-    HomeAdapter(HomeFragment homeFragment, List<Event> mAgenda) {
+
+    HomeAdapter(Context context, HomeFragment homeFragment, List<Event> mAgenda) {
+        this.context = context;
         this.homeFragment = homeFragment;
         this.mAgenda = mAgenda;
     }
@@ -72,23 +62,32 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         if (event.getDate() != null) {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
             if (event.getDate() != null) {
+                // event has already passed
                 if (event.getDate().before(localCalendar.getTime())) {
                     viewHolder.tvDate.setTextColor(Color.RED);
-                } else {
+                    // check if current user is the host
+                    if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                        viewHolder.btnCancel.setText("Rate guests");
+                    } else {
+                        viewHolder.btnCancel.setText("Rate host");
+                    }
+                }
+                // event is in the future
+                else {
                     viewHolder.tvDate.setTextColor(Color.BLACK);
                 }
                 viewHolder.tvDate.setText(event.getDate().toString());
             }
         }
-            if (event.getTitle() != null) {
-                viewHolder.tvTitle.setText(event.getTitle());
-            }
+        if (event.getTitle() != null) {
+            viewHolder.tvTitle.setText(event.getTitle());
+        }
 
-            try {
-                viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+        try {
+            viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
@@ -104,14 +103,17 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             e.printStackTrace();
         }
 
-        requests = new ArrayList<>();
-        requestAdapter = new RequestAdapter(event, requests);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-        layoutManager.setReverseLayout(true);
-        viewHolder.rvRequests.setLayoutManager(layoutManager);
-        viewHolder.rvRequests.setAdapter(requestAdapter);
+        if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
+            requests = new ArrayList<>();
+            requestAdapter = new RequestAdapter(event, requests);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+            layoutManager.setReverseLayout(true);
+            viewHolder.rvRequests.setVisibility(View.VISIBLE);
+            viewHolder.rvRequests.setLayoutManager(layoutManager);
+            viewHolder.rvRequests.setAdapter(requestAdapter);
 
-        getPendingRequests(event);
+            getPendingRequests(event);
+        }
     }
 
     @Override
@@ -159,9 +161,22 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mAgenda.remove(getAdapterPosition());
-                    notifyItemRemoved(getAdapterPosition());
-                    notifyItemRangeChanged(getAdapterPosition(), mAgenda.size());
+                    int eventPosition = getAdapterPosition();
+                    Event event = mAgenda.get(eventPosition);
+
+                    // if past event date, rate the attending users. otherwise cancel the event
+                    Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+                    if (event.getDate() != null) {
+                        if (event.getDate().before(localCalendar.getTime())) {
+                            Intent i = new Intent(context, RateUserActivity.class);
+                            i.putExtra("event", event);
+                            context.startActivity(i);
+                        }
+                        // TODO add some sort of check to remove the user from the event in the Parse database
+                        mAgenda.remove(eventPosition);
+                        notifyItemRemoved(eventPosition);
+                        notifyItemRangeChanged(eventPosition, mAgenda.size());
+                    }
                 }
             });
 
