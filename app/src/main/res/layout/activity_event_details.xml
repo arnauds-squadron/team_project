@@ -84,7 +84,8 @@
         android:paddingEnd="12dp"
         app:layout_constraintBottom_toTopOf="@+id/recyclerview_pager_indicator"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:clipToPadding="false"/>
 
     <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
         android:id="@+id/recyclerview_pager_indicator"

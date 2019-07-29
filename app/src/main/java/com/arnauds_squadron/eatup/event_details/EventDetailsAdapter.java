@@ -61,21 +61,6 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.recyclerView = recyclerView;
     }
 
-    final String yelpKey = applicationContext.getString(R.string.yelp_api_key);
-    //Getting Authentication through OkHttpClient
-    OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder()
-            .addInterceptor(new Interceptor() {
-                @NotNull
-                @Override
-                public Response intercept(@NotNull Chain chain) throws IOException {
-                    Request request = chain.request();
-                    Request.Builder requestBuilder = request.newBuilder()
-                            .header("Authorization", "Bearer " + yelpKey)
-                            .method(request.method(), request.body());
-                    return chain.proceed(requestBuilder.build());
-                }
-            });
-
     // separate viewholders for the host and the restaurant
     class HostViewHolder extends RecyclerView.ViewHolder {
         final View rootView;
@@ -85,6 +70,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView tvHostName;
         @BindView(R.id.hostRating)
         RatingBar hostRating;
+
 
         public HostViewHolder(View itemView) {
             super(itemView);

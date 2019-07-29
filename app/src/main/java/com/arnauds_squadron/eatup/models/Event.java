@@ -128,6 +128,10 @@ public class Event extends ParseObject {
         return getJSONArray(KEY_ACCEPTED_GUESTS);
     }
 
+    public List<ParseUser> getAcceptedGuestsList() {
+        return getList(KEY_ACCEPTED_GUESTS);
+    }
+
     public int getMaxGuests() {
         return getInt(KEY_MAX_GUESTS);
     }

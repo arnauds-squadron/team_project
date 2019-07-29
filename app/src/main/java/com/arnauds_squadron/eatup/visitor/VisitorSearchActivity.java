@@ -130,9 +130,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         Places.initialize(this, getString(R.string.google_api_key));
         placesClient = Places.createClient(this);
 
-
-
-//        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source

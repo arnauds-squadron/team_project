@@ -79,7 +79,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     viewHolder.tvDate.setTextColor(Color.RED);
                     // check if current user is the host
                     if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                        viewHolder.btnCancel.setText("Rate guests");
+                        if(event.getAcceptedGuestsList() != null) {
+                            if(event.getAcceptedGuestsList().size() != 0) {
+                                viewHolder.btnCancel.setText("Rate guests");
+                            }
+                        }
+                        else {
+                            viewHolder.btnCancel.setVisibility(View.INVISIBLE);
+                        }
                     }
                     else {
                         viewHolder.btnCancel.setText("Rate host");
