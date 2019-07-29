@@ -7,22 +7,22 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
-import com.parse.ParseUser;
 
 import java.io.File;
 
@@ -60,19 +60,21 @@ public class ProfileImageActivity extends AppCompatActivity {
             shouldShowRequestPermissionRationale(Manifest.permission.CAMERA);
         }
     }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @OnClick(R.id.btnCamera)
     public void accessRequested() {
         onLaunchCamera();
     }
+
     @OnClick(R.id.btnCameraRoll)
     public void CameraRollAccessRequested() {
         onPickPhoto();
     }
+
     @OnClick(R.id.btnSave)
     public void savePhoto() {
-        ParseUser user = ParseUser.getCurrentUser();
-        user.put(KEY_PROFILE_PICTURE, new ParseFile(photoFile));
+        Constants.CURRENT_USER.put(KEY_PROFILE_PICTURE, new ParseFile(photoFile));
         Intent i = new Intent(ProfileImageActivity.this, ProfileActivity.class);
         startActivity(i);
     }

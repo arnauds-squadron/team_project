@@ -20,11 +20,11 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Message;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
@@ -93,7 +93,7 @@ public class MessengerFragment extends Fragment {
 
         Context context = getContext();
         messages = new ArrayList<>();
-        messageAdapter = new MessageAdapter(context, ParseUser.getCurrentUser(), messages);
+        messageAdapter = new MessageAdapter(context, Constants.CURRENT_USER, messages);
         rvMessages.setAdapter(messageAdapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
@@ -174,7 +174,7 @@ public class MessengerFragment extends Fragment {
 
         if (!data.trim().isEmpty()) {
             final Message message = new Message();
-            message.setSender(ParseUser.getCurrentUser());
+            message.setSender(Constants.CURRENT_USER);
             message.setContent(data);
             message.setChatId(chat.getObjectId());
             message.saveInBackground(new SaveCallback() {

@@ -92,7 +92,7 @@ public class LocalFragment extends Fragment implements
     /**
      * Overrides the TagsFragment interface
      * <p>
-     * Updates some of the initial fields of the newly created event (tags, 21+, restauraunt, etc)
+     * Updates some of the initial fields of the newly created event (tags, 21+, restaurant, etc)
      */
     @Override
     public void updateTags(Event newEvent) {
@@ -143,14 +143,14 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void createEvent(String eventTitle) {
-        createEventChat();
+        createEventChat(eventTitle);
         event.setTitle(eventTitle);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_LONG).show();
-                    mListener.switchToHomeFragment();
+                    mListener.onEventCreated();
                     resetSetupViewPager();
                 } else {
                     Toast.makeText(getActivity(), "Error creating event", Toast.LENGTH_LONG).show();
@@ -162,12 +162,14 @@ public class LocalFragment extends Fragment implements
 
     // TODO: move get current user to new thread
     // TODO: add accepted guests immediately after being accepted
+
     /**
      * Creates the event's chat once the create event button is hit
+     * @param eventTitle The title of the new event
      */
-    private void createEventChat() {
+    private void createEventChat(String eventTitle) {
         final Chat chat = new Chat();
-        chat.setName(event.getTitle() + " Chat");
+        chat.setName(eventTitle + " Chat");
         chat.addMember(ParseUser.getCurrentUser().getObjectId());
 
         if (event.getEventImage() != null)
@@ -236,6 +238,6 @@ public class LocalFragment extends Fragment implements
         /**
          * Callback to the parent's listener to switch to the home fragment
          */
-        void switchToHomeFragment();
+        void onEventCreated();
     }
 }

@@ -32,6 +32,7 @@ public class ChatFragment extends Fragment implements
     FrameLayout flDashboard;
 
     private OnFragmentInteractionListener mListener;
+    private ChatDashboardFragment dashboardFragment;
     private MessengerFragment messengerFragment;
 
     public static ChatFragment newInstance() {
@@ -43,6 +44,9 @@ public class ChatFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         ButterKnife.bind(this, view);
+
+        dashboardFragment = (ChatDashboardFragment)
+                getChildFragmentManager().findFragmentById(R.id.dashboardFragment);
 
         messengerFragment = (MessengerFragment)
                 getChildFragmentManager().findFragmentById(R.id.messengerFragment);
@@ -106,6 +110,14 @@ public class ChatFragment extends Fragment implements
     @Override
     public void goToDashboard() {
         showDashboardFragment();
+    }
+
+    /**
+     * Updates the chat list in the ChatDashboardFragment. Called after a new event is created,
+     * since a new chat is also created
+     */
+    public void updateDashboardChats() {
+        dashboardFragment.getChats();
     }
 
     /**

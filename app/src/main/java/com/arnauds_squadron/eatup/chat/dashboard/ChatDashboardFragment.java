@@ -84,13 +84,14 @@ public class ChatDashboardFragment extends Fragment {
      * Queries the ParseServer for all the chats that the current user is a member of, adding
      * them to the chatList and notifying the adapter
      */
-    private void getChats() {
+    public void getChats() {
         Chat.Query query = new Chat.Query();
         String userId = ParseUser.getCurrentUser().getObjectId();
         query.newestFirst().matchesUserId(userId).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
                 if (e == null) {
+                    chatList.clear();
                     chatList.addAll(objects);
                     chatAdapter.notifyDataSetChanged();
                 } else {
