@@ -187,6 +187,20 @@ public class MessengerFragment extends Fragment {
                     }
                 }
             });
+
+            chat.justUpdated();
+            chat.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        mListener.updateDashboardChats();
+                    } else {
+                        Toast.makeText(getContext(), "Could not update in chat",
+                                Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
@@ -238,5 +252,7 @@ public class MessengerFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         void goToDashboard();
+
+        void updateDashboardChats();
     }
 }

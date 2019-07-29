@@ -48,10 +48,9 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
 
         ParseFile image = chat.getImage();
 
+        // TODO: image should never be null
         if (image != null) {
-            Glide.with(context)
-                    .load(chat.getImage().getUrl())
-                    .into(viewHolder.ivImage);
+            Glide.with(context).load(image.getUrl()).into(viewHolder.ivImage);
         }
     }
 

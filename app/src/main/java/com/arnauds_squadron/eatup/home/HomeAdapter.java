@@ -17,6 +17,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
@@ -67,8 +68,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     // check if current user is the host
                     if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                         viewHolder.btnCancel.setText("Rate guests");
-                    }
-                    else {
+                    } else {
                         viewHolder.btnCancel.setText("Rate host");
                     }
                 }
@@ -79,15 +79,15 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 viewHolder.tvDate.setText(event.getDate().toString());
             }
         }
-            if (event.getTitle() != null) {
-                viewHolder.tvTitle.setText(event.getTitle());
-            }
+        if (event.getTitle() != null) {
+            viewHolder.tvTitle.setText(event.getTitle());
+        }
 
-            try {
-                viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+        try {
+            viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
@@ -103,14 +103,17 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             e.printStackTrace();
         }
 
-        requests = new ArrayList<>();
-        requestAdapter = new RequestAdapter(event, requests);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-        layoutManager.setReverseLayout(true);
-        viewHolder.rvRequests.setLayoutManager(layoutManager);
-        viewHolder.rvRequests.setAdapter(requestAdapter);
+        if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
+            requests = new ArrayList<>();
+            requestAdapter = new RequestAdapter(event, requests);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+            layoutManager.setReverseLayout(true);
+            viewHolder.rvRequests.setVisibility(View.VISIBLE);
+            viewHolder.rvRequests.setLayoutManager(layoutManager);
+            viewHolder.rvRequests.setAdapter(requestAdapter);
 
-        getPendingRequests(event);
+            getPendingRequests(event);
+        }
     }
 
     @Override

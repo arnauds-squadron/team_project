@@ -172,6 +172,7 @@ public class LocalFragment extends Fragment implements
         chat.setName(eventTitle + " Chat");
         chat.addMember(ParseUser.getCurrentUser().getObjectId());
 
+        // TODO: ensure not null
         if (event.getEventImage() != null)
             chat.setImage(event.getEventImage());
 
