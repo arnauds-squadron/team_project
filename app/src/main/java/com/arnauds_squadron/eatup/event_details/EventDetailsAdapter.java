@@ -1,9 +1,8 @@
 package com.arnauds_squadron.eatup.event_details;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
@@ -15,29 +14,13 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.home.HomeDetailsActivity;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
-import com.arnauds_squadron.eatup.yelp_api.YelpService;
+import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
@@ -46,37 +29,20 @@ import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 
 public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context applicationContext;
-    private Context context;
+    private Activity context;
     private Event event;
     private RecyclerView recyclerView;
-    private final int CARD_COUNT = 2;
+    private final static int CARD_COUNT = 2;
 
     // TODO implement restaurant detail view when parse database set up
 
-    public EventDetailsAdapter(Context applicationContext, Context context, Event event, RecyclerView recyclerView) {
-        this.applicationContext = applicationContext;
+    EventDetailsAdapter(Activity context, Event event, RecyclerView recyclerView) {
         this.context = context;
         this.event = event;
         this.recyclerView = recyclerView;
     }
 
-    final String yelpKey = applicationContext.getString(R.string.yelp_api_key);
-    //Getting Authentication through OkHttpClient
-    OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder()
-            .addInterceptor(new Interceptor() {
-                @NotNull
-                @Override
-                public Response intercept(@NotNull Chain chain) throws IOException {
-                    Request request = chain.request();
-                    Request.Builder requestBuilder = request.newBuilder()
-                            .header("Authorization", "Bearer " + yelpKey)
-                            .method(request.method(), request.body());
-                    return chain.proceed(requestBuilder.build());
-                }
-            });
-
-    // separate viewholders for the host and the restaurant
+    // separate ViewHolders for the host and the restaurant
     class HostViewHolder extends RecyclerView.ViewHolder {
         final View rootView;
         @BindView(R.id.ivHostImage)
@@ -86,7 +52,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @BindView(R.id.hostRating)
         RatingBar hostRating;
 
-        public HostViewHolder(View itemView) {
+        HostViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
@@ -101,7 +67,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     Pair<View, String> namePair = Pair.create((View) tvHostName, "hostName");
                     Pair<View, String> ratingPair = Pair.create((View) hostRating, "hostRating");
                     ActivityOptionsCompat options = ActivityOptionsCompat.
-                            makeSceneTransitionAnimation((Activity) context, imagePair, namePair, ratingPair);
+                            makeSceneTransitionAnimation(context, imagePair, namePair, ratingPair);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(i, options.toBundle());
                 }
@@ -122,7 +88,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @BindView(R.id.restaurantRating)
         RatingBar restaurantRating;
 
-        public RestaurantViewHolder(View itemView) {
+        RestaurantViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
@@ -138,7 +104,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     Pair<View, String> namePair = Pair.create((View) tvRestaurantName, "restaurantName");
                     Pair<View, String> ratingPair = Pair.create((View) restaurantRating, "restaurantRating");
                     ActivityOptionsCompat options = ActivityOptionsCompat.
-                            makeSceneTransitionAnimation((Activity) context, imagePair, namePair, ratingPair);
+                            makeSceneTransitionAnimation(context, imagePair, namePair, ratingPair);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(i, options.toBundle());
                 }
@@ -160,8 +126,9 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return CARD_COUNT;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder viewHolder = null;
         LayoutInflater inflater = LayoutInflater.from(context);
         int width = recyclerView.getWidth();
@@ -184,7 +151,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         int viewType = getItemViewType(position);
         switch (viewType) {
             case 0:
