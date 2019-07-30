@@ -14,7 +14,9 @@ import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
+import com.parse.Parse;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 
 import java.util.List;
 
@@ -27,11 +29,13 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
     private final String KEY_PROFILE_IMAGE = "profileImage";
     // context defined as global variable so Glide in onBindViewHolder has access
     private Context context;
+    private ParseGeoPoint currentUserLocation;
 
     // pass Event array in constructor
-    public BrowseEventAdapter(Context context, List<Event> events) {
+    public BrowseEventAdapter(Context context, List<Event> events, ParseGeoPoint currentUserLocation) {
         this.context = context;
         this.events = events;
+        this.currentUserLocation = currentUserLocation;
     }
 
     // for each row, inflate layout and cache references into ViewHolder
@@ -72,8 +76,13 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
         }
 
         public void bind(Event event) {
+
+            ParseGeoPoint eventAddress = event.getAddress();
+            double distanceInMiles = eventAddress.distanceInMilesTo(currentUserLocation);
             // populate views according to data
             tvEventTitle.setText(event.getTitle());
+            tvEventTitle.setTag(distanceInMiles);
+
             ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)
@@ -93,9 +102,14 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
 
                 Intent intent = new Intent(context, EventDetailsActivity.class);
                 intent.putExtra("event_id", event.getObjectId());
+                intent.putExtra("distance", (Double) v.getRootView().findViewById(R.id.tvEventTitle).getTag());
                 context.startActivity(intent);
             }
         }
+    }
+
+    void updateCurrentLocation(ParseGeoPoint currentUserLocation) {
+        this.currentUserLocation = currentUserLocation;
     }
 
     // RecyclerView adapter helper methods to clear items from or add items to underlying dataset

@@ -47,6 +47,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -94,7 +95,6 @@ public class VisitorFragment extends Fragment {
     Spinner searchSpinner;
 
     private Unbinder unbinder;
-    private EndlessRecyclerViewScrollListener scrollListener;
     private BrowseEventAdapter eventAdapter;
     private ArrayList<Event> mEvents;
 
@@ -104,6 +104,10 @@ public class VisitorFragment extends Fragment {
     private LocationRequest locationRequest;
     private LocationCallback mLocationCallback;
 
+    // adapter GeoPoint to load events in the area, loads 1x when obtaining user's current location and stops
+    private ParseGeoPoint adapterGeoPoint;
+    private boolean foundCurrentLocation = false;
+
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 14;
     private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
@@ -112,6 +116,17 @@ public class VisitorFragment extends Fragment {
     private String addressOutput;
 
     private int searchCategoryCode;
+
+    // TODO public latitude and longitude of current location for victor to use
+    public Double currentLatitude;
+    public Double currentLongitude;
+
+    public static VisitorFragment newInstance() {
+        Bundle args = new Bundle();
+        VisitorFragment fragment = new VisitorFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -123,12 +138,12 @@ public class VisitorFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // TODO uncomment so can set name of current user
         tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
         // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source
-        eventAdapter = new BrowseEventAdapter(getContext(), mEvents);
+        adapterGeoPoint = new ParseGeoPoint(0, 0);
+        eventAdapter = new BrowseEventAdapter(getContext(), mEvents, adapterGeoPoint);
         // RecyclerView setup
         SnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(rvBrowse);
@@ -137,20 +152,6 @@ public class VisitorFragment extends Fragment {
         rvBrowse.setAdapter(eventAdapter);
 
         resultReceiver = new AddressResultReceiver(new Handler());
-
-        // load data entries
-        // retain instance so can call "resetStates" for fresh searches
-        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                Date maxEventId = getMaxDate();
-                Log.d("DATE", maxEventId.toString());
-                loadTopEvents(getMaxDate());
-            }
-        };
-        // add endless scroll listener to RecyclerView and load items
-        rvBrowse.addOnScrollListener(scrollListener);
-        loadTopEvents(new Date(0));
 
         // initialize current location services
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -162,10 +163,8 @@ public class VisitorFragment extends Fragment {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+
                 for (Location location : locationResult.getLocations()) {
-
-                    // TODO - tag current location with coordinates? or just store this information in the Parse database
-
                     // geocoder for translating coordinates to address
                     if (!Geocoder.isPresent()) {
                         Toast.makeText(getActivity(),
@@ -177,9 +176,19 @@ public class VisitorFragment extends Fragment {
                         // Start geocoder service and update UI to reflect the new address
                         startIntentService(location);
                     }
-//                    tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
                     tvCurrentLocation.setTag(R.id.latitude, location.getLatitude());
                     tvCurrentLocation.setTag(R.id.longitude, location.getLongitude());
+
+                    currentLatitude = location.getLatitude();
+                    currentLongitude = location.getLongitude();
+
+                    // set current location for adapter and load only once
+                    if(!foundCurrentLocation) {
+                        adapterGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                        locationSearch(adapterGeoPoint);
+                        eventAdapter.updateCurrentLocation(adapterGeoPoint);
+                        foundCurrentLocation = true;
+                    }
                 }
             }
         };
@@ -228,7 +237,6 @@ public class VisitorFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // don't do anything
             }
         });
     }
@@ -252,45 +260,32 @@ public class VisitorFragment extends Fragment {
     }
 
     // methods to load posts into the recyclerview based on location
-    protected void loadTopEvents(Date maxDate) {
-//        progressBar.setVisibility(View.VISIBLE);
+    private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
-        eventsQuery.getTop().withHost().notOwnEvent(Constants.CURRENT_USER);
-        // if opening app for the first time, get top 20 and clear old items
-        // otherwise, query for posts older than the oldest
-        if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-        } else {
-            eventsQuery.getOlder(maxDate);
-        }
+            eventsQuery.getClosest(geoPoint).getTop().withHost().notOwnEvent(Constants.CURRENT_USER);
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
-                    for (int i = 0; i < objects.size(); ++i) {
-                        mEvents.add(objects.get(i));
-                        eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                        // on successful reload, signal that refresh has completed
-//                        swipeContainer.setRefreshing(false);
+                    if(objects.size() != 0) {
+                        for (int i = 0; i < objects.size(); ++i) {
+                            mEvents.add(objects.get(i));
+                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                        }
+                    }
+                    else {
+                        // only notify user if no events to show
+                        if(mEvents.size() == 0) {
+                            Toast.makeText(getContext(), "No events found nearby.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 } else {
                     e.printStackTrace();
                 }
-//                progressBar.setVisibility(View.INVISIBLE);
             }
         });
-    }
-
-    // get date of oldest post
-    protected Date getMaxDate() {
-        int postsSize = mEvents.size();
-        if (postsSize == 0) {
-            return (new Date(0));
-        } else {
-            Event oldest = mEvents.get(mEvents.size() - 1);
-            return oldest.getCreatedAt();
-        }
     }
 
     @Override

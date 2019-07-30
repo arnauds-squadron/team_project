@@ -186,7 +186,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         }
     }
 
-    public void updateCurrentLocation(ParseGeoPoint currentUserLocation) {
+    void updateCurrentLocation(ParseGeoPoint currentUserLocation) {
         this.currentUserLocation = currentUserLocation;
     }
 
