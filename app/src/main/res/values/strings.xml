@@ -55,6 +55,7 @@
     <string name="over_21_label">21+</string>
     <string name="calendar_icon_text">Calendar</string>
     <string name="clock_icon_text">Clock</string>
+    <string name="event_creation_copy_event">Copy event</string>
 
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />

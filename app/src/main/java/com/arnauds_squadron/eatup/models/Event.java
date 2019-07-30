@@ -36,13 +36,31 @@ public class Event extends ParseObject {
     private static final String KEY_ACCEPTED_GUESTS = "acceptedGuests";
     private static final Double MAX_DISTANCE = 100.0;
     private static final String YELP_ID = "yelpRestaurantId";
+    private static final String KEY_CREATED_AT = "createdAt";
+
+    public static Event copyEvent(Event oldEvent) {
+        Event newEvent = new Event();
+        newEvent.setEventImage(oldEvent.getEventImage());
+        newEvent.setDate(oldEvent.getDate());
+        newEvent.setTitle(oldEvent.getTitle());
+        newEvent.setHost(oldEvent.getHost());
+        newEvent.setAddress(oldEvent.getAddress());
+        newEvent.setAddressString(oldEvent.getAddressString());
+        newEvent.setTags(oldEvent.getTags());
+        newEvent.setAcceptedGuests(new JSONArray());
+        newEvent.setMaxGuests(oldEvent.getMaxGuests());
+        newEvent.setOver21(oldEvent.getOver21());
+        // TODO;: remove when getYelpId is never null
+        //newEvent.setYelpId(oldEvent.getYelpId());
+        return newEvent;
+    }
 
     // ParseFile - class in SDK that allows accessing files stored with Parse
     public ParseFile getEventImage() {
         return getParseFile(KEY_EVENT_IMAGE);
     }
 
-    public void setImage(ParseFile image) {
+    public void setEventImage(ParseFile image) {
         put(KEY_EVENT_IMAGE, image);
     }
 
@@ -119,6 +137,10 @@ public class Event extends ParseObject {
         return getJSONArray(KEY_ACCEPTED_GUESTS);
     }
 
+    private void setAcceptedGuests(JSONArray guests) {
+        put(KEY_ACCEPTED_GUESTS, guests);
+    }
+
     public List<ParseUser> getAcceptedGuestsList() {
         return getList(KEY_ACCEPTED_GUESTS);
     }
@@ -143,7 +165,7 @@ public class Event extends ParseObject {
         return (Chat) get(KEY_CHAT);
     }
 
-    public void addChat(Chat chat) {
+    public void setChat(Chat chat) {
         put(KEY_CHAT, chat);
     }
 
@@ -155,7 +177,7 @@ public class Event extends ParseObject {
         return getString(YELP_ID);
     }
 
-    public void setYelpId(String yelpId) {
+    private void setYelpId(String yelpId) {
         put(YELP_ID, yelpId);
     }
 
@@ -207,8 +229,14 @@ public class Event extends ParseObject {
 
     // inner class to query event model
     public static class Query extends ParseQuery<Event> {
+
         public Query() {
             super(Event.class);
+        }
+
+        public Query getClosest(ParseGeoPoint location) {
+            whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
+            return this;
         }
 
         public Query getOlder(Date maxId) {
@@ -223,6 +251,16 @@ public class Event extends ParseObject {
             return this;
         }
 
+        public Query ownEvent(ParseUser user) {
+            whereEqualTo(KEY_HOST, user);
+            return this;
+        }
+
+        public Query newestFirst() {
+            orderByDescending(KEY_CREATED_AT);
+            return this;
+        }
+
         public Query notOwnEvent(ParseUser user) {
             whereNotEqualTo(KEY_HOST, user);
             return this;
@@ -230,11 +268,6 @@ public class Event extends ParseObject {
 
         public Query withHost() {
             include("host");
-            return this;
-        }
-
-        public Query getClosest(ParseGeoPoint location) {
-            whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
             return this;
         }
     }

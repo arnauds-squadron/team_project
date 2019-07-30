@@ -1,14 +1,24 @@
-package com.arnauds_squadron.eatup.local.setup;
+package com.arnauds_squadron.eatup.local.setup.start;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -18,7 +28,13 @@ import butterknife.OnClick;
 public class StartFragment extends Fragment {
     // TODO: Copy a recent event (have users working first)
 
+    @BindView(R.id.rvRecentEvents)
+    RecyclerView rvRecentEvents;
+
     private OnFragmentInteractionListener mListener;
+    private List<Event> events;
+    private RecentEventAdapter recentEventAdapter;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +47,26 @@ public class StartFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_start, container, false);
         ButterKnife.bind(this, view);
+
+        events = new ArrayList<>();
+        // construct adapter from data source
+        recentEventAdapter = new RecentEventAdapter(this, events);
+        // RecyclerView setup
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvRecentEvents.setLayoutManager(layoutManager);
+        rvRecentEvents.setAdapter(recentEventAdapter);
+
+        Event.Query query = new Event.Query();
+        query.newestFirst().getTop().withHost().ownEvent(Constants.CURRENT_USER);
+
+        query.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                events.addAll(objects);
+                recentEventAdapter.notifyItemRangeInserted(0, events.size());
+            }
+        });
+
         return view;
     }
 
@@ -60,11 +96,18 @@ public class StartFragment extends Fragment {
         mListener.startEventCreation();
     }
 
+    public void useRecentEvent(Event event) {
+        mListener.useRecentEvent(Event.copyEvent(event));
+
+    }
+
     public interface OnFragmentInteractionListener {
 
         /**
          * Method that triggers the event creation method in the parent fragment
          */
         void startEventCreation();
+
+        void useRecentEvent(Event event);
     }
 }

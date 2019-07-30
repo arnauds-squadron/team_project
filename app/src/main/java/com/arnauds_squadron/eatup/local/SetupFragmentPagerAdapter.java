@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
-import com.arnauds_squadron.eatup.local.setup.StartFragment;
+import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 
 /**
