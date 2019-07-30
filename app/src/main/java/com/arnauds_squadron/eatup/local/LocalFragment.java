@@ -29,9 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link LocalFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment that handles the creation of a new event
  */
 public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
@@ -48,10 +46,6 @@ public class LocalFragment extends Fragment implements
     private OnFragmentInteractionListener mListener;
     // The local event variable that is updated as the user creates their event
     private Event event;
-
-    public static LocalFragment newInstance() {
-        return new LocalFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

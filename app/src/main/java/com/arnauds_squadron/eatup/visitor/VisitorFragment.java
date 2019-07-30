@@ -70,7 +70,10 @@ import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
 import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
 import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
-
+/**
+ * Fragment that allows the user to search through different events, view their details, and RSVP
+ * for them
+ */
 public class VisitorFragment extends Fragment {
 
     // TODO browsing nearby events - account for scenario in which user doesn't enable current location, use last remembered location or display a random array of events
@@ -109,13 +112,6 @@ public class VisitorFragment extends Fragment {
     private String addressOutput;
 
     private int searchCategoryCode;
-
-    public static VisitorFragment newInstance() {
-        Bundle args = new Bundle();
-        VisitorFragment fragment = new VisitorFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

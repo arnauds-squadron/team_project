@@ -188,6 +188,10 @@ public class MessengerFragment extends Fragment {
         }
     }
 
+    /**
+     * Called by the parent fragment to stop the runnable so the messages aren't being refreshed
+     * after the fragment is closed.
+     */
     public void stopRefreshingMessages() {
         updateHandler.removeCallbacks(refreshMessageRunnable);
         refreshRunnableNotStarted = false;
@@ -260,7 +264,6 @@ public class MessengerFragment extends Fragment {
                             i--;
                         }
                     }
-
                     // append any messages found after the newest message
                     for (int j = i; j >= 0; j--) {
                         Message message = objects.get(j);
@@ -324,6 +327,10 @@ public class MessengerFragment extends Fragment {
          */
         void updateDashboardChats();
 
+        /**
+         * Notifies the parent ChatFragment to update the number of new messages next to the chat
+         * icon
+         */
         void handleNotification();
     }
 }

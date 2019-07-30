@@ -39,9 +39,7 @@ import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment that displays the current user's information
  */
 public class ProfileFragment extends Fragment {
 
@@ -74,14 +72,6 @@ public class ProfileFragment extends Fragment {
     ImageView ivEditUsername;
 
     private OnFragmentInteractionListener mListener;
-
-    public static ProfileFragment newInstance() {
-        Bundle args = new Bundle();
-        ProfileFragment fragment = new ProfileFragment();
-        fragment.setArguments(args);
-
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

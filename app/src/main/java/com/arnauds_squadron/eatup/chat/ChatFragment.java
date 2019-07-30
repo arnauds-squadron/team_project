@@ -37,10 +37,6 @@ public class ChatFragment extends Fragment implements
     private ChatDashboardFragment dashboardFragment;
     private MessengerFragment messengerFragment;
 
-    public static ChatFragment newInstance() {
-        return new ChatFragment();
-    }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

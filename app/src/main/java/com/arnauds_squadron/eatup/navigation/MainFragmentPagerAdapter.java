@@ -48,16 +48,16 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (position == 0)
-            return ChatFragment.newInstance();
+            return new ChatFragment();
         if (position == 1)
-            return LocalFragment.newInstance();
+            return new LocalFragment();
         if (position == 2)
-            return HomeFragment.newInstance();
+            return new HomeFragment();
         if (position == 3)
-            return VisitorFragment.newInstance();
+            return new VisitorFragment();
         if (position == 4)
-            return ProfileFragment.newInstance();
-        return HomeFragment.newInstance();
+            return new ProfileFragment();
+        return new HomeFragment();
     }
 
     public View getTabView(int position, String text) {

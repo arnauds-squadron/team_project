@@ -28,9 +28,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment that displays the user's RSVP'd events and is the fragment to accept or deny guests.
+ * Serves as an agenda and constantly refreshes to stay up to date.
  */
 public class HomeFragment extends Fragment {
 
@@ -52,10 +51,6 @@ public class HomeFragment extends Fragment {
             updateHandler.postDelayed(this, Constants.EVENT_UPDATE_SPEED_MILLIS);
         }
     };
-
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -136,13 +131,16 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Called by the parent Activity to stop updating the events when the user is logged out
+     * Called by the parent Activity to stop updating the events when the user is logged out.
      */
     public void stopUpdatingEvents() {
         updateHandler.removeCallbacks(refreshEventsRunnable);
         refreshRunnableNotStarted = false;
     }
 
+    /**
+     * Method called to start the runnable so the events are constantly refreshing.
+     */
     private void startUpdatingEvents() {
         // TODO: change to progress bar in the middle?
         refreshEventsAsync();
