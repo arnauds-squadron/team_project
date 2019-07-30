@@ -101,8 +101,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            int test = getAdapterPosition();
-
             btnAccept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
