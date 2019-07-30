@@ -23,7 +23,6 @@ public class RateUserActivity extends AppCompatActivity {
 
     @BindView(R.id.rvUsers)
     RecyclerView rvUsers;
-    // TODO fix ratings only going into host column
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +33,6 @@ public class RateUserActivity extends AppCompatActivity {
         Event event = getIntent().getParcelableExtra("event");
         String ratingType = getIntent().getStringExtra("ratingType");
         ParseUser eventHost = event.getHost();
-
-        ParseUser currentUser = ParseUser.getCurrentUser();
 
         SnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(rvUsers);
@@ -49,7 +46,6 @@ public class RateUserActivity extends AppCompatActivity {
 
         // if the current user is the host, switch to guest view
         if(ratingType.equals(GUEST)) {
-            // TODO allow host to rate the guest
             List<ParseUser> accepted = event.getAcceptedGuestsList();
             users.addAll(accepted);
         }
