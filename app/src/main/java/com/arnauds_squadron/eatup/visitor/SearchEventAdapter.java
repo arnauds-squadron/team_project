@@ -103,6 +103,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                     // otherwise, create request/add to "allRequests" and send back to home screen
 
                     if(event.checkRequest(Constants.CURRENT_USER)) {
+                        btRequest.setText("RSVP requested");
                         Toast.makeText(context, "RSVP already requested", Toast.LENGTH_SHORT).show();
                     } else {
                         event.createRequest(Constants.CURRENT_USER, event);
@@ -124,7 +125,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         public void bind(Event event) {
             // populate views according to data
             tvEventName.setText(event.getTitle());
-            tvCuisine.setText(event.getCuisine());
             tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
             tvHostName.setTag(event.getHost());
 
@@ -137,12 +137,21 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                 hostRating.setRating(NO_RATING);
             }
             Number numRatings = event.getHost().getNumber(NUM_RATINGS_HOST);
-            tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
+            if (numRatings != null) {
+                tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings));
+            }
+            else {
+                tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", 0));
+            }
 
             // TODO return distance between the current location and restaurant using Yelp API
             // tvDistance.setText("");
 
-            // TODO set \cuisine
+            List<String> cuisineTags = event.getTags();
+            tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
+
+
+            // TODO set cuisine
             ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)

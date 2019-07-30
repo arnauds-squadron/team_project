@@ -364,9 +364,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // otherwise, query for events older than the oldest
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withHost().whereEqualTo("foodType", cuisineQuery);
+            eventsQuery.getTop().withHost().whereEqualTo("tags", cuisineQuery);
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo("foodType", cuisineQuery);
+            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo("tags", cuisineQuery);
         }
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
