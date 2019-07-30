@@ -5,6 +5,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.Date;
+
 @ParseClassName("Message")
 public class Message extends ParseObject {
     private static final String KEY_SENDER = "sender";
@@ -28,12 +30,25 @@ public class Message extends ParseObject {
         put(KEY_CONTENT, content);
     }
 
-    public void setChatId(String chat) { put(KEY_CHAT_ID, chat); }
+    public Date getCreatedAt() {
+        return getDate(KEY_CREATED_AT);
+    }
+
+    public void setChatId(String chat) {
+        put(KEY_CHAT_ID, chat);
+    }
 
     // inner class to query event model
     public static class Query extends ParseQuery<Message> {
+        // Max number of messages is 99 (Parse default)
+
         public Query() {
             super(Message.class);
+        }
+
+        public Query getPrevious(int skipAmount) {
+            setSkip(skipAmount);
+            return this;
         }
 
         public Query newestFirst() {

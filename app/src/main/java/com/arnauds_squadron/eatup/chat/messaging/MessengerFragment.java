@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +20,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Message;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -50,12 +50,14 @@ public class MessengerFragment extends Fragment {
     RecyclerView rvMessages;
 
     private OnFragmentInteractionListener mListener;
+
     // The current chat that is open
     private Chat chat;
     private List<Message> messages;
     private MessageAdapter messageAdapter;
-    // Total message count, including other chats
-    private int messageCount;
+
+    // The newest message obtained by the Message queries
+    private Message newestMessage;
     // Boolean to ensure we only have one refresh runnable
     private boolean refreshRunnableNotStarted = false;
     // Handler to post the runnable on the Looper's queue every second
@@ -65,7 +67,6 @@ public class MessengerFragment extends Fragment {
         @Override
         public void run() {
             refreshMessagesAsync();
-            Log.i("afsdfasdf", "refreshing messages");
             updateHandler.postDelayed(this, Constants.CHAT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -95,6 +96,32 @@ public class MessengerFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         layoutManager.setReverseLayout(true);
         rvMessages.setLayoutManager(layoutManager);
+
+        EndlessRecyclerViewScrollListener scrollListener =
+                new EndlessRecyclerViewScrollListener(layoutManager) {
+                    @Override
+                    public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                        Message.Query messageQuery = new Message.Query();
+                        messageQuery.newestFirst().matchesChat(chat).getPrevious(messages.size());
+
+                        messageQuery.findInBackground(new FindCallback<Message>() {
+                            @Override
+                            public void done(List<Message> objects, ParseException e) {
+                                if (e == null) {
+                                    for (int i = 0; i < objects.size(); i++) {
+                                        Message message = objects.get(i);
+                                        addMessage(message);
+                                    }
+                                } else {
+                                    Toast.makeText(getActivity(), "Could not load more messages",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                };
+
+        rvMessages.addOnScrollListener(scrollListener);
 
         // If the user hits the send button on the soft keyboard, send the message
         etMessage.setOnEditorActionListener(new EditText.OnEditorActionListener() {
@@ -131,8 +158,7 @@ public class MessengerFragment extends Fragment {
      */
     @OnClick(R.id.ibBack)
     public void goBackToDashboard() {
-        updateHandler.removeCallbacks(refreshMessageRunnable);
-        refreshRunnableNotStarted = false;
+        stopRefreshingMessages();
         mListener.goToDashboard();
     }
 
@@ -162,6 +188,11 @@ public class MessengerFragment extends Fragment {
         }
     }
 
+    public void stopRefreshingMessages() {
+        updateHandler.removeCallbacks(refreshMessageRunnable);
+        refreshRunnableNotStarted = false;
+    }
+
     /**
      * Saves the message typed by the user to the Parse Server and appends the message to the
      * current list.
@@ -179,7 +210,6 @@ public class MessengerFragment extends Fragment {
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        messageCount++;
                         appendMessage(message);
                         etMessage.setText(null);
                     } else {
@@ -212,19 +242,47 @@ public class MessengerFragment extends Fragment {
      */
     private void refreshMessagesAsync() {
         Message.Query messageQuery = new Message.Query();
-        messageQuery.newestFirst().matchesChat(chat).findInBackground(new FindCallback<Message>() {
+        messageQuery.newestFirst().matchesChat(chat);
+
+        messageQuery.findInBackground(new FindCallback<Message>() {
             @Override
             public void done(List<Message> objects, ParseException e) {
                 if (e == null) {
-                    int newMessageCount = objects.size() - messageCount - 1;
-                    for (int i = newMessageCount; i >= 0; i--) {
-                        Message message = objects.get(i);
+                    String newestId = newestMessage != null ? newestMessage.getObjectId() : null;
+                    newestMessage = objects.get(0);
+                    // get the index of the newest message
+                    int i = objects.size() - 1;
+                    if (newestId != null) {
+                        boolean newestFound = false;
+                        while (i >= 0 && !newestFound) {
+                            if (objects.get(i).getObjectId().equals(newestId))
+                                newestFound = true;
+                            i--;
+                        }
+                    }
+
+                    // append any messages found after the newest message
+                    for (int j = i; j >= 0; j--) {
+                        Message message = objects.get(j);
                         appendMessage(message);
                     }
-                    messageCount = objects.size();
+                } else {
+                    Toast.makeText(getActivity(), "Could not load messages",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    /**
+     * Helper method to append the message to the bottom of the chat's RecyclerView. Also scrolls
+     * to the bottom of the chat.
+     *
+     * @param message The message to append
+     */
+    private void addMessage(Message message) {
+        messages.add(message);
+        messageAdapter.notifyItemInserted(messages.size() - 1);
     }
 
     /**
@@ -237,6 +295,7 @@ public class MessengerFragment extends Fragment {
         messages.add(0, message);
         messageAdapter.notifyItemInserted(0);
         rvMessages.scrollToPosition(0);
+        mListener.handleNotification();
     }
 
     /**
@@ -245,7 +304,6 @@ public class MessengerFragment extends Fragment {
     private void resetMessages() {
         messages.clear();
         messageAdapter.notifyDataSetChanged();
-        messageCount = 0;
     }
 
     /**
@@ -253,8 +311,17 @@ public class MessengerFragment extends Fragment {
      * hits the back button
      */
     public interface OnFragmentInteractionListener {
+        /**
+         * Notifies the parent ChatFragment to switch to the ChatDashboardFragment
+         */
         void goToDashboard();
 
+        /**
+         * Updates the chats in the ChatDashboardFragment to have the correct updated time. Updates
+         * the chats whenever a message is sent.
+         */
         void updateDashboardChats();
+
+        void handleNotification();
     }
 }
