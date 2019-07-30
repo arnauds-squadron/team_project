@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +39,6 @@ import butterknife.OnClick;
  * messages and periodically updates the messages in real time
  */
 public class MessengerFragment extends Fragment {
-    // 1 second
-    private static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
 
     @BindView(R.id.tvChatName)
     TextView tvChatName;
@@ -56,17 +55,18 @@ public class MessengerFragment extends Fragment {
     private List<Message> messages;
     private MessageAdapter messageAdapter;
     // Total message count, including other chats
-    private int totalMessageCount;
+    private int messageCount;
     // Boolean to ensure we only have one refresh runnable
     private boolean refreshRunnableNotStarted = false;
     // Handler to post the runnable on the Looper's queue every second
-    private Handler chatUpdateHandler = new Handler();
+    private Handler updateHandler = new Handler();
     // Refresh runnable that refreshes the messages every second
     private Runnable refreshMessageRunnable = new Runnable() {
         @Override
         public void run() {
-            refreshMessages();
-            chatUpdateHandler.postDelayed(this, CHAT_UPDATE_SPEED_MILLIS);
+            refreshMessagesAsync();
+            Log.i("afsdfasdf", "refreshing messages");
+            updateHandler.postDelayed(this, Constants.CHAT_UPDATE_SPEED_MILLIS);
         }
     };
 
@@ -131,6 +131,8 @@ public class MessengerFragment extends Fragment {
      */
     @OnClick(R.id.ibBack)
     public void goBackToDashboard() {
+        updateHandler.removeCallbacks(refreshMessageRunnable);
+        refreshRunnableNotStarted = false;
         mListener.goToDashboard();
     }
 
@@ -144,7 +146,7 @@ public class MessengerFragment extends Fragment {
         if (!chat.equals(this.chat)) { // only clear if there was a chat loaded before
             this.chat = chat;
             resetMessages();
-            refreshMessages();
+            refreshMessagesAsync();
 
             chat.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
                 @Override
@@ -177,7 +179,7 @@ public class MessengerFragment extends Fragment {
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        totalMessageCount++;
+                        messageCount++;
                         appendMessage(message);
                         etMessage.setText(null);
                     } else {
@@ -208,18 +210,18 @@ public class MessengerFragment extends Fragment {
      * Searches the Messages table for a0ny new messages that match the current chat's objectId.
      * Appends messages, does not clear and addAll()
      */
-    private void refreshMessages() {
+    private void refreshMessagesAsync() {
         Message.Query messageQuery = new Message.Query();
         messageQuery.newestFirst().matchesChat(chat).findInBackground(new FindCallback<Message>() {
             @Override
             public void done(List<Message> objects, ParseException e) {
                 if (e == null) {
-                    int newMessageCount = objects.size() - totalMessageCount - 1;
+                    int newMessageCount = objects.size() - messageCount - 1;
                     for (int i = newMessageCount; i >= 0; i--) {
                         Message message = objects.get(i);
                         appendMessage(message);
                     }
-                    totalMessageCount = objects.size();
+                    messageCount = objects.size();
                 }
             }
         });
@@ -243,7 +245,7 @@ public class MessengerFragment extends Fragment {
     private void resetMessages() {
         messages.clear();
         messageAdapter.notifyDataSetChanged();
-        totalMessageCount = 0;
+        messageCount = 0;
     }
 
     /**
