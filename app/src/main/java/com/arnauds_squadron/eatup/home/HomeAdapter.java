@@ -43,7 +43,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<ParseUser> requests;
     private RequestAdapter requestAdapter;
 
-
     HomeAdapter(Context context, HomeFragment homeFragment, List<Event> mAgenda) {
         this.context = context;
         this.homeFragment = homeFragment;
@@ -116,6 +115,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             e.printStackTrace();
         }
 
+        // Display requests if the current user is the host of this event
         if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
             requests = new ArrayList<>();
             requestAdapter = new RequestAdapter(event, requests);

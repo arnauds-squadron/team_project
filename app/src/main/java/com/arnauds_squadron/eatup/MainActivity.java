@@ -14,6 +14,7 @@ import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
+import com.arnauds_squadron.eatup.profile.ProfileFragment;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseUser;
 
@@ -25,7 +26,8 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener,
         LocalFragment.OnFragmentInteractionListener,
-        ChatFragment.OnFragmentInteractionListener {
+        ChatFragment.OnFragmentInteractionListener,
+        ProfileFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.frameLayout)
     ViewPager viewPager;
@@ -129,11 +131,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onEventCreated() {
         viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
 
-        HomeFragment homeFragment = (HomeFragment) getTypedFragment(HomeFragment.class);
         ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
-
-        if (homeFragment != null)
-            homeFragment.fetchTimelineAsync();
 
         if (chatFragment != null)
             chatFragment.updateDashboardChats();
@@ -166,6 +164,27 @@ public class MainActivity extends AppCompatActivity implements
         return temp;
     }
 
+    /**
+     * Overrides the ProfileFragment interface
+     * <p>
+     * Once the user logs out the Constants.CURRENT_USER object is null, so there is no point in
+     * searching for any new events until the user logs in again
+     */
+    @Override
+    public void stopUpdatingEvents() {
+        HomeFragment fragment = (HomeFragment) getTypedFragment(HomeFragment.class);
+        fragment.stopUpdatingEvents();
+    }
+
+    /**
+     * Given the class of a specific fragment (ProfileFragment or HomeFragment), this method
+     * searches through the child Fragments and returns the given fragment if found, or null if it's
+     * not found
+     *
+     * @param fragmentClass The class of the fragment you are trying to find
+     * @return The specified fragment with the matching class, or null if the fragment does not
+     * exist
+     */
     private Fragment getTypedFragment(Class fragmentClass) {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
 

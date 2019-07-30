@@ -1,15 +1,11 @@
 package com.arnauds_squadron.eatup.profile;
 
-import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +26,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 import java.util.Locale;
@@ -77,6 +72,9 @@ public class ProfileFragment extends Fragment {
     ImageView ivProfile;
     @BindView(R.id.ivEditUsername)
     ImageView ivEditUsername;
+
+    private OnFragmentInteractionListener mListener;
+
     public static ProfileFragment newInstance() {
         Bundle args = new Bundle();
         ProfileFragment fragment = new ProfileFragment();
@@ -153,6 +151,20 @@ public class ProfileFragment extends Fragment {
             tvBio.setText(R.string.no_bio);
         }
     }
+
+    /**
+     * Attaches the listener to the MainActivity
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (OnFragmentInteractionListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement the interface");
+        }
+    }
+
     //todo update user profile photo
 //    @OnClick(R.id.btnNewProfileImage)
 //    public void setNewProfileImage () {
@@ -215,18 +227,19 @@ public class ProfileFragment extends Fragment {
 
     @OnClick(R.id.ivLogout)
     public void logout () {
-        logoutUser();
-        gotoLoginActivity();
-    }
-
-    private void logoutUser() {
         ParseUser.logOut();
+        mListener.stopUpdatingEvents();
         Constants.CURRENT_USER = null;
+        gotoLoginActivity();
     }
 
     private void gotoLoginActivity() {
         Intent i = new Intent(getActivity(), LoginActivity.class);
         startActivity(i);
         getActivity().finish();
+    }
+
+    public interface OnFragmentInteractionListener {
+        void stopUpdatingEvents();
     }
 }

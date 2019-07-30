@@ -30,9 +30,16 @@ public final class Constants {
     public static final int CUISINE_SEARCH = 2;
     public static final int LOCATION_SEARCH = 3;
 
+    // Update speed to refresh messages: 1 second
+    public static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
+
+    // Update speed to refresh events: 5 seconds
+    public static final int EVENT_UPDATE_SPEED_MILLIS = 5000;
+
     // PagerAdapter constants
     public static final int MAIN_PAGER_START_PAGE = 2;
 
+    // The logged in user, only changed in the login activity
     public static ParseUser CURRENT_USER;
 
     // hardcoded category suggestions for search
