@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup.local.setup;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,14 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.utils.UIHelper;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -86,18 +89,21 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
 
     /**
      * Called whenever getMapAsync() is called, and sets up the map
+     *
      * @param googleMap The map obtained from the maps API
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if(selectedPlace == null) {
-            // TODO: move map to current location
-            // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user.location.latlng, 1));
+        if (selectedPlace == null) {
+            Location location = MainActivity.getCurrentLocation();
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM_LEVEL));
         } else {
-            mMap.animateCamera(
+            // TODO: animate camera?
+            mMap.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(selectedPlace.getLatLng(),
-                            UIHelper.DEFAULT_MAP_ZOOM_LEVEL));
+                            Constants.DETAILED_MAP_ZOOM_LEVEL));
 
             mMap.addMarker(new MarkerOptions()
                     .position(selectedPlace.getLatLng())
@@ -110,14 +116,13 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     /**
      * Called in onCreate to bind the this child fragment to its parent, so the listener
      * can be used
+     *
      * @param fragment The parent fragment
      */
-    public void onAttachToParentFragment(Fragment fragment)
-    {
+    public void onAttachToParentFragment(Fragment fragment) {
         try {
             mListener = (OnFragmentInteractionListener) fragment;
-        }
-        catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(fragment.toString() + " must implement the interface");
         }
     }

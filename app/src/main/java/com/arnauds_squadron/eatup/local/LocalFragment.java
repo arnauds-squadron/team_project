@@ -18,9 +18,9 @@ import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
@@ -160,9 +160,6 @@ public class LocalFragment extends Fragment implements
         });
     }
 
-    // TODO: move get current user to new thread
-    // TODO: add accepted guests immediately after being accepted
-
     /**
      * Creates the event's chat once the create event button is hit
      * @param eventTitle The title of the new event
@@ -170,7 +167,7 @@ public class LocalFragment extends Fragment implements
     private void createEventChat(String eventTitle) {
         final Chat chat = new Chat();
         chat.setName(eventTitle + " Chat");
-        chat.addMember(ParseUser.getCurrentUser().getObjectId());
+        chat.addMember(Constants.CURRENT_USER.getObjectId());
 
         // TODO: ensure not null
         if (event.getEventImage() != null)

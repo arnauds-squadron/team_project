@@ -28,10 +28,21 @@ public final class Constants {
     // PagerAdapter constants
     public static final int MAIN_PAGER_START_PAGE = 2;
 
+    // AddressFragment constants
+    // 1 (zoomed out) - 19 (too close)
+    public final static float DEFAULT_MAP_ZOOM_LEVEL = 14;
+
+    // Shows name of restaurant if it's decently well known
+    public final static float DETAILED_MAP_ZOOM_LEVEL = 17;
+
+    // The logged in user
+    // Only updated in the LoginActivity so the application doesn't have to get the current user
+    // from memory constantly
     public static ParseUser CURRENT_USER;
 
     // hardcoded category suggestions for search
-    public static final String[] CATEGORY_TITLE = {"Acai Bowls",
+    public static final String[] CATEGORY_TITLE = {
+            "Acai Bowls",
             "Afghan",
             "African",
             "Andalusian",

@@ -1,21 +1,13 @@
 package com.arnauds_squadron.eatup.visitor;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.ResultReceiver;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
@@ -29,21 +21,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.arnauds_squadron.eatup.BuildConfig;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -94,15 +78,6 @@ public class VisitorFragment extends Fragment {
     private BrowseEventAdapter eventAdapter;
     private ArrayList<Event> mEvents;
 
-    //Define fields for Google API Client
-    private FusedLocationProviderClient mFusedLocationClient;
-    private Location lastLocation;
-    private LocationRequest locationRequest;
-    private LocationCallback mLocationCallback;
-
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 14;
-    private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
@@ -117,7 +92,7 @@ public class VisitorFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_visitor, container, false);
         unbinder = ButterKnife.bind(this, view);
@@ -155,37 +130,25 @@ public class VisitorFragment extends Fragment {
         rvBrowse.addOnScrollListener(scrollListener);
         loadTopEvents(new Date(0));
 
-        // initialize current location services
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(FASTEST_INTERVAL);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        Location location = MainActivity.getCurrentLocation();
+        if (location != null) {
 
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
+            // TODO - tag current location with coordinates? or just store this information in the Parse database
+            // geocoder for translating coordinates to address
+            if (!Geocoder.isPresent()) {
+//                        Toast.makeText(getActivity(),
+//                                R.string.no_geocoder_available,
+//                                Toast.LENGTH_LONG).show();
+                tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f",
+                        location.getLatitude(), location.getLongitude()));
 
-                    // TODO - tag current location with coordinates? or just store this information in the Parse database
-
-                    // geocoder for translating coordinates to address
-                    if (!Geocoder.isPresent()) {
-                        Toast.makeText(getActivity(),
-                                R.string.no_geocoder_available,
-                                Toast.LENGTH_LONG).show();
-                        tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
-
-                    } else {
-                        // Start geocoder service and update UI to reflect the new address
-                        startIntentService(location);
-                    }
-//                    tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
-                    tvCurrentLocation.setTag(R.id.latitude, location.getLatitude());
-                    tvCurrentLocation.setTag(R.id.longitude, location.getLongitude());
-                }
+            } else {
+                // Start geocoder service and update UI to reflect the new address
+                startIntentService(location);
             }
-        };
+            tvCurrentLocation.setTag(R.id.latitude, location.getLatitude());
+            tvCurrentLocation.setTag(R.id.longitude, location.getLongitude());
+        }
 
         // TODO tag previous locations with latitude and longitude. default (0, 0)
         tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
@@ -202,7 +165,7 @@ public class VisitorFragment extends Fragment {
             // when item selected, bring user to the new search activity with search bar and search category packaged as intent extra
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch(position) {
+                switch (position) {
                     // search category hint
                     case 0:
                         break;
@@ -219,7 +182,7 @@ public class VisitorFragment extends Fragment {
                         searchCategoryCode = LOCATION_SEARCH;
                         break;
                 }
-                if(searchCategoryCode != 0) {
+                if (searchCategoryCode != 0) {
                     searchSpinner.setSelection(NO_SEARCH);
                     Intent i = new Intent(getContext(), VisitorSearchActivity.class);
                     i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
@@ -233,7 +196,6 @@ public class VisitorFragment extends Fragment {
             }
         });
     }
-
 
     @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1, R.id.tvPrevLocation2})
     public void searchLocation(TextView tvLocation) {
@@ -251,6 +213,8 @@ public class VisitorFragment extends Fragment {
         i.putExtra("user", user);
         getActivity().startActivity(i);
     }
+
+    public void updateLocationTextView() {}
 
     // methods to load posts into the recyclerview based on location
     protected void loadTopEvents(Date maxDate) {
@@ -294,162 +258,6 @@ public class VisitorFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (!checkPermissions()) {
-            requestPermissions();
-        } else {
-            getLastLocation();
-            startLocationUpdates();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        stopLocationUpdates();
-        super.onPause();
-    }
-
-    /**
-     * Return the current state of the permissions needed.
-     */
-    private boolean checkPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        return permissionState == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void startLocationPermissionRequest() {
-        requestPermissions(
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_PERMISSIONS_REQUEST_CODE);
-    }
-
-    // TODO account for case when device policy or previous settings set permission
-    private void requestPermissions() {
-        boolean shouldProvideRationale =
-                shouldShowRequestPermissionRationale(
-                        Manifest.permission.ACCESS_FINE_LOCATION);
-
-        // Provide an additional rationale to the user. This would happen if the user denied the
-        // request previously, but didn't check the "Don't ask again" checkbox.
-        if (shouldProvideRationale) {
-            Log.i("LocationFragment", "Displaying permission rationale to provide additional context.");
-            showSnackbar("EatUp needs your current location to find hosts near you.", "Grant permission",
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request permission
-                            startLocationPermissionRequest();
-                        }
-                    });
-
-        } else {
-            // Request permission. Can be auto answered if device policy sets the permission
-            // or the user denied permission previously and checked "Never ask again".
-            startLocationPermissionRequest();
-        }
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        Log.i("LocationFragment", "onRequestPermissionResult");
-        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-                Log.i("LocationFragment", "User interaction was cancelled.");
-            }
-            else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted.
-                getLastLocation();
-                startLocationUpdates();
-            } else {
-                // Permission denied.
-                // Notify the user that GPS is necessary to use the current location component of the app.
-                // Permission might have been rejected without asking the user for permission
-                // device policy or "Never ask again" prompts).
-                // TODO add ignore functionality so user can continue without inputting current location
-                showSnackbar("EatUp needs your current location to find hosts near you.", "Settings",
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(
-                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package",
-                                        BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        });
-            }
-        }
-    }
-
-    /**
-     * Provides a simple way of getting a device's location and is well suited for
-     * applications that do not require a fine-grained location and that do not need location
-     * updates. Gets the best and most recent location currently available, which may be null
-     * in rare cases when a location is not available.
-     * <p>
-     * Note: this method should be called after location permission has been granted.
-     */
-    @SuppressLint("MissingPermission")
-    private void getLastLocation() {
-        mFusedLocationClient.getLastLocation()
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            lastLocation = task.getResult();
-
-                            // TODO - tag current location with coordinates? or just store this information in the Parse database
-
-                            // geocoder for translating coordinates to address
-                            if (!Geocoder.isPresent()) {
-                                Toast.makeText(getActivity(),
-                                        R.string.no_geocoder_available,
-                                        Toast.LENGTH_LONG).show();
-                                tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
-                            } else {
-                                // Start geocoder service and update UI to reflect the new address
-                                startIntentService(lastLocation);
-                            }
-//                            tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
-                            tvCurrentLocation.setTag(R.id.latitude, lastLocation.getLatitude());
-                            tvCurrentLocation.setTag(R.id.longitude, lastLocation.getLongitude());
-                        } else {
-                            // TODO add edge cases for nonsuccessful calls to getLastLocation
-                            startLocationUpdates();
-//                            Log.d("LocationFragment", "getLastLocation:exception", task.getException());
-//                            showSnackbar("Could not obtain precise location.", "Try again", new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    startLocationUpdates();
-//                                    Log.d("Do something clicked", "start location updates");
-//                                }
-//                            });
-                        }
-                    }
-                });
-    }
-
-    private void stopLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startLocationUpdates() {
-        mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
-    }
 
 //    private void showSnackbar(final int mainTextStringId, final int actionStringId,
 //                               View.OnClickListener listener) {
@@ -460,13 +268,7 @@ public class VisitorFragment extends Fragment {
 //    }
 
     // rewrite above method to avoid int errors
-    private void showSnackbar(String mainString, String actionString,
-                              View.OnClickListener listener) {
-        Snackbar.make(getActivity().findViewById(android.R.id.content),
-                mainString,
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(actionString, listener).show();
-    }
+
 
     @Override
     public void onDestroyView() {

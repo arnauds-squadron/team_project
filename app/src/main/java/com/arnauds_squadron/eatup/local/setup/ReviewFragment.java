@@ -13,8 +13,8 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
-import com.arnauds_squadron.eatup.utils.UIHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -151,7 +151,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                 event.getAddress().getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
-                UIHelper.DETAILED_MAP_ZOOM_LEVEL));
+                Constants.DETAILED_MAP_ZOOM_LEVEL));
 
         googleMap.addMarker(new MarkerOptions()
                 .position(eventLocation)
