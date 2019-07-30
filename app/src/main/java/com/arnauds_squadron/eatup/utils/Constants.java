@@ -17,8 +17,8 @@ public final class Constants {
     public static final String DISPLAY_NAME = "displayName";
     public static final String AVG_RATING_HOST = "avgRatingsHost";
     public static final String NUM_RATINGS_HOST = "numRatingsHost";
-    public static final String AVG_RATINGS_GUEST = "avgRatingsHost";
-    public static final String NUM_RATINGS_GUEST = "numRatingsHost";
+    public static final String AVG_RATINGS_GUEST = "avgRatingsGuest";
+    public static final String NUM_RATINGS_GUEST = "numRatingsGuesyt";
     public static final String GUEST = "guest";
     public static final String HOST = "host";
     public static final float NO_RATING = 0f;

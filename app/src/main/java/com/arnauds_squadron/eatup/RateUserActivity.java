@@ -16,6 +16,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
+
 
 public class RateUserActivity extends AppCompatActivity {
 
@@ -46,7 +48,7 @@ public class RateUserActivity extends AppCompatActivity {
         RateUserAdapter rateUserAdapter = new RateUserAdapter(RateUserActivity.this, users, rvUsers, ratingType);
 
         // if the current user is the host, switch to guest view
-        if(currentUser.getObjectId().equals(event.getHost().getObjectId())) {
+        if(ratingType.equals(GUEST)) {
             // TODO allow host to rate the guest
             List<ParseUser> accepted = event.getAcceptedGuestsList();
             users.addAll(accepted);
