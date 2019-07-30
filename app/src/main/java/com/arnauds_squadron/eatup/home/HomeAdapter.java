@@ -32,6 +32,9 @@ import java.util.TimeZone;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
+import static com.arnauds_squadron.eatup.utils.Constants.HOST;
+
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
     private List<Event> mAgenda;
@@ -70,6 +73,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         if(event.getAcceptedGuestsList() != null) {
                             if(event.getAcceptedGuestsList().size() != 0) {
                                 viewHolder.btnCancel.setText("Rate guests");
+                                viewHolder.btnCancel.setTag(GUEST);
                             }
                         }
                         else {
@@ -78,6 +82,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     }
                     else {
                         viewHolder.btnCancel.setText("Rate host");
+                        viewHolder.btnCancel.setTag(HOST);
                     }
                 }
                 // event is in the future
@@ -178,6 +183,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         if (event.getDate().before(localCalendar.getTime())) {
                             Intent i = new Intent(context, RateUserActivity.class);
                             i.putExtra("event", event);
+                            i.putExtra("ratingType", (String) btnCancel.getTag());
                             context.startActivity(i);
                         }
                         // TODO add some sort of check to remove the user from the event in the Parse database

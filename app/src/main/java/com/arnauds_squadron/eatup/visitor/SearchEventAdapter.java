@@ -28,10 +28,10 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATING_HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
+import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS_HOST;
 
 public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
@@ -129,14 +129,14 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             tvHostName.setTag(event.getHost());
 
             // load user rating
-            Number rating = event.getHost().getNumber(AVERAGE_RATING);
+            Number rating = event.getHost().getNumber(AVG_RATING_HOST);
             if (rating != null) {
                 hostRating.setRating(rating.floatValue());
             }
             else {
                 hostRating.setRating(NO_RATING);
             }
-            Number numRatings = event.getHost().getNumber(NUM_RATINGS);
+            Number numRatings = event.getHost().getNumber(NUM_RATINGS_HOST);
             tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
 
             // TODO return distance between the current location and restaurant using Yelp API

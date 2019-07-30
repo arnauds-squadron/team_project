@@ -31,17 +31,18 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import org.parceler.Parcels;
-
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATINGS_GUEST;
+import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATING_HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
+import static com.arnauds_squadron.eatup.utils.Constants.HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
+import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS_GUEST;
+import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS_HOST;
 
 // Provide the underlying view for an individual list item.
 public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
@@ -49,11 +50,13 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
     private Context context;
     private List<ParseUser> mUsers;
     private RecyclerView rvUsers;
+    private String ratingType;
 
-    public RateUserAdapter(Activity context, List<ParseUser> users, RecyclerView rvUsers) {
+    public RateUserAdapter(Activity context, List<ParseUser> users, RecyclerView rvUsers, String ratingType) {
         this.mContext = context;
         this.mUsers = users;
         this.rvUsers = rvUsers;
+        this.ratingType = ratingType;
     }
 
     // Inflate the view based on the viewType provided.
@@ -118,7 +121,7 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
             btSubmitRating.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    submitRating(context, (ParseUser) rootView.getTag(), userRatingBar.getRating());
+                    submitRating(context, (ParseUser) rootView.getTag(), userRatingBar.getRating(), ratingType);
                     btSubmitRating.setText("Rating submitted");
                     btSubmitRating.setOnClickListener(null);
                 }
@@ -126,20 +129,27 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
         }
     }
 
-    void submitRating(final Context context, final ParseUser user, final float newRating) {
+    void submitRating(final Context context, final ParseUser user, final float newRating, final String ratingType) {
         ParseQuery<Rating> query = new Rating.Query();
         query.whereEqualTo("user", user);
         query.findInBackground(new FindCallback<Rating>() {
             public void done(List<Rating> ratings, ParseException e) {
                 if (e == null) {
-                    if(ratings.size() != 0) {
+                    if (ratings.size() != 0) {
                         Rating rating = ratings.get(0);
-                        float averageRating = rating.getAvgRating().floatValue();
-                        int numRatings = rating.getNumRatings().intValue();
+                        if (ratingType.equals(HOST)) {
+                            float averageRating = rating.getAvgRatingHost().floatValue();
+                            int numRatings = rating.getNumRatingsHost().intValue();
 
-                        rating.put(AVERAGE_RATING, calculateRating(averageRating, numRatings, newRating));
-                        rating.increment(NUM_RATINGS);
+                            rating.put(AVG_RATING_HOST, calculateRating(averageRating, numRatings, newRating));
+                            rating.increment(NUM_RATINGS_HOST);
+                        } else {
+                            float averageRating = rating.getAvgRatingGuest().floatValue();
+                            int numRatings = rating.getNumRatingsGuest().intValue();
 
+                            rating.put(AVG_RATINGS_GUEST, calculateRating(averageRating, numRatings, newRating));
+                            rating.increment(NUM_RATINGS_GUEST);
+                        }
                         rating.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
@@ -151,17 +161,14 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
                                 }
                             }
                         });
+                    } else {
+                        createRating(context, newRating, user, ratingType);
                     }
-                    else {
-                        createRating(context, newRating, user);
-                    }
-
                 } else {
-                    Toast.makeText(context,"Query for rating not successful",Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Query for rating not successful", Toast.LENGTH_LONG).show();
                 }
             }
         });
-
     }
 
     private float calculateRating(float averageRating, int numRatings, float newRating) {
@@ -169,12 +176,16 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
         return (currentTotal + newRating) / (numRatings + 1);
     }
 
-    private void createRating(final Context context, float rating, ParseUser user) {
+    private void createRating(final Context context, float rating, ParseUser user, String ratingType) {
         final Rating newRating = new Rating();
-        newRating.setAvgRating(rating);
         newRating.setUser(user);
-        newRating.setNumRatings(1);
-
+        if(ratingType.equals(HOST)) {
+            newRating.setAvgRatingHost(rating);
+            newRating.setNumRatingsHost(1);
+        } else {
+            newRating.setAvgRatingGuest(rating);
+            newRating.setNumRatingsGuest(1);
+        }
         newRating.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {

@@ -1,51 +1,27 @@
 package com.arnauds_squadron.eatup;
 
-import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
-import com.arnauds_squadron.eatup.event_details.EventDetailsAdapter;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.Rating;
-import com.bumptech.glide.Glide;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
-import org.w3c.dom.Comment;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
-import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
-import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
 
 public class RateUserActivity extends AppCompatActivity {
 
     @BindView(R.id.rvUsers)
     RecyclerView rvUsers;
+    // TODO fix ratings only going into host column
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +30,7 @@ public class RateUserActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Event event = getIntent().getParcelableExtra("event");
+        String ratingType = getIntent().getStringExtra("ratingType");
         ParseUser eventHost = event.getHost();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
@@ -66,7 +43,7 @@ public class RateUserActivity extends AppCompatActivity {
         indefinitePagerIndicator.attachToRecyclerView(rvUsers);
 
         List<ParseUser> users = new ArrayList<>();
-        RateUserAdapter rateUserAdapter = new RateUserAdapter(RateUserActivity.this, users, rvUsers);
+        RateUserAdapter rateUserAdapter = new RateUserAdapter(RateUserActivity.this, users, rvUsers, ratingType);
 
         // if the current user is the host, switch to guest view
         if(currentUser.getObjectId().equals(event.getHost().getObjectId())) {

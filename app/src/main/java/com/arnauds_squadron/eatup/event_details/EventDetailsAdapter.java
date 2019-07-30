@@ -22,7 +22,7 @@ import com.parse.ParseFile;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
+import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATING_HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 
@@ -165,7 +165,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             .centerCrop()
                             .into(hostViewHolder.ivHostImage);
                 }
-                Number rating = event.getHost().getNumber(AVERAGE_RATING);
+                Number rating = event.getHost().getNumber(AVG_RATING_HOST);
                 if (rating != null) {
                     hostViewHolder.hostRating.setRating(rating.floatValue());
                 }

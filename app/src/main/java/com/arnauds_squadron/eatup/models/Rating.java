@@ -9,24 +9,42 @@ import java.util.Date;
 
 @ParseClassName("Ratings")
 public class Rating extends ParseObject {
-    private static final String KEY_NUM_RATINGS = "numRatings";
-    private static final String KEY_AVG_RATINGS = "averageRating";
+    private static final String KEY_NUM_RATINGS_GUEST = "numRatingsGuest";
+    private static final String KEY_AVG_RATINGS_GUEST = "avgRatingsGuest";
+    private static final String KEY_NUM_RATINGS_HOST = "numRatingsHost";
+    private static final String KEY_AVG_RATINGS_HOST = "avgRatingsHost";
     private static final String KEY_USER = "user";
 
-    public Number getNumRatings() {
-        return getNumber(KEY_NUM_RATINGS);
+    public Number getNumRatingsGuest() {
+        return getNumber(KEY_NUM_RATINGS_GUEST);
     }
 
-    public void setNumRatings(int numRatings) {
-        put(KEY_NUM_RATINGS, numRatings);
+    public void setNumRatingsGuest(int numRatings) {
+        put(KEY_NUM_RATINGS_GUEST, numRatings);
     }
 
-    public Number getAvgRating() {
-        return getNumber(KEY_AVG_RATINGS);
+    public Number getAvgRatingGuest() {
+        return getNumber(KEY_AVG_RATINGS_GUEST);
     }
 
-    public void setAvgRating(float avgRating) {
-        put(KEY_AVG_RATINGS, avgRating);
+    public void setAvgRatingGuest(float avgRating) {
+        put(KEY_AVG_RATINGS_GUEST, avgRating);
+    }
+
+    public Number getNumRatingsHost() {
+        return getNumber(KEY_NUM_RATINGS_HOST);
+    }
+
+    public void setNumRatingsHost(int numRatings) {
+        put(KEY_NUM_RATINGS_HOST, numRatings);
+    }
+
+    public Number getAvgRatingHost() {
+        return getNumber(KEY_AVG_RATINGS_HOST);
+    }
+
+    public void setAvgRatingHost(float avgRating) {
+        put(KEY_AVG_RATINGS_HOST, avgRating);
     }
 
     public ParseUser getUser() {

@@ -15,9 +15,14 @@ public final class Constants {
     public static final String KEY_PROFILE_PICTURE = "profilePicture";
     public static final String BIO = "bio";
     public static final String DISPLAY_NAME = "displayName";
-    public static final String AVERAGE_RATING = "averageRating";
+    public static final String AVG_RATING_HOST = "avgRatingsHost";
+    public static final String NUM_RATINGS_HOST = "numRatingsHost";
+    public static final String AVG_RATINGS_GUEST = "avgRatingsHost";
+    public static final String NUM_RATINGS_GUEST = "numRatingsHost";
+    public static final String GUEST = "guest";
+    public static final String HOST = "host";
     public static final float NO_RATING = 0f;
-    public static final String NUM_RATINGS = "numRatings";
+
     // search constants
     public static final String SEARCH_CATEGORY = "searchCategory";
     public static final int NO_SEARCH = 0;

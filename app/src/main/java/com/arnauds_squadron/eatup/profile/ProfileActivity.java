@@ -27,11 +27,9 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVERAGE_RATING;
 import static com.arnauds_squadron.eatup.utils.Constants.BIO;
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS;
 
 public class ProfileActivity extends AppCompatActivity {
     ParseUser user;
@@ -64,8 +62,8 @@ public class ProfileActivity extends AppCompatActivity {
                 if (e == null) {
                     if(ratings.size() != 0) {
                         Rating rating = ratings.get(0);
-                        float averageRating = rating.getAvgRating().floatValue();
-                        int numRatings = rating.getNumRatings().intValue();
+                        float averageRating = rating.getAvgRatingHost().floatValue();
+                        int numRatings = rating.getNumRatingsHost().intValue();
                         ratingBar.setRating(averageRating);
                         tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings));
                     }
