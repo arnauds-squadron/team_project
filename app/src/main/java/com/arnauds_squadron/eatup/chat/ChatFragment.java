@@ -31,13 +31,11 @@ public class ChatFragment extends Fragment implements
     @BindView(R.id.flDashboard)
     FrameLayout flDashboard;
 
+    private boolean isVisibleToUser;
+    private int notifications = 0;
     private OnFragmentInteractionListener mListener;
     private ChatDashboardFragment dashboardFragment;
     private MessengerFragment messengerFragment;
-
-    public static ChatFragment newInstance() {
-        return new ChatFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -79,11 +77,16 @@ public class ChatFragment extends Fragment implements
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        this.isVisibleToUser = isVisibleToUser;
 
         if (mListener != null) {
             Chat newChat = mListener.getSelectedChat();
-            if (newChat != null)
+            if (newChat != null) // open chat otherwise stay on dashboard if its null
                 openChatFragment(newChat);
+            if (isVisibleToUser) { // handle message notifications
+                notifications = 0;
+                mListener.updateMessageNotifications(0);
+            }
         }
     }
 
@@ -110,6 +113,7 @@ public class ChatFragment extends Fragment implements
     @Override
     public void goToDashboard() {
         showDashboardFragment();
+        notifications = 0;
     }
 
     /**
@@ -119,6 +123,14 @@ public class ChatFragment extends Fragment implements
     @Override
     public void updateDashboardChats() {
         dashboardFragment.getChatsAsync();
+    }
+
+    @Override
+    public void handleNotification() {
+        if (!isVisibleToUser) {
+            notifications++;
+            mListener.updateMessageNotifications(notifications);
+        }
     }
 
     /**
@@ -134,6 +146,10 @@ public class ChatFragment extends Fragment implements
         } else {
             return false;
         }
+    }
+
+    public void stopUpdatingMessages() {
+        messengerFragment.stopRefreshingMessages();
     }
 
     /**
@@ -164,5 +180,7 @@ public class ChatFragment extends Fragment implements
          * normally to the ChatFragment
          */
         Chat getSelectedChat();
+
+        void updateMessageNotifications(int notifications);
     }
 }

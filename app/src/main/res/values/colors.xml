@@ -9,6 +9,8 @@
 
     <!--Eat up custom colors-->
     <color name="widget_red">#CC0000</color>
+    <color name="notification_red">#FF0000</color>
+    <color name="notification_white">#FFFFFF</color>
     <color name="toolbar">@color/view_background</color>
     <color name="accept_button_tint">#86db9a</color>
     <color name="deny_button_tint">#db8686</color>

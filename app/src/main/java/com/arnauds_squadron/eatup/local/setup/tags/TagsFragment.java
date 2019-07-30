@@ -51,10 +51,6 @@ public class TagsFragment extends Fragment {
     private List<String> tagList;
     private TagAdapter tagAdapter;
 
-    public static TagsFragment newInstance() {
-        return new TagsFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

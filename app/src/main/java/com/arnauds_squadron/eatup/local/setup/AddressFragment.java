@@ -46,10 +46,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     // The place that the user selects after searching for its address
     private Place selectedPlace;
 
-    public static AddressFragment newInstance() {
-        return new AddressFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

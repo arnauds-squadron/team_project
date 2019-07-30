@@ -38,15 +38,7 @@ public class MainActivity extends AppCompatActivity implements
     // Chat selected in the HomeFragment, stored to be accessed by the ChatFragment
     private Chat chat;
 
-    private final int[] tabIcons = {
-            R.drawable.chat_tab,
-            R.drawable.host_create_tab,
-            R.drawable.home_tab,
-            R.drawable.visitor_meal_tab,
-            R.drawable.profile_tab
-    };
-
-    ParseUser currentUser;
+    private MainFragmentPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +46,15 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        currentUser = ParseUser.getCurrentUser();
+        ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser == null) {
             gotoLoginActivity();
         }
 
+        pagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(), this);
+
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(pagerAdapter);
 
         // All the tabs in this viewpager will be loaded (4 neighboring tabs)
         viewPager.setOffscreenPageLimit(4);
@@ -92,8 +86,30 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout.setupWithViewPager(viewPager);
 
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(tabIcons[i]);
+            tabLayout.getTabAt(i).setCustomView(pagerAdapter.getTabView(i, null));
         }
+
+        tabLayout.addOnTabSelectedListener(
+                new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        super.onTabSelected(tab);
+                        tab.getCustomView().setAlpha(1);
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                        super.onTabUnselected(tab);
+                        tab.getCustomView().setAlpha(0.75f);
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                        super.onTabReselected(tab);
+                    }
+                }
+        );
     }
 
     /**
@@ -164,6 +180,11 @@ public class MainActivity extends AppCompatActivity implements
         return temp;
     }
 
+    @Override
+    public void updateMessageNotifications(int notifications) {
+        tabLayout.getTabAt(0).setCustomView(pagerAdapter.getTabView(0, notifications + ""));
+    }
+
     /**
      * Overrides the ProfileFragment interface
      * <p>
@@ -172,8 +193,10 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void stopUpdatingEvents() {
-        HomeFragment fragment = (HomeFragment) getTypedFragment(HomeFragment.class);
-        fragment.stopUpdatingEvents();
+        HomeFragment homeFragment = (HomeFragment) getTypedFragment(HomeFragment.class);
+        ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
+        homeFragment.stopUpdatingEvents();
+        chatFragment.stopUpdatingMessages();
     }
 
     /**

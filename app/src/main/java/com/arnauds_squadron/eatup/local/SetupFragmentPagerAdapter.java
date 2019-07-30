@@ -28,15 +28,15 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0)
-            return StartFragment.newInstance();
+            return new StartFragment();
         if(position == 1)
-            return TagsFragment.newInstance();
+            return new TagsFragment();
         if (position == 2)
-            return AddressFragment.newInstance();
+            return new AddressFragment();
         if (position == 3)
-            return DateFragment.newInstance();
+            return new DateFragment();
         if (position == 4)
-            return ReviewFragment.newInstance();
-        return StartFragment.newInstance();
+            return new ReviewFragment();
+        return new StartFragment();
     }
 }

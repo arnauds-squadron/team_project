@@ -20,10 +20,6 @@ public class StartFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public static StartFragment newInstance() {
-        return new StartFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

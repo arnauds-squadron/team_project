@@ -31,7 +31,7 @@ public final class Constants {
     public static final int LOCATION_SEARCH = 3;
 
     // Update speed to refresh messages: 1 second
-    public static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
+    public static final int CHAT_UPDATE_SPEED_MILLIS = 2000;
 
     // Update speed to refresh events: 5 seconds
     public static final int EVENT_UPDATE_SPEED_MILLIS = 5000;

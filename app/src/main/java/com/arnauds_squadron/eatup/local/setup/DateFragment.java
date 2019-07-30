@@ -54,10 +54,6 @@ public class DateFragment extends Fragment {
     private boolean dateSet;
     private boolean timeSet;
 
-    public static DateFragment newInstance() {
-        return new DateFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

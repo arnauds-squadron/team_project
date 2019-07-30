@@ -58,10 +58,6 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     private OnFragmentInteractionListener mListener;
     private Event event;
 
-    public static ReviewFragment newInstance() {
-        return new ReviewFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
