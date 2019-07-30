@@ -105,6 +105,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    // TODO: constantly update because swiping to refresh can be annoying with many events
     public void fetchTimelineAsync() {
         final Event.Query query = new Event.Query();
         query.orderByDescending("createdAt");

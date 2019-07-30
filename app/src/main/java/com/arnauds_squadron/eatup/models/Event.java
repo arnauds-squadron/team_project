@@ -215,6 +215,11 @@ public class Event extends ParseObject {
             return this;
         }
 
+        public Query notOwnEvent(ParseUser user) {
+            whereNotEqualTo(KEY_HOST, user);
+            return this;
+        }
+
         public Query withHost() {
             include("host");
             return this;
