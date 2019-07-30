@@ -36,6 +36,7 @@ public class Event extends ParseObject {
     private static final String KEY_ACCEPTED_GUESTS = "acceptedGuests";
     private static final String KEY_CREATED_AT = "createdAt";
     private static final Double MAX_DISTANCE = 0.1;
+    private static final String YELP_ID = "yelpRestaurantId";
 
     // ParseFile - class in SDK that allows accessing files stored with Parse
     public ParseFile getEventImage() {
@@ -149,6 +150,14 @@ public class Event extends ParseObject {
 
     public List<ParseUser> getPendingRequests() {
         return getList(KEY_PENDING_GUESTS);
+    }
+
+    public String getYelpId() {
+        return getString(YELP_ID);
+    }
+
+    public void setYelpId(String yelpId) {
+        put(YELP_ID, yelpId);
     }
 
     /**

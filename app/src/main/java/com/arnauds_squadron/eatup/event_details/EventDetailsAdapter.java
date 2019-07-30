@@ -12,15 +12,30 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Rating;
 import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
+
+import org.parceler.Parcels;
+
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATING_HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
@@ -74,7 +89,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             });
         }
 
-        void setRootViewTag(Event event) {
+        void setEventRootViewTag(Event event) {
             rootView.setTag(event);
         }
     }
@@ -97,9 +112,9 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Event event = (Event) v.getTag();
+                    final Business business = (Business) v.getTag();
                     Intent i = new Intent(context, EventDetailsRestaurantActivity.class);
-                    i.putExtra("event", event);
+                    i.putExtra("restaurant", Parcels.wrap(business));
                     Pair<View, String> imagePair = Pair.create((View) ivEventImage, "eventImage");
                     Pair<View, String> namePair = Pair.create((View) tvRestaurantName, "restaurantName");
                     Pair<View, String> ratingPair = Pair.create((View) restaurantRating, "restaurantRating");
@@ -111,9 +126,10 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             });
         }
 
-        void setRootViewTag(Event event) {
-            rootView.setTag(event);
+        void setBusinessRootViewTag(Business business) {
+            rootView.setTag(business);
         }
+
     }
 
     @Override
@@ -155,8 +171,8 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         int viewType = getItemViewType(position);
         switch (viewType) {
             case 0:
-                HostViewHolder hostViewHolder = (HostViewHolder) holder;
-                hostViewHolder.setRootViewTag(event);
+                final HostViewHolder hostViewHolder = (HostViewHolder) holder;
+                hostViewHolder.setEventRootViewTag(event);
                 hostViewHolder.tvHostName.setText(event.getHost().getUsername());
                 ParseFile profileImage = event.getHost().getParseFile(KEY_PROFILE_PICTURE);
                 if (profileImage != null) {
@@ -165,26 +181,54 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             .centerCrop()
                             .into(hostViewHolder.ivHostImage);
                 }
-                Number rating = event.getHost().getNumber(AVG_RATING_HOST);
-                if (rating != null) {
-                    hostViewHolder.hostRating.setRating(rating.floatValue());
-                }
-                else {
-                    hostViewHolder.hostRating.setRating(NO_RATING);
-                }
+
+                // load user rating
+                ParseQuery<Rating> query = new Rating.Query();
+                query.whereEqualTo("user", event.getHost());
+                query.findInBackground(new FindCallback<Rating>() {
+                    public void done(List<Rating> ratings, ParseException e) {
+                        if (e == null) {
+                            if(ratings.size() != 0) {
+                                Rating rating = ratings.get(0);
+                                float averageRating = rating.getAvgRatingHost().floatValue();
+                                hostViewHolder.hostRating.setRating(averageRating);
+                            }
+                            else {
+                                hostViewHolder.hostRating.setRating(NO_RATING);
+                            }
+                        } else {
+                            Toast.makeText(context, "Query for rating not successful", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
                 break;
             case 1:
-                RestaurantViewHolder restaurantViewHolder = (RestaurantViewHolder) holder;
-                restaurantViewHolder.setRootViewTag(event);
-                restaurantViewHolder.tvRestaurantName.setText(event.getTitle());
-                ParseFile eventImage = event.getEventImage();
-                if (eventImage != null) {
-                    Glide.with(context.getApplicationContext())
-                            .load(eventImage.getUrl())
-                            .centerCrop()
-                            .into(restaurantViewHolder.ivEventImage);
-                }
-                // TODO get rating and restaurant name
+                final RestaurantViewHolder restaurantViewHolder = (RestaurantViewHolder) holder;
+
+                Call<Business> restaurantDetails = YelpData.retrofit(context).getDetails(event.getYelpId());
+                restaurantDetails.enqueue(new Callback<Business>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Business> call,
+                                           @NonNull Response<Business> response) {
+                        if (response.isSuccessful()) {
+                            Business restaurant = response.body();
+                            restaurantViewHolder.setBusinessRootViewTag(restaurant);
+                            if (restaurant != null) {
+                                restaurantViewHolder.tvRestaurantName.setText(restaurant.name);
+                                Glide.with(context.getApplicationContext())
+                                        .load(restaurant.imageUrl)
+                                        .centerCrop()
+                                        .into(restaurantViewHolder.ivEventImage);
+                                restaurantViewHolder.restaurantRating.setRating(restaurant.rating);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Business> call, @NonNull Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
         }
     }
 }

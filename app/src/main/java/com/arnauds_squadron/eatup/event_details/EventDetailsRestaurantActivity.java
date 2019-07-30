@@ -1,20 +1,26 @@
 package com.arnauds_squadron.eatup.event_details;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
-import com.parse.ParseFile;
+
+import org.parceler.Parcels;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class EventDetailsRestaurantActivity extends AppCompatActivity {
 
@@ -25,12 +31,12 @@ public class EventDetailsRestaurantActivity extends AppCompatActivity {
     TextView tvRestaurantName;
     @BindView(R.id.restaurantRating)
     RatingBar restaurantRating;
-    @BindView(R.id.tvAddress)
-    TextView tvAddress;
+    @BindView(R.id.tvNumberRatings)
+    TextView tvNumberRatings;
     @BindView(R.id.tvPhone)
     TextView tvPhone;
-    @BindView(R.id.tvURL)
-    TextView tvURL;
+    @BindView(R.id.tvPrice)
+    TextView tvPrice;
     @BindView(R.id.btYelp)
     Button btYelp;
 
@@ -40,34 +46,26 @@ public class EventDetailsRestaurantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_details_restaurant);
         ButterKnife.bind(this);
 
-        event = getIntent().getParcelableExtra("event");
+        Business restaurant = Parcels.unwrap(getIntent().getParcelableExtra("restaurant"));
+        tvRestaurantName.setText(restaurant.name);
+        restaurantRating.setRating(restaurant.rating);
+        tvNumberRatings.setText(String.format(Locale.getDefault(), "(%s)", Integer.toString(restaurant.reviewCount)));
+        tvPhone.setText(restaurant.displayPhone);
+        Glide.with(EventDetailsRestaurantActivity.this)
+                .load(restaurant.imageUrl)
+                .into(ivEventImage);
 
-        // load eventImage
-        tvRestaurantName.setText(event.getTitle());
-        ParseFile eventImage = event.getEventImage();
-        if (eventImage != null) {
-            Glide.with(getApplicationContext())
-                    .load(eventImage.getUrl())
-                    .centerCrop()
-                    .into(ivEventImage);
-        }
-        // TODO get all restaurant information from database and query to Yelp API
-
-        // load restaurant rating
-//        Number rating = user.getNumber(AVERAGE_RATING);
-//        Number numRatings = user.getNumber(NUM_RATINGS);
-//        if (rating != null) {
-//            ratingBar.setRating(rating.floatValue());
-//        }
-//        else {
-//            ratingBar.setRating(NO_RATING);
-//        }
-//        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings.toString()));
-    }
-
-    @OnClick(R.id.btYelp)
-    public void goToYelp() {
-
+        final String url = restaurant.url;
+        btYelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+                finish();
+            }
+        });
+        tvPrice.setText(restaurant.price);
     }
 }
 

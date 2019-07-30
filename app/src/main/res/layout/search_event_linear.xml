@@ -36,13 +36,13 @@
         style="@style/Widget.AppCompat.RatingBar.Small"
         android:layout_width="81dp"
         android:layout_height="17dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="6dp"
         android:numStars="5"
         android:stepSize="0.5"
-        app:layout_constraintStart_toEndOf="@+id/ivEventImage"
-        app:layout_constraintTop_toBottomOf="@+id/tvHostName" />
+        app:layout_constraintStart_toEndOf="@+id/tvHostName"
+        app:layout_constraintTop_toBottomOf="@+id/tvEventName" />
 
     <TextView
         android:id="@+id/tvTags"
@@ -90,16 +90,5 @@
         android:text="@string/detailview_host_name"
         app:layout_constraintStart_toEndOf="@+id/ivEventImage"
         app:layout_constraintTop_toBottomOf="@+id/tvEventName" />
-
-    <TextView
-        android:id="@+id/tvNumRatings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="2dp"
-        android:text="@string/num_ratings"
-        app:layout_constraintStart_toEndOf="@+id/hostRating"
-        app:layout_constraintTop_toBottomOf="@+id/tvHostName" />
 
 </android.support.constraint.ConstraintLayout>

@@ -14,12 +14,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
+import com.arnauds_squadron.eatup.models.Rating;
 import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -81,8 +85,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvDistance;
         @BindView(R.id.hostRating)
         RatingBar hostRating;
-        @BindView(R.id.tvNumRatings)
-        TextView tvNumRatings;
         @BindView(R.id.btRequest)
         Button btRequest;
 
@@ -123,35 +125,36 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         }
 
         public void bind(Event event) {
+            // TODO return distance between the current location and restaurant using Yelp API
+
             // populate views according to data
             tvEventName.setText(event.getTitle());
             tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
             tvHostName.setTag(event.getHost());
 
             // load user rating
-            Number rating = event.getHost().getNumber(AVG_RATING_HOST);
-            if (rating != null) {
-                hostRating.setRating(rating.floatValue());
-            }
-            else {
-                hostRating.setRating(NO_RATING);
-            }
-            Number numRatings = event.getHost().getNumber(NUM_RATINGS_HOST);
-            if (numRatings != null) {
-                tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings));
-            }
-            else {
-                tvNumRatings.setText(String.format(Locale.getDefault(),"(%s)", 0));
-            }
-
-            // TODO return distance between the current location and restaurant using Yelp API
-            // tvDistance.setText("");
+            ParseQuery<Rating> query = new Rating.Query();
+            query.whereEqualTo("user", event.getHost());
+            query.findInBackground(new FindCallback<Rating>() {
+                public void done(List<Rating> ratings, ParseException e) {
+                    if (e == null) {
+                        if(ratings.size() != 0) {
+                            Rating rating = ratings.get(0);
+                            float averageRating = rating.getAvgRatingHost().floatValue();
+                            hostRating.setRating(averageRating);
+                        }
+                        else {
+                            hostRating.setRating(NO_RATING);
+                        }
+                    } else {
+                        Toast.makeText(context, "Query for rating not successful", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
             List<String> cuisineTags = event.getTags();
             tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
 
-
-            // TODO set cuisine
             ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {
                 Glide.with(context)
