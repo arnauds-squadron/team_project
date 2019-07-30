@@ -35,6 +35,7 @@ import com.arnauds_squadron.eatup.BuildConfig;
 import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -202,7 +203,7 @@ public class VisitorFragment extends Fragment {
             // when item selected, bring user to the new search activity with search bar and search category packaged as intent extra
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch(position) {
+                switch (position) {
                     // search category hint
                     case 0:
                         break;
@@ -219,7 +220,7 @@ public class VisitorFragment extends Fragment {
                         searchCategoryCode = LOCATION_SEARCH;
                         break;
                 }
-                if(searchCategoryCode != 0) {
+                if (searchCategoryCode != 0) {
                     searchSpinner.setSelection(NO_SEARCH);
                     Intent i = new Intent(getContext(), VisitorSearchActivity.class);
                     i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
@@ -256,13 +257,13 @@ public class VisitorFragment extends Fragment {
     protected void loadTopEvents(Date maxDate) {
 //        progressBar.setVisibility(View.VISIBLE);
         final Event.Query eventsQuery = new Event.Query();
+        eventsQuery.getTop().withHost().notOwnEvent(Constants.CURRENT_USER);
         // if opening app for the first time, get top 20 and clear old items
         // otherwise, query for posts older than the oldest
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withHost();
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withHost();
+            eventsQuery.getOlder(maxDate);
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
@@ -364,8 +365,7 @@ public class VisitorFragment extends Fragment {
                 // If user interaction was interrupted, the permission request is cancelled and you
                 // receive empty arrays.
                 Log.i("LocationFragment", "User interaction was cancelled.");
-            }
-            else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted.
                 getLastLocation();
                 startLocationUpdates();
