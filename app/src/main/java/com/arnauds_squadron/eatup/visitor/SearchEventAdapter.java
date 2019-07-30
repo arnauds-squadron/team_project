@@ -145,7 +145,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             }
 
             // TODO return distance between the current location and restaurant using Yelp API
-            // tvDistance.setText("");
 
             List<String> cuisineTags = event.getTags();
             tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
