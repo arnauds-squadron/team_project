@@ -107,12 +107,12 @@ public class MessengerFragment extends Fragment {
                         messageQuery.findInBackground(new FindCallback<Message>() {
                             @Override
                             public void done(List<Message> objects, ParseException e) {
-                                if (e == null) {
+                                if (e == null && objects != null) {
                                     for (int i = 0; i < objects.size(); i++) {
                                         Message message = objects.get(i);
                                         addMessage(message);
                                     }
-                                } else {
+                                } else if (e != null) {
                                     Toast.makeText(getActivity(), "Could not load more messages",
                                             Toast.LENGTH_SHORT).show();
                                 }
@@ -247,7 +247,7 @@ public class MessengerFragment extends Fragment {
         messageQuery.findInBackground(new FindCallback<Message>() {
             @Override
             public void done(List<Message> objects, ParseException e) {
-                if (e == null) {
+                if (e == null && objects != null && objects.size() > 0) {
                     String newestId = newestMessage != null ? newestMessage.getObjectId() : null;
                     newestMessage = objects.get(0);
                     // get the index of the newest message
@@ -266,9 +266,10 @@ public class MessengerFragment extends Fragment {
                         Message message = objects.get(j);
                         appendMessage(message);
                     }
-                } else {
+                } else if (e != null) {
                     Toast.makeText(getActivity(), "Could not load messages",
                             Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 }
             }
         });
@@ -304,6 +305,7 @@ public class MessengerFragment extends Fragment {
     private void resetMessages() {
         messages.clear();
         messageAdapter.notifyDataSetChanged();
+        newestMessage = null;
     }
 
     /**
