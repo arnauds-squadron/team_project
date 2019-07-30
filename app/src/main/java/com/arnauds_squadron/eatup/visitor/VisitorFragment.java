@@ -224,6 +224,8 @@ public class VisitorFragment extends Fragment {
                     searchSpinner.setSelection(NO_SEARCH);
                     Intent i = new Intent(getContext(), VisitorSearchActivity.class);
                     i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
+                    i.putExtra("latitude", (Double) tvCurrentLocation.getTag(R.id.latitude));
+                    i.putExtra("longitude", (Double) tvCurrentLocation.getTag(R.id.longitude));
                     getContext().startActivity(i);
                 }
             }

@@ -20,6 +20,9 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
+import java.util.List;
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -41,7 +44,6 @@ public class EventDetailsActivity extends AppCompatActivity {
     @BindView(R.id.btRequest)
     Button btRequest;
 
-    private String eventId;
     private Event currentEvent;
     private EventDetailsAdapter eventDetailsAdapter;
 
@@ -55,7 +57,10 @@ public class EventDetailsActivity extends AppCompatActivity {
             gotoLoginActivity();
         }
 
-        eventId = getIntent().getStringExtra("event_id");
+        String eventId = getIntent().getStringExtra("event_id");
+        Double distanceInMiles = getIntent().getDoubleExtra("distance", 0f);
+
+        tvDistance.setText(String.format(Locale.getDefault(), "%.2f mi", distanceInMiles));
 
         ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
         // try to find item from cache, otherwise go to network
@@ -78,7 +83,9 @@ public class EventDetailsActivity extends AppCompatActivity {
                     indefinitePagerIndicator.attachToRecyclerView(rvEventDetails);
 
                     tvEventTitle.setText(event.getTitle());
-                    tvCuisine.setText(event.getCuisine());
+
+                    List<String> cuisineTags = event.getTags();
+                    tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
 
                     }
                 else {
@@ -90,7 +97,6 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     @OnClick(R.id.btRequest)
     public void eventRSVP() {
-        // TODO send request to Parse server to RSVP to the event
         Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
         // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
         // otherwise, create request/add to "allRequests" and send back to home screen

@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -42,11 +43,13 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
     private List<Event> events;
     // context defined as global variable so Glide in onBindViewHolder has access
     private Context context;
+    private ParseGeoPoint currentUserLocation;
 
     // pass event array in constructor
-    public SearchEventAdapter(Context context, List<Event> events) {
+    public SearchEventAdapter(Context context, List<Event> events, ParseGeoPoint currentUserLocation) {
         this.context = context;
         this.events = events;
+        this.currentUserLocation = currentUserLocation;
     }
 
     // for each row, inflate layout and cache references into ViewHolder
@@ -125,9 +128,12 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         }
 
         public void bind(Event event) {
-            // TODO return distance between the current location and restaurant using Yelp API
-
             // populate views according to data
+            ParseGeoPoint eventAddress = event.getAddress();
+            double distanceInMiles = eventAddress.distanceInMilesTo(currentUserLocation);
+
+            tvDistance.setText(String.format(Locale.getDefault(), "%.2f mi", distanceInMiles));
+            tvDistance.setTag(distanceInMiles);
             tvEventName.setText(event.getTitle());
             tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
             tvHostName.setTag(event.getHost());
@@ -174,9 +180,14 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
 
                 Intent intent = new Intent(context, EventDetailsActivity.class);
                 intent.putExtra("event_id", event.getObjectId());
+                intent.putExtra("distance", (Double) v.getRootView().findViewById(R.id.tvDistance).getTag());
                 context.startActivity(intent);
             }
         }
+    }
+
+    public void updateCurrentLocation(ParseGeoPoint currentUserLocation) {
+        this.currentUserLocation = currentUserLocation;
     }
 
     // RecyclerView adapter helper methods to clear items from or add items to underlying dataset
