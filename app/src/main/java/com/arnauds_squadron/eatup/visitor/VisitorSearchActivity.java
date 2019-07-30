@@ -1,13 +1,20 @@
 package com.arnauds_squadron.eatup.visitor;
 
+import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.location.Location;
+import android.os.Build;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,14 +28,23 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpService;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -77,7 +93,8 @@ import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
 
 
-public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     // initialize adapter, views, scroll listener
     private SearchEventAdapter eventAdapter;
@@ -117,26 +134,66 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
 
-    // adapter for search suggestions
+    // adapter for location search suggestions
     private PlacesClient placesClient;
+
+    /* Current user location using Google API Client: initialize variables
+     * Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
+     */
+    private Location currentLocation;
+    private ParseGeoPoint currentGeoPoint;
+    private GoogleApiClient googleApiClient;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private LocationRequest locationRequest;
+    private static final long UPDATE_INTERVAL = 5000, FASTEST_INTERVAL = 5000; // = 5 seconds
+    // lists to store location permissions
+    private ArrayList<String> permissionsToRequest;
+    private ArrayList<String> permissionsRejected = new ArrayList<>();
+    private ArrayList<String> permissions = new ArrayList<>();
+    // code for permissions results request
+    private static final int ALL_PERMISSIONS_RESULT = 1011;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_visitor_search);
         ButterKnife.bind(this);
 
+        /* Current user location: manage permissions
+         * Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
+         */
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        permissionsToRequest = permissionsToRequest(permissions);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (permissionsToRequest.size() > 0) {
+                requestPermissions(permissionsToRequest.toArray(
+                        new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
+            }
+        }
+
+        // Build google api client
+        googleApiClient = new GoogleApiClient.Builder(this).
+                addApi(LocationServices.API).
+                addConnectionCallbacks(this).
+                addOnConnectionFailedListener(this).build();
+
+        // Initialize Google Places client for location-based searches
         Places.initialize(this, getString(R.string.google_api_key));
         placesClient = Places.createClient(this);
 
-        // initialize data source
+        // Initialize data source for events recyclerview
         mEvents = new ArrayList<>();
-        // construct adapter from data source
-        eventAdapter = new SearchEventAdapter(this, mEvents);
         // RecyclerView setup
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvEvents.setLayoutManager(linearLayoutManager);
+
+        Double currentLatitude = getIntent().getDoubleExtra("latitude", 0);
+        Double currentLongitude = getIntent().getDoubleExtra("longitude", 0);
+        currentGeoPoint = new ParseGeoPoint(currentLatitude, currentLongitude);
+
+        eventAdapter = new SearchEventAdapter(this, mEvents, currentGeoPoint);
         rvEvents.setAdapter(eventAdapter);
 
         // initialize search services
@@ -187,6 +244,168 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
     }
 
+
+    /* Current user location: functions to manage user permissions
+    Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
+     */
+
+    private ArrayList<String> permissionsToRequest(ArrayList<String> wantedPermissions) {
+        ArrayList<String> result = new ArrayList<>();
+
+        for (String perm : wantedPermissions) {
+            if (!hasPermission(perm)) {
+                result.add(perm);
+            }
+        }
+
+        return result;
+    }
+
+    private boolean hasPermission(String permission) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!checkPlayServices()) {
+            Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // stop location updates
+        if (googleApiClient != null  &&  googleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+            googleApiClient.disconnect();
+        }
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+            } else {
+                finish();
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                &&  ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // Permissions ok, we get last location
+        currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        if (currentLocation != null) {
+            currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+            eventAdapter.updateCurrentLocation(currentGeoPoint);
+        }
+
+        startLocationUpdates();
+    }
+
+    private void startLocationUpdates() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                &&  ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Permissions necessary for EatUp to use your location", Toast.LENGTH_SHORT).show();
+        }
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            Log.d("VisitorSearch locChange", "Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode) {
+            case ALL_PERMISSIONS_RESULT:
+                for (String perm : permissionsToRequest) {
+                    if (!hasPermission(perm)) {
+                        permissionsRejected.add(perm);
+                    }
+                }
+
+                if (permissionsRejected.size() > 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (shouldShowRequestPermissionRationale(permissionsRejected.get(0))) {
+                            new AlertDialog.Builder(VisitorSearchActivity.this).
+                                    setMessage("Permission must be granted for EatUp to use your location.").
+                                    setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                requestPermissions(permissionsRejected.
+                                                        toArray(new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
+                                            }
+                                        }
+                                    }).setNegativeButton("Cancel", null).create().show();
+
+                            return;
+                        }
+                    }
+                } else {
+                    if (googleApiClient != null) {
+                        googleApiClient.connect();
+                    }
+                }
+
+                break;
+        }
+    }
+
+
+    // Handle the events being loaded into the recyclerview depending on search query
     private void handleRecyclerEvents(Date maxDate) {
         switch(searchCategory) {
             case USER_SEARCH:
@@ -292,9 +511,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         final Event.Query eventsQuery = new Event.Query();
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getClosest(geoPoint).getTop().withHost();
+            eventsQuery.getClosest(geoPoint).getTop().withHost().notOwnEvent(Constants.CURRENT_USER);
         } else {
-            eventsQuery.getOlder(maxDate).getClosest(geoPoint).getTop().withHost();
+            eventsQuery.getOlder(maxDate).getClosest(geoPoint).getTop().withHost().notOwnEvent(Constants.CURRENT_USER);
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
@@ -329,9 +548,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // otherwise, query for posts older than the oldest
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withHost().whereEqualTo("host", user);
+            eventsQuery.getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).whereEqualTo("host", user);
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo("host", user);
+            eventsQuery.getOlder(maxDate).getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).whereEqualTo("host", user);
         }
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
@@ -364,9 +583,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // otherwise, query for events older than the oldest
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getTop().withHost().whereEqualTo("tags", cuisineQuery);
+            eventsQuery.getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).whereEqualTo("tags", cuisineQuery);
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withHost().whereEqualTo("tags", cuisineQuery);
+            eventsQuery.getOlder(maxDate).getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).whereEqualTo("tags", cuisineQuery);
         }
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
@@ -475,7 +694,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String incompleteQuery) {
-                // TODO set different search suggestions for cuisine and location
 
                 AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 

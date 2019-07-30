@@ -35,7 +35,7 @@ public class Event extends ParseObject {
     private static final String KEY_PENDING_GUESTS = "pendingGuests";
     private static final String KEY_ACCEPTED_GUESTS = "acceptedGuests";
     private static final String KEY_CREATED_AT = "createdAt";
-    private static final Double MAX_DISTANCE = 0.1;
+    private static final Double MAX_DISTANCE = 100.0;
     private static final String YELP_ID = "yelpRestaurantId";
 
     // ParseFile - class in SDK that allows accessing files stored with Parse
@@ -213,14 +213,14 @@ public class Event extends ParseObject {
         }
 
         public Query getOlder(Date maxId) {
-            whereLessThan("createdAt", maxId);
+            whereLessThan(KEY_DATE, maxId);
             return this;
         }
 
         // get most recent 20 posts
         public Query getTop() {
             setLimit(20);
-            orderByDescending(KEY_CREATED_AT);
+            orderByDescending(KEY_DATE);
             return this;
         }
 
