@@ -46,5 +46,4 @@ public class Business {
     @Expose
     public String price;
 
-
 }

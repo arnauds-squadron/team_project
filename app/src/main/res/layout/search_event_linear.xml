@@ -91,13 +91,4 @@
         app:layout_constraintStart_toEndOf="@+id/ivEventImage"
         app:layout_constraintTop_toBottomOf="@+id/tvEventName" />
 
-    <TextView
-        android:id="@+id/tvNumRatings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/num_ratings"
-        app:layout_constraintStart_toEndOf="@+id/hostRating"
-        app:layout_constraintTop_toBottomOf="@+id/tvEventName" />
-
 </android.support.constraint.ConstraintLayout>
