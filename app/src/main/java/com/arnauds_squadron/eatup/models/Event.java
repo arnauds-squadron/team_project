@@ -237,5 +237,10 @@ public class Event extends ParseObject {
             whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
             return this;
         }
+
+        public Query notFilled(int guestArraySize) {
+            whereNotEqualTo(KEY_MAX_GUESTS, guestArraySize);
+            return this;
+        }
     }
 }
