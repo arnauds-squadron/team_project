@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="@string/detailview_event_title"
@@ -40,25 +40,23 @@
         android:id="@+id/tvTags"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginTop="34dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="@string/detailview_cuisine_name"
         android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/tvDistance"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/tvEventTitle"
+        app:layout_constraintEnd_toStartOf="@+id/tvDistance" />
 
     <TextView
         android:id="@+id/tvDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="34dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:text="@string/detailview_distance"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/tvEventTitle"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 <TextView
     android:id="@+id/tvBookPrompt"
@@ -79,13 +77,15 @@
         android:id="@+id/rvEventDetails"
         android:layout_width="0dp"
         android:layout_height="370dp"
+        android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp"
+        android:clipToPadding="false"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         app:layout_constraintBottom_toTopOf="@+id/recyclerview_pager_indicator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:clipToPadding="false"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvDate" />
 
     <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
         android:id="@+id/recyclerview_pager_indicator"
@@ -95,7 +95,7 @@
         android:layout_marginLeft="82dp"
         android:layout_marginEnd="83dp"
         android:layout_marginRight="83dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="28dp"
         app:dotColor="@color/bottom_gray"
         app:layout_constraintBottom_toTopOf="@+id/tvBookPrompt"
         app:layout_constraintEnd_toEndOf="parent"
@@ -109,7 +109,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="Event Date"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvEventTitle" />
@@ -118,11 +118,10 @@
         android:id="@+id/tvNumGuests"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:text="num RSVPs"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDistance" />
+        app:layout_constraintBottom_toBottomOf="@+id/tvDate"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
