@@ -18,7 +18,10 @@ import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +46,10 @@ public class EventDetailsActivity extends AppCompatActivity {
     RecyclerView rvEventDetails;
     @BindView(R.id.btRequest)
     Button btRequest;
+    @BindView(R.id.tvNumGuests)
+    TextView tvNumGuests;
+    @BindView(R.id.tvDate)
+    TextView tvDate;
 
     private Event currentEvent;
     private EventDetailsAdapter eventDetailsAdapter;
@@ -86,6 +93,15 @@ public class EventDetailsActivity extends AppCompatActivity {
 
                     List<String> cuisineTags = event.getTags();
                     tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
+
+                    int numGuests;
+                    List<ParseUser> accepted = event.getAcceptedGuestsList();
+                    if(accepted != null) {
+                        numGuests = accepted.size();
+                    } else {
+                        numGuests = 0;
+                    }
+                    tvNumGuests.setText(String.format(Locale.getDefault(), "%s/%s slots filled", numGuests, event.getMaxGuests()));
 
                     }
                 else {
