@@ -271,11 +271,6 @@ public class Event extends ParseObject {
             return this;
         }
 
-        public Query getClosest(ParseGeoPoint location) {
-            whereWithinMiles(KEY_ADDRESS, location, MAX_DISTANCE);
-            return this;
-        }
-
         public Query notFilled(int guestArraySize) {
             whereNotEqualTo(KEY_MAX_GUESTS, guestArraySize);
             return this;
