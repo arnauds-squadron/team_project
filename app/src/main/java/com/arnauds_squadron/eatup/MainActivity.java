@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements
         viewPager.setAdapter(pagerAdapter);
 
         // All the tabs in this viewpager will be loaded (4 neighboring tabs)
-        viewPager.setOffscreenPageLimit(4);
+        viewPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
 
         // Start on the HomeFragment
         viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);

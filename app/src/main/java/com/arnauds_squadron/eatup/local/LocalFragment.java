@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +14,14 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
-import com.arnauds_squadron.eatup.local.setup.StartFragment;
+import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.navigation.NoSwipingPagerAdapter;
+import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
@@ -39,21 +40,24 @@ public class LocalFragment extends Fragment implements
         ReviewFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.frameLayout)
-    NoSwipingPagerAdapter setupViewPager;
+    NoSwipingViewPager viewPager;
 
-    // Listener that communicates with the parent activity to switch back to the HomeFragment
-    // when the event is finally created
     private OnFragmentInteractionListener mListener;
+
+    private SetupFragmentPagerAdapter setupAdapter;
     // The local event variable that is updated as the user creates their event
     private Event event;
+    private boolean usingRecentEvent;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_local, container, false);
         ButterKnife.bind(this, view);
-        // Set the viewpager's adapter so that it can display the setup fragments
-        setupViewPager.setAdapter(new SetupFragmentPagerAdapter(getChildFragmentManager()));
+        // Set the viewpager's setupAdapter so that it can display the setup fragments
+        setupAdapter = new SetupFragmentPagerAdapter(getChildFragmentManager());
+        viewPager.setAdapter(setupAdapter);
+        viewPager.setOffscreenPageLimit(setupAdapter.getCount() - 1);
         return view;
     }
 
@@ -80,6 +84,7 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void startEventCreation() {
+        usingRecentEvent = false;
         advanceViewPager();
     }
 
@@ -154,17 +159,29 @@ public class LocalFragment extends Fragment implements
         });
     }
 
-    // TODO: move get current user to new thread
-    // TODO: add accepted guests immediately after being accepted
+    /**
+     * Takes the selected event by the user and switches to the ReviewFragment so the user can
+     * create the event as soon as possible.
+     *
+     * @param event The event they want to replicate.
+     */
+    public void useRecentEvent(Event event) {
+        this.event = event;
+        usingRecentEvent = true;
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        viewPager.setCurrentItem(setupAdapter.getCount() - 1, false);
+    }
 
     /**
      * Creates the event's chat once the create event button is hit
+     *
      * @param eventTitle The title of the new event
      */
     private void createEventChat(String eventTitle) {
         final Chat chat = new Chat();
         chat.setName(eventTitle + " Chat");
-        chat.addMember(ParseUser.getCurrentUser().getObjectId());
+        chat.addMember(Constants.CURRENT_USER.getObjectId());
 
         // TODO: ensure not null
         if (event.getEventImage() != null)
@@ -174,7 +191,7 @@ public class LocalFragment extends Fragment implements
             @Override
             public void done(ParseException e) {
                 if (e == null) { // Register chat to the current event
-                    event.addChat(chat);
+                    event.setChat(chat);
                     event.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -202,10 +219,13 @@ public class LocalFragment extends Fragment implements
      * item
      */
     public boolean onBackPressed() {
-        if (setupViewPager.getCurrentItem() == 0) {
+        if (viewPager.getCurrentItem() == 0) {
             return false;
         } else {
-            setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() - 1);
+            if (usingRecentEvent)
+                viewPager.setCurrentItem(0, false);
+            else
+                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
             return true;
         }
     }
@@ -214,14 +234,14 @@ public class LocalFragment extends Fragment implements
      * Method to be called by the parent activity to reset the setup viewpager to the start fragment
      */
     public void resetSetupViewPager() {
-        setupViewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(0);
     }
 
     /**
      * Moves the pager one fragment forward
      */
     private void advanceViewPager() {
-        setupViewPager.setCurrentItem(setupViewPager.getCurrentItem() + 1);
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
     }
 
 

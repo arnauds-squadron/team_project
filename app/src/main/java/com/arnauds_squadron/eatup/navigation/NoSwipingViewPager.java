@@ -9,13 +9,13 @@ import android.view.MotionEvent;
  * Child of the ViewPager but prohibits the user from swiping between fragments.
  * Switching between fragments programatically still gives the cool swiping animation
  */
-public class NoSwipingPagerAdapter extends ViewPager {
+public class NoSwipingViewPager extends ViewPager {
 
-    public NoSwipingPagerAdapter(Context context) {
+    public NoSwipingViewPager(Context context) {
         super(context);
     }
 
-    public NoSwipingPagerAdapter(Context context, AttributeSet attrs) {
+    public NoSwipingViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
