@@ -17,4 +17,8 @@
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
         <item name="android:textStyle" >bold</item>
     </style>
+    <style name="spinner_dropdown_style1" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">#507B91</item>
+    </style>
 </resources>
