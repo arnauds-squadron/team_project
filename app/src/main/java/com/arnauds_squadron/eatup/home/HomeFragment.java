@@ -11,6 +11,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -22,7 +26,10 @@ import com.parse.ParseException;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +43,8 @@ public class HomeFragment extends Fragment {
     @BindView(R.id.rvAgenda)
     RecyclerView rvAgenda;
 
+    @BindView(R.id.spinner)
+    Spinner spinner;
     private OnFragmentInteractionListener mListener;
     private List<Event> agenda;
     private HomeAdapter homeAdapter;
@@ -47,7 +56,7 @@ public class HomeFragment extends Fragment {
     private Runnable refreshEventsRunnable = new Runnable() {
         @Override
         public void run() {
-            refreshEventsAsync();
+//            refreshEventsAsync(0);
             updateHandler.postDelayed(this, Constants.EVENT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -70,10 +79,34 @@ public class HomeFragment extends Fragment {
         layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(getContext(), R.array.date, R.layout.spinner_item1);
+        spinner.setAdapter(adapter);
+        String value = spinner.getSelectedItem().toString();
+        setSpinnerToValue(spinner, value);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                refreshEventsAsync(position);
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         startUpdatingEvents();
     }
-
+    public void setSpinnerToValue(Spinner spinner, String value) {
+        int index = 0;
+        SpinnerAdapter spinnerAdapter = spinner.getAdapter();
+        for (int i = 0; i < spinnerAdapter.getCount(); i++) {
+            if (spinnerAdapter.getItem(i).equals(value)) {
+                index = i;
+                break; // terminate loop
+            }
+        }
+        spinner.setSelection(index);
+    }
     /**
      * Attaches the listener to the MainActivity
      */
@@ -92,37 +125,51 @@ public class HomeFragment extends Fragment {
      * Fetches all events from the Parse server and filters if the current user is the host
      * or is an accepted guest
      */
-    public void refreshEventsAsync() {
+    public void refreshEventsAsync(int filterType) {
         // List that represents the timeline if it were to be updates. The timeline only updates
         // when this list is different from the current timeline.
         final List<Event> tempEvents = new ArrayList<>();
 
         final String userId = Constants.CURRENT_USER.getObjectId();
         final Event.Query query = new Event.Query();
-        query.withHost().notRated(Constants.CURRENT_USER).orderByDescending("createdAt");
+
+        Date date = Calendar.getInstance(TimeZone.getDefault()).getTime();
+
+        if(filterType == 1) {
+            query.getOlder(date).notRated(Constants.CURRENT_USER);
+        } else if (filterType == 2) {
+            query.getAvailable(date).notRated(Constants.CURRENT_USER);
+        } else{
+            query.withHost().notRated(Constants.CURRENT_USER).orderByDescending("createdAt");
+
+        }
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
-                    for (final Event event : objects) {
-                        final JSONArray guests = event.getAcceptedGuests();
-                        String hostId = event.getHost().getObjectId();
-                        if (userId.equals(hostId) || (guests != null &&
-                                guests.toString().contains(userId)))
-                            tempEvents.add(event);
-                    }
-                    if (tempEvents.size() != agenda.size()) { // Only update if events changed
-                        agenda.clear();
-                        agenda.addAll(tempEvents);
-                        homeAdapter.notifyDataSetChanged();
-                    }
+                        for (final Event event : objects) {
+                            final JSONArray guests = event.getAcceptedGuests();
+                            String hostId = event.getHost().getObjectId();
+                            if (userId.equals(hostId) || (guests != null &&
+                                    guests.toString().contains(userId)))
+                                tempEvents.add(event);
+                        }
+                        if (tempEvents.size() != agenda.size()) { // Only update if events changed
+                            agenda.clear();
+                            agenda.addAll(tempEvents);
+                            homeAdapter.notifyDataSetChanged();
+                        }
+
                 } else {
                     e.printStackTrace();
                 }
             }
         });
     }
-
+//
+//    public void sortedDates(List<Event> objects) {
+//
+//    }
     /**
      * Called by the HomeAdapter to open an event's chat
      */
@@ -143,7 +190,7 @@ public class HomeFragment extends Fragment {
      */
     private void startUpdatingEvents() {
         // TODO: change to progress bar in the middle?
-        refreshEventsAsync();
+//        refreshEventsAsync(0);
 
         if (!refreshRunnableNotStarted) { // only one runnable
             refreshEventsRunnable.run();

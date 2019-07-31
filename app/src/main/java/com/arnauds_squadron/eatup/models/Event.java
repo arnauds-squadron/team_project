@@ -15,6 +15,7 @@ import com.parse.SaveCallback;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -273,6 +274,10 @@ public class Event extends ParseObject {
 
         public Query getOlder(Date maxId) {
             whereLessThan(KEY_DATE, maxId);
+            return this;
+        }
+        public Query getAvailable(Date date) {
+            whereGreaterThan(KEY_DATE, date);
             return this;
         }
 

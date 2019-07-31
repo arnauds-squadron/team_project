@@ -56,7 +56,7 @@
     <string name="calendar_icon_text">Calendar</string>
     <string name="clock_icon_text">Clock</string>
     <string name="event_creation_copy_event">Copy event</string>
-
+    <string name="date_choice">Which dates</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />
