@@ -37,6 +37,7 @@ public class Event extends ParseObject {
     private static final Double MAX_DISTANCE = 10.0;
     private static final String YELP_ID = "yelpRestaurantId";
     private static final String KEY_CREATED_AT = "createdAt";
+    private static final String KEY_IS_FILLED = "isFilled";
 
     public static Event copyEvent(Event oldEvent) {
         Event newEvent = new Event();
@@ -172,10 +173,17 @@ public class Event extends ParseObject {
         return getString(YELP_ID);
     }
 
-    private void setYelpId(String yelpId) {
+    public void setYelpId(String yelpId) {
         put(YELP_ID, yelpId);
     }
 
+    public boolean getIsFilled() {
+        return getBoolean(KEY_IS_FILLED);
+    }
+
+    public void setIsFilled() {
+        put(KEY_IS_FILLED, true);
+    }
     /**
      * Adds the user to this event's pending guests lists, and they must be accepted or denied
      * later by the host
@@ -214,11 +222,15 @@ public class Event extends ParseObject {
         List<ParseUser> tempList = new ArrayList<>();
         tempList.add(user);
         removeAll(KEY_PENDING_GUESTS, tempList);
+        int guestSize = getAcceptedGuestsList().size();
 
         if (isAccepted) {
             if (getAcceptedGuests() == null)
                 put(KEY_ACCEPTED_GUESTS, new JSONArray());
             add(KEY_ACCEPTED_GUESTS, user);
+            if (getMaxGuests() == guestSize + 1) {
+                setIsFilled();
+            }
         }
     }
 
@@ -266,8 +278,8 @@ public class Event extends ParseObject {
             return this;
         }
 
-        public Query notFilled(int guestArraySize) {
-            whereNotEqualTo(KEY_MAX_GUESTS, guestArraySize);
+        public Query notFilled() {
+            whereNotEqualTo(KEY_IS_FILLED, false);
             return this;
         }
     }
