@@ -82,6 +82,8 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvEventName;
         @BindView(R.id.tvHostName)
         TextView tvHostName;
+        @BindView(R.id.tvDate)
+        TextView tvDate;
         @BindView(R.id.tvTags)
         TextView tvCuisine;
         @BindView(R.id.tvDistance)
@@ -137,6 +139,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             tvEventName.setText(event.getTitle());
             tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
             tvHostName.setTag(event.getHost());
+            tvDate.setText(event.getDateString(context));
 
             // load user rating
             ParseQuery<Rating> query = new Rating.Query();

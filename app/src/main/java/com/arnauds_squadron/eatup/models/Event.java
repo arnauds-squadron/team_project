@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup.models;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.parse.ParseClassName;
@@ -16,6 +17,10 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateWithMonthNames;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 
 @ParseClassName("Event")
 public class Event extends ParseObject {
@@ -70,6 +75,12 @@ public class Event extends ParseObject {
 
     public Date getDate() {
         return getDate(KEY_DATE);
+    }
+
+    public String getDateString(Context context) {
+        Date eventDate = getDate(KEY_DATE);
+        String formattedDate = String.format(Locale.getDefault(), "%s, %s", formatDateWithMonthNames(eventDate), formatTime(eventDate, context));
+        return formattedDate;
     }
 
     public void setDate(Date date) {
@@ -279,7 +290,7 @@ public class Event extends ParseObject {
         }
 
         public Query notFilled() {
-            whereNotEqualTo(KEY_IS_FILLED, false);
+            whereEqualTo(KEY_IS_FILLED, false);
             return this;
         }
     }

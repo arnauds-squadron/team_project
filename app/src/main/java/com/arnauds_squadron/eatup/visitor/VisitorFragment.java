@@ -89,8 +89,6 @@ public class VisitorFragment extends Fragment {
     TextView tvCurrentLocation;
     @BindView(R.id.tvPrevLocation1)
     TextView tvPrevLocation1;
-    @BindView(R.id.tvPrevLocation2)
-    TextView tvPrevLocation2;
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
 
@@ -195,7 +193,6 @@ public class VisitorFragment extends Fragment {
 
         // TODO tag previous locations with latitude and longitude. default (0, 0)
         tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
-        tvPrevLocation2.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
 
         // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -242,7 +239,7 @@ public class VisitorFragment extends Fragment {
     }
 
 
-    @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1, R.id.tvPrevLocation2})
+    @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1})
     public void searchLocation(TextView tvLocation) {
         // TODO search the event database by current location. currently sends the lat/long data to SearchActivity
         Intent i = new Intent(getActivity(), VisitorSearchActivity.class);

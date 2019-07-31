@@ -30,6 +30,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateWithFullMonth;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
+
 
 public class EventDetailsActivity extends AppCompatActivity {
 
@@ -90,6 +93,10 @@ public class EventDetailsActivity extends AppCompatActivity {
                     indefinitePagerIndicator.attachToRecyclerView(rvEventDetails);
 
                     tvEventTitle.setText(event.getTitle());
+                    tvDate.setText(String.format(Locale.getDefault(),
+                            "%s on %s",
+                            formatTime(event.getDate(), EventDetailsActivity.this),
+                            formatDateWithFullMonth(event.getDate())));
 
                     List<String> cuisineTags = event.getTags();
                     tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
