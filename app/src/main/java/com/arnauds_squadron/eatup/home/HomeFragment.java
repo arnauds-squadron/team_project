@@ -99,7 +99,7 @@ public class HomeFragment extends Fragment {
 
         final String userId = Constants.CURRENT_USER.getObjectId();
         final Event.Query query = new Event.Query();
-        query.withHost().orderByDescending("createdAt");
+        query.withHost().notRated(Constants.CURRENT_USER).orderByDescending("createdAt");
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {

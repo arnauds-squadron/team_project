@@ -1,13 +1,20 @@
 package com.arnauds_squadron.eatup;
 
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
@@ -23,6 +30,7 @@ public class RateUserActivity extends AppCompatActivity {
 
     @BindView(R.id.rvUsers)
     RecyclerView rvUsers;
+    private Event event;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +38,7 @@ public class RateUserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_rate_user);
         ButterKnife.bind(this);
 
-        Event event = getIntent().getParcelableExtra("event");
+        event = getIntent().getParcelableExtra("event");
         String ratingType = getIntent().getStringExtra("ratingType");
         ParseUser eventHost = event.getHost();
 
@@ -55,5 +63,21 @@ public class RateUserActivity extends AppCompatActivity {
         }
         rateUserAdapter.notifyDataSetChanged();
         rvUsers.setAdapter(rateUserAdapter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        event.ratingSubmitted(Constants.CURRENT_USER);
+        event.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(getApplicationContext(), "Ratings complete.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Error saving ratings.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

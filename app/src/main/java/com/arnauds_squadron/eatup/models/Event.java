@@ -43,6 +43,7 @@ public class Event extends ParseObject {
     private static final String YELP_ID = "yelpRestaurantId";
     private static final String KEY_CREATED_AT = "createdAt";
     private static final String KEY_IS_FILLED = "isFilled";
+    private static final String KEY_NO_RATING = "noRatingSubmitted";
 
     public static Event copyEvent(Event oldEvent) {
         Event newEvent = new Event();
@@ -152,6 +153,10 @@ public class Event extends ParseObject {
         return getList(KEY_ACCEPTED_GUESTS);
     }
 
+    public JSONArray getNoRatingSubmitted() {
+        return getJSONArray(KEY_NO_RATING);
+    }
+
     public int getMaxGuests() {
         return getInt(KEY_MAX_GUESTS);
     }
@@ -237,12 +242,21 @@ public class Event extends ParseObject {
 
         if (isAccepted) {
             if (getAcceptedGuests() == null)
-                put(KEY_ACCEPTED_GUESTS, new JSONArray());
+                { put(KEY_ACCEPTED_GUESTS, new JSONArray()); }
             add(KEY_ACCEPTED_GUESTS, user);
+            if (getNoRatingSubmitted() == null)
+                { put (KEY_NO_RATING, new JSONArray()); }
+            add(KEY_NO_RATING, user);
             if (getMaxGuests() == guestSize + 1) {
                 setIsFilled();
             }
         }
+    }
+
+    public void ratingSubmitted(ParseUser user) {
+        List<ParseUser> tempList = new ArrayList<>();
+        tempList.add(user);
+        removeAll(KEY_NO_RATING, tempList);
     }
 
     // inner class to query event model
@@ -291,6 +305,11 @@ public class Event extends ParseObject {
 
         public Query notFilled() {
             whereEqualTo(KEY_IS_FILLED, false);
+            return this;
+        }
+
+        public Query notRated(ParseUser user) {
+            whereEqualTo(KEY_NO_RATING, user);
             return this;
         }
     }
