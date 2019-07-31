@@ -46,7 +46,10 @@ public class Event extends ParseObject {
         newEvent.setTitle(oldEvent.getTitle());
         newEvent.setHost(oldEvent.getHost());
         newEvent.setAddress(oldEvent.getAddress());
-        newEvent.setAddressString(oldEvent.getAddressString());
+        // TODO: ensure not null
+        if(oldEvent.getAddressString() != null)
+            newEvent.setAddressString(oldEvent.getAddressString());
+
         newEvent.setTags(oldEvent.getTags());
         newEvent.setAcceptedGuests(new JSONArray());
         newEvent.setMaxGuests(oldEvent.getMaxGuests());
@@ -104,14 +107,6 @@ public class Event extends ParseObject {
 
     public void setAddressString(String address) {
         put(KEY_ADDRESS_STRING, address);
-    }
-
-    public String getDescription() {
-        return getString(KEY_DESCRIPTION);
-    }
-
-    public void setDescription(String description) {
-        put(KEY_DESCRIPTION, description);
     }
 
     public List<String> getTags() {

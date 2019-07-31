@@ -22,6 +22,8 @@ public final class Constants {
     public static final String GUEST = "guest";
     public static final String HOST = "host";
     public static final float NO_RATING = 0f;
+    // Maximum number of guests
+    public static final int MAX_GUESTS = 100;
 
     // search constants
     public static final String SEARCH_CATEGORY = "searchCategory";
@@ -32,7 +34,6 @@ public final class Constants {
 
     // Update speed to refresh messages: 1 second
     public static final int CHAT_UPDATE_SPEED_MILLIS = 2000;
-
     // Update speed to refresh events: 5 seconds
     public static final int EVENT_UPDATE_SPEED_MILLIS = 5000;
 
