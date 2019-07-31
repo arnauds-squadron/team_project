@@ -27,7 +27,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-
 /**
  * Fragment that asks the user to input the date and time of their event through a series of
  * input dialogs.
@@ -45,7 +44,6 @@ public class DateFragment extends Fragment {
 
     @BindView(R.id.ivClock)
     ImageView clock;
-
 
     private OnFragmentInteractionListener mListener;
     // Calendar object that holds the date and time that the user selects

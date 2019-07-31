@@ -109,6 +109,10 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * By clicking on the number of guests or the guest icon, the user can increase the max number
+     * of guests by 1
+     */
     @OnClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
     public void addGuest() {
         int newAmount = Integer.parseInt(tvMaxGuests.getText().toString()) + 1;
@@ -119,6 +123,12 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * // TODO: replace with textview to input text
+     * On a long click on the number of guests or the guests icon, the user can decrease the
+     * max number of guests by 1
+     * @return true
+     */
     @OnLongClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
     public boolean removeGuest() {
         int newAmount = Integer.parseInt(tvMaxGuests.getText().toString()) - 1;
@@ -130,16 +140,25 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         return true;
     }
 
+    /**
+     * Toggles between adult only and open for all
+     */
     @OnCheckedChanged(R.id.cbOver21)
     public void update21() {
         event.setOver21(cbOver21.isChecked());
     }
 
+    /**
+     * Navigates to the AddressFragment when the user clicks on the address string
+     */
     @OnClick(R.id.tvAddress)
     public void updateAddress() {
         mListener.updateAddress();
     }
 
+    /**
+     * Navigates to the DateFragment when either the images or TextViews are clicked
+     */
     @OnClick({R.id.tvSelectedDate, R.id.tvSelectedTime, R.id.ivCalendar, R.id.ivClock})
     public void updateDate() {
         mListener.updateDate();
@@ -206,8 +225,16 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
          */
         void createEvent(String eventTitle);
 
+        /**
+         * Notifies the parent LocalFragment to go back to the AddressFragment so the user can
+         * update the address of the event
+         */
         void updateAddress();
 
+        /**
+         * Notifies the parent LocalFragment to go back to the DateFragment so the user can
+         * update the date of the event
+         */
         void updateDate();
     }
 }
