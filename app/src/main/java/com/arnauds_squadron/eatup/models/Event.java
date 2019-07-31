@@ -265,5 +265,10 @@ public class Event extends ParseObject {
             include("host");
             return this;
         }
+
+        public Query notFilled(int guestArraySize) {
+            whereNotEqualTo(KEY_MAX_GUESTS, guestArraySize);
+            return this;
+        }
     }
 }
