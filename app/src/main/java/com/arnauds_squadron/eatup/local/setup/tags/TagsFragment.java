@@ -32,8 +32,6 @@ import butterknife.OnClick;
  */
 public class TagsFragment extends Fragment {
 
-    private final static int MAX_GUESTS = 100;
-
     @BindView(R.id.tvEventFoodType)
     AutoCompleteTextView tvEventFoodType;
 
@@ -172,7 +170,7 @@ public class TagsFragment extends Fragment {
      */
     private void setUpNumberPicker() {
         npMaxGuests.setMinValue(1);
-        npMaxGuests.setMaxValue(MAX_GUESTS);
+        npMaxGuests.setMaxValue(Constants.MAX_GUESTS);
         npMaxGuests.setWrapSelectorWheel(false);
     }
 

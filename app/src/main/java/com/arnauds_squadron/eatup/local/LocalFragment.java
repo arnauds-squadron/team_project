@@ -160,6 +160,27 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
+     * Overrides the ReviewFragment interface
+     *
+     * Moves the ViewPager to the AddressFragment so the user can update the address of their meal
+     */
+    @Override
+    public void updateAddress() {
+        retreatViewPager();
+        retreatViewPager();
+    }
+
+    /**
+     * Overrides the ReviewFragment interface
+     *
+     * Moves the ViewPager to the DateFragment so the user can update the date
+     */
+    @Override
+    public void updateDate() {
+        retreatViewPager();
+    }
+
+    /**
      * Takes the selected event by the user and switches to the ReviewFragment so the user can
      * create the event as soon as possible.
      *
@@ -171,6 +192,32 @@ public class LocalFragment extends Fragment implements
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         viewPager.setCurrentItem(setupAdapter.getCount() - 1, false);
+    }
+
+    /**
+     * Method to be called by the parent activity to handle back presses. Moves the pager one
+     * fragment backwards if possible
+     *
+     * @return true if the view pager was moved backwards, false if we were already on the first
+     * item
+     */
+    public boolean onBackPressed() {
+        if (viewPager.getCurrentItem() == 0) {
+            return false;
+        } else {
+            if (usingRecentEvent)
+                viewPager.setCurrentItem(0, false);
+            else
+                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+            return true;
+        }
+    }
+
+    /**
+     * Method to be called by the parent activity to reset the setup viewpager to the start fragment
+     */
+    public void resetSetupViewPager() {
+        viewPager.setCurrentItem(0);
     }
 
     /**
@@ -212,29 +259,10 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
-     * Method to be called by the parent activity to handle back presses. Moves the pager one
-     * fragment backwards if possible
-     *
-     * @return true if the view pager was moved backwards, false if we were already on the first
-     * item
+     * Moves the pager one fragment backward
      */
-    public boolean onBackPressed() {
-        if (viewPager.getCurrentItem() == 0) {
-            return false;
-        } else {
-            if (usingRecentEvent)
-                viewPager.setCurrentItem(0, false);
-            else
-                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
-            return true;
-        }
-    }
-
-    /**
-     * Method to be called by the parent activity to reset the setup viewpager to the start fragment
-     */
-    public void resetSetupViewPager() {
-        viewPager.setCurrentItem(0);
+    private void retreatViewPager() {
+        viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
     }
 
     /**
@@ -243,7 +271,6 @@ public class LocalFragment extends Fragment implements
     private void advanceViewPager() {
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
     }
-
 
     /**
      * Interface to communicate with the parent activity so the HomeFragment is navigated to

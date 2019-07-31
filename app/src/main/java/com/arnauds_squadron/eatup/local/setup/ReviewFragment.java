@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.utils.UIHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,7 +28,9 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 /**
  * Fragment that displays all the selected fields and will create the event when confirmed
@@ -106,6 +109,42 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    @OnClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
+    public void addGuest() {
+        int newAmount = Integer.parseInt(tvMaxGuests.getText().toString()) + 1;
+        if (newAmount < Constants.MAX_GUESTS) {
+            String text = Integer.toString(newAmount);
+            event.setMaxGuests(newAmount);
+            tvMaxGuests.setText(text);
+        }
+    }
+
+    @OnLongClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
+    public boolean removeGuest() {
+        int newAmount = Integer.parseInt(tvMaxGuests.getText().toString()) - 1;
+        if (newAmount > 0) {
+            String text = Integer.toString(newAmount);
+            event.setMaxGuests(newAmount);
+            tvMaxGuests.setText(text);
+        }
+        return true;
+    }
+
+    @OnCheckedChanged(R.id.cbOver21)
+    public void update21() {
+        event.setOver21(cbOver21.isChecked());
+    }
+
+    @OnClick(R.id.tvAddress)
+    public void updateAddress() {
+        mListener.updateAddress();
+    }
+
+    @OnClick({R.id.tvSelectedDate, R.id.tvSelectedTime, R.id.ivCalendar, R.id.ivClock})
+    public void updateDate() {
+        mListener.updateDate();
+    }
+
     /**
      * Communicates with the LocalFragment with the listener to create the event with the
      * given event name. Requires the name to not be empty or just spaces.
@@ -166,5 +205,9 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
          * Method that triggers the event creation method in the parent fragment
          */
         void createEvent(String eventTitle);
+
+        void updateAddress();
+
+        void updateDate();
     }
 }
