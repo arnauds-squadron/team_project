@@ -33,10 +33,8 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATING_HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS_HOST;
 
 public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
@@ -57,7 +55,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int ViewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View eventView = inflater.inflate(R.layout.search_event_linear, parent, false);
+        View eventView = inflater.inflate(R.layout.search_event_grid, parent, false);
         return new ViewHolder(eventView);
     }
 

@@ -25,9 +25,9 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
 
     private final int[] tabIcons = {
             R.drawable.chat_tab,
-            R.drawable.host_create_tab,
+            R.drawable.local_tab,
             R.drawable.home_tab,
-            R.drawable.visitor_meal_tab,
+            R.drawable.visitor_tab,
             R.drawable.profile_tab
     };
 

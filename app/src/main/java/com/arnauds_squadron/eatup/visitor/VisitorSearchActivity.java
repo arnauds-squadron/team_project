@@ -17,6 +17,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -186,8 +187,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // Initialize data source for events recyclerview
         mEvents = new ArrayList<>();
         // RecyclerView setup
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        rvEvents.setLayoutManager(linearLayoutManager);
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+//        rvEvents.setLayoutManager(linearLayoutManager);
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1);
+        rvEvents.setLayoutManager(gridLayoutManager);
 
         Double currentLatitude = getIntent().getDoubleExtra("latitude", 0);
         Double currentLongitude = getIntent().getDoubleExtra("longitude", 0);
@@ -217,7 +221,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
         // load data entries
         // retain instance so can call "resetStates" for fresh searches
-        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Date maxEventId = getMaxDate();
