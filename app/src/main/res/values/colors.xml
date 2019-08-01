@@ -2,19 +2,21 @@
 <resources>
     <color name="colorPrimary">#000000</color>
     <!--status bar-->
-    <color name="colorPrimaryDark">#D81B41</color>
+    <color name="colorPrimaryDark">@color/toast_red</color>
     <!--calendar-->
-    <color name="colorAccent">#D81B41</color>
+    <color name="colorAccent">@color/toast_red</color>
     <color name="bottom_black">#333333</color>
     <color name="bottom_gray">#666666</color>
-    <color name="view_background">#FAFAFA</color>
 
     <!--Eat up custom colors-->
-    <color name="widget_red">#CC0000</color>
-    <color name="notification_red">#FF0000</color>
-    <color name="notification_white">#FFFFFF</color>
-    <color name="toolbar">@color/view_background</color>
+    <color name="toast_red">#D81B34</color>
+    <color name="view_background">#FAFAFA</color>
     <color name="accept_button_tint">#86db9a</color>
     <color name="deny_button_tint">#db8686</color>
+
+    <!--Helpful colors-->
+    <color name="transparent">#00FFFFFF></color>
+    <color name="red">#FF0000</color>
+    <color name="white">#FFFFFF</color>
 
 </resources>
