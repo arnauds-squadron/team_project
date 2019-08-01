@@ -27,6 +27,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <activity android:name=".profile.VisitorProfileActivity"></activity>
         <activity android:name=".RateUserActivity" />
         <activity android:name=".profile.ProfileImageActivity" />
         <activity android:name=".event_details.EventDetailsRestaurantActivity" />
@@ -66,8 +67,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity
-            android:name=".MainActivity" />
+        <activity android:name=".MainActivity" />
         <activity
             android:name=".login.LoginActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">

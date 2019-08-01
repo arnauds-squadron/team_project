@@ -103,22 +103,11 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
         TextView tvUserName;
         @BindView(R.id.userRatingBar)
         RatingBar userRatingBar;
-        @BindView(R.id.btSubmitRating)
-        Button btSubmitRating;
 
         VH(View itemView, final Context context) {
             super(itemView);
             rootView = itemView;
             ButterKnife.bind(this, itemView);
-
-            btSubmitRating.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    submitRating(context, (ParseUser) rootView.getTag(), userRatingBar.getRating(), ratingType);
-                    btSubmitRating.setText("Rating submitted");
-                    btSubmitRating.setOnClickListener(null);
-                }
-            });
 
             userRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                 @Override
