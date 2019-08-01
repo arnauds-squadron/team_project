@@ -9,19 +9,27 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 
 /**
  * Fragment that displays the list of active chats the user is part of
@@ -34,9 +42,15 @@ public class ChatDashboardFragment extends Fragment {
     @BindView(R.id.rvChats)
     RecyclerView rvChats;
 
+    @BindView(R.id.ivProfile)
+    ImageView ivProfile;
+
     private OnFragmentInteractionListener mListener;
     private List<Chat> chatList;
     private ChatDashboardAdapter chatAdapter;
+
+    // Variable to keep track of the newest updated chat so we don't always reload the views
+    private Chat newestChat;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,15 +59,24 @@ public class ChatDashboardFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chat_dashboard, container, false);
+        final View view = inflater.inflate(R.layout.fragment_chat_dashboard, container, false);
         ButterKnife.bind(this, view);
+
+        Constants.CURRENT_USER.fetchInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                Glide.with(ChatDashboardFragment.this)
+                        .load(object.getParseFile(KEY_PROFILE_PICTURE).getUrl())
+                        .transform(new CircleCrop())
+                        .into(ivProfile);
+            }
+        });
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Your code to refresh the list here.
                 getChatsAsync();
             }
         });
@@ -104,17 +127,22 @@ public class ChatDashboardFragment extends Fragment {
      * Queries the ParseServer for all the chats that the current user is a member of, adding
      * them to the chatList and notifying the adapter
      */
+    // TODO: update constantly and show the newest message on the dashboard screen
     public void getChatsAsync() {
         Chat.Query query = new Chat.Query();
-        String userId = Constants.CURRENT_USER.getObjectId();
-        query.newestFirst().matchesUserId(userId).findInBackground(new FindCallback<Chat>() {
+        ParseUser user = Constants.CURRENT_USER;
+        query.newestFirst().matchesUser(user).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
-                if (e == null) {
-                    chatList.clear();
-                    chatList.addAll(objects);
-                    chatAdapter.notifyDataSetChanged();
-                } else {
+                if (e == null && objects != null && objects.size() > 0 ) {
+                    if (newestChat == null ||
+                            !objects.get(0).getObjectId().equals(newestChat.getObjectId())) {
+                        chatList.clear();
+                        chatList.addAll(objects);
+                        chatAdapter.notifyDataSetChanged();
+                        newestChat = objects.get(0);
+                    }
+                } else if (e != null) {
                     Toast.makeText(getActivity(), "Could not load chats",
                             Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
