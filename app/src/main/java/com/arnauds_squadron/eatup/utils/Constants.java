@@ -45,6 +45,9 @@ public final class Constants {
     // The logged in user, only changed in the login activity
     public static ParseUser CURRENT_USER;
 
+    // Channel id for push notifications
+    public final static String CHANNEL_ID = "Toast";
+
     // hardcoded category suggestions for search
     public static final String[] CATEGORY_TITLE = {"Acai Bowls",
             "Afghan",

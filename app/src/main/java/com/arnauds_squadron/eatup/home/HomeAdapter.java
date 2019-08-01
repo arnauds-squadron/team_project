@@ -1,9 +1,15 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
@@ -27,11 +34,14 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.arnauds_squadron.eatup.utils.Constants.CHANNEL_ID;
+import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
 import static com.arnauds_squadron.eatup.utils.Constants.HOST;
 
@@ -137,12 +147,35 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     /**
      * Queries the Parse Server to get the list of pending request for this particular event
      */
+
     private void getPendingRequests(Event event) {
         List<ParseUser> pending = event.getPendingRequests();
+        String eventTitle = event.getTitle();
         if (pending != null && pending.size() > requests.size()) {
             requests.clear();
             requests.addAll(pending);
             requestAdapter.notifyItemRangeInserted(0, pending.size());
+
+            // create notifications for each of the pending requests
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+//            Intent intent = new Intent(this, MainActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+            for (int i = 0; i < pending.size(); i++) {
+                // notificationId is a unique int for each notification that you must define
+                int notificationId = i;
+                String contentText = String.format(Locale.getDefault(), "You have a new request to join %s!", eventTitle);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                        // TODO replace with Toast's logo
+                        .setSmallIcon(R.drawable.ic_home)
+                        .setContentTitle("New request to join event")
+                        .setContentText(contentText)
+//                        .setContentIntent(pendingIntent)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true);
+                notificationManager.notify(notificationId, builder.build());
+            }
         }
     }
 
