@@ -22,7 +22,7 @@
     <string name="event_creation_tags_hint">Cuisine</string>
     <string name="event_creation_next_button_text">Next</string>
     <string name="event_creation_review_title">Confirm Your Event</string>
-    <string name="event_creation_start_new_event">Create a new event</string>
+    <string name="event_creation_start_new_event">\ \ \ \ Create a new event\ \ \ \ </string>
     <string name="event_creation_start_title">Set Up Your Event</string>
     <string name="event_creation_time_not_selected">Time not set</string>
     <string name="event_creation_title_caption">And give it a good name!</string>
@@ -57,6 +57,7 @@
     <string name="clock_icon_text">Clock</string>
     <string name="event_creation_copy_event">Copy event</string>
     <string name="date_choice">Which dates</string>
+    <string name="your_recent_events_label">Your Recent Events</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />
