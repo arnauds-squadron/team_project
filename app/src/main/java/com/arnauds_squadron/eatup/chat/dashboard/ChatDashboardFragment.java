@@ -49,6 +49,9 @@ public class ChatDashboardFragment extends Fragment {
     private List<Chat> chatList;
     private ChatDashboardAdapter chatAdapter;
 
+    // Variable to keep track of the newest updated chat so we don't always reload the views
+    private Chat newestChat;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,17 +127,22 @@ public class ChatDashboardFragment extends Fragment {
      * Queries the ParseServer for all the chats that the current user is a member of, adding
      * them to the chatList and notifying the adapter
      */
+    // TODO: update constantly and show the newest message on the dashboard screen
     public void getChatsAsync() {
         Chat.Query query = new Chat.Query();
         ParseUser user = Constants.CURRENT_USER;
         query.newestFirst().matchesUser(user).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
-                if (e == null) {
-                    chatList.clear();
-                    chatList.addAll(objects);
-                    chatAdapter.notifyDataSetChanged();
-                } else {
+                if (e == null && objects != null && objects.size() > 0) {
+                    String newestId = newestChat.getObjectId();
+                    if (newestChat == null || !objects.get(0).getObjectId().equals(newestId)) {
+                        chatList.clear();
+                        chatList.addAll(objects);
+                        chatAdapter.notifyDataSetChanged();
+                        newestChat = objects.get(0);
+                    }
+                } else if (e != null) {
                     Toast.makeText(getActivity(), "Could not load chats",
                             Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
