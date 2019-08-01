@@ -2,6 +2,7 @@ package com.arnauds_squadron.eatup.yelp_api;
 
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Category;
+import com.arnauds_squadron.eatup.models.Location;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

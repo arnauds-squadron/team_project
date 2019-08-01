@@ -46,4 +46,8 @@ public class Business {
     @Expose
     public String price;
 
+    @SerializedName("location")
+    @Expose
+    public Location location;
+
 }

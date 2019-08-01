@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
@@ -24,7 +26,6 @@ import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
-import org.json.JSONException;
 import org.parceler.Parcels;
 
 import butterknife.BindView;
@@ -39,6 +40,9 @@ public class HomeDetailsActivity extends AppCompatActivity {
 
     @BindView(R.id.ivProfile)
     ParseImageView ivProfile;
+
+    @BindView(R.id.ivImage)
+    ImageView ivImage;
 
     @BindView(R.id.cbLegal)
     CheckBox cbLegal;
@@ -58,11 +62,8 @@ public class HomeDetailsActivity extends AppCompatActivity {
     @BindView(R.id.tvYelp)
     TextView tvYelp;
 
-    @BindView(R.id.btnLink)
-    Button btnLink;
-
-    @BindView(R.id.ivImage)
-    ImageView ivImage;
+    @BindView(R.id.ivLink)
+    ImageView ivLink;
 
     private Event event;
     private Context context;
@@ -81,9 +82,9 @@ public class HomeDetailsActivity extends AppCompatActivity {
         // if we have a response, then get the specific information defined in the Business Class
         Call<YelpApiResponse> meetUp = null;
         if (event.getTags() != null){
-            meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().get(0));
+            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().get(0));
         } else {
-            meetUp = YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine());
+            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine());
         }
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the
         // ApiResponse if we have a response, then get the specific information defined in the
@@ -93,6 +94,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 event.getTags().get(0));
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(@NonNull Call<YelpApiResponse> call,
                                    @NonNull retrofit2.Response<YelpApiResponse> response) {
@@ -101,9 +103,12 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     YelpApiResponse yelpApiResponse = response.body();
                     if (yelpApiResponse != null) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
+                        Location location = restaurant.location;
+                        tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
                         tvYelp.setText(restaurant.name);
                         final String url = restaurant.url;
-                        btnLink.setOnClickListener(new View.OnClickListener() {
+
+                        ivLink.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Intent i = new Intent(Intent.ACTION_VIEW);
