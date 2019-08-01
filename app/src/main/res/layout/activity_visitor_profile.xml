@@ -8,7 +8,6 @@
 
     <com.parse.ParseImageView
         android:id="@+id/ivImage"
-        android:transitionName="profileImage"
         android:layout_width="0dp"
         android:layout_height="250dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -18,7 +17,6 @@
 
     <TextView
         android:id="@+id/tvUsername"
-        android:transitionName="hostName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -65,7 +63,6 @@
     <RatingBar
         android:id="@+id/ratingBar"
         style="@style/Widget.AppCompat.RatingBar.Indicator"
-        android:transitionName="hostRating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
