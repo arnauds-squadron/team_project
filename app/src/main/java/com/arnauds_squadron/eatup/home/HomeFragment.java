@@ -1,13 +1,16 @@
 package com.arnauds_squadron.eatup.home;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -79,6 +83,9 @@ public class HomeFragment extends Fragment {
         layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
+        //swipe to delete
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(rvAgenda);
         ArrayAdapter adapter = ArrayAdapter.createFromResource(getContext(), R.array.date, R.layout.spinner_item1);
         spinner.setAdapter(adapter);
         String value = spinner.getSelectedItem().toString();
@@ -166,10 +173,34 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-//
-//    public void sortedDates(List<Event> objects) {
-//
-//    }
+    //swipe to delete
+    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            Toast.makeText(getContext(), "on Move", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder target, int swipeDir) {
+//            Toast.makeText(getContext(), "on Swiped ", Toast.LENGTH_SHORT).show();
+            //Remove swiped item from list and notify the RecyclerView
+            final int position = target.getAdapterPosition();
+            final Event item = agenda.get(position);
+            agenda.remove(position);
+            homeAdapter.notifyDataSetChanged();
+            Snackbar snackbar = Snackbar.make(rvAgenda, "DELETED!", Snackbar.LENGTH_LONG)
+                    .setAction("UNDO", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            agenda.add(position, item);
+                            homeAdapter.notifyDataSetChanged();
+                        }
+                    });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
+    };
+
     /**
      * Called by the HomeAdapter to open an event's chat
      */
