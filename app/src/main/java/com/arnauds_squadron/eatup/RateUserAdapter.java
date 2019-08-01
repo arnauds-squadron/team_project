@@ -2,9 +2,6 @@ package com.arnauds_squadron.eatup;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,12 +13,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Rating;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -110,20 +103,18 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
         TextView tvUserName;
         @BindView(R.id.userRatingBar)
         RatingBar userRatingBar;
-        @BindView(R.id.btSubmitRating)
-        Button btSubmitRating;
 
         VH(View itemView, final Context context) {
             super(itemView);
             rootView = itemView;
             ButterKnife.bind(this, itemView);
 
-            btSubmitRating.setOnClickListener(new View.OnClickListener() {
+            userRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                 @Override
-                public void onClick(View v) {
-                    submitRating(context, (ParseUser) rootView.getTag(), userRatingBar.getRating(), ratingType);
-                    btSubmitRating.setText("Rating submitted");
-                    btSubmitRating.setOnClickListener(null);
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    if(getAdapterPosition() < mUsers.size() - 1) {
+                        rvUsers.smoothScrollToPosition(getAdapterPosition() + 1);
+                    }
                 }
             });
         }

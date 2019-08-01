@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup.models;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.parse.ParseClassName;
@@ -17,6 +18,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateWithMonthNames;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 
 @ParseClassName("Event")
 public class Event extends ParseObject {
@@ -38,6 +43,8 @@ public class Event extends ParseObject {
     private static final Double MAX_DISTANCE = 10.0;
     private static final String YELP_ID = "yelpRestaurantId";
     private static final String KEY_CREATED_AT = "createdAt";
+    private static final String KEY_IS_FILLED = "isFilled";
+    private static final String KEY_NO_RATING = "noRatingSubmitted";
 
     public static Event copyEvent(Event oldEvent) {
         Event newEvent = new Event();
@@ -70,6 +77,12 @@ public class Event extends ParseObject {
 
     public Date getDate() {
         return getDate(KEY_DATE);
+    }
+
+    public String getDateString(Context context) {
+        Date eventDate = getDate(KEY_DATE);
+        String formattedDate = String.format(Locale.getDefault(), "%s, %s", formatDateWithMonthNames(eventDate), formatTime(eventDate, context));
+        return formattedDate;
     }
 
     public void setDate(Date date) {
@@ -141,6 +154,10 @@ public class Event extends ParseObject {
         return getList(KEY_ACCEPTED_GUESTS);
     }
 
+    public JSONArray getNoRatingSubmitted() {
+        return getJSONArray(KEY_NO_RATING);
+    }
+
     public int getMaxGuests() {
         return getInt(KEY_MAX_GUESTS);
     }
@@ -173,10 +190,17 @@ public class Event extends ParseObject {
         return getString(YELP_ID);
     }
 
-    private void setYelpId(String yelpId) {
+    public void setYelpId(String yelpId) {
         put(YELP_ID, yelpId);
     }
 
+    public boolean getIsFilled() {
+        return getBoolean(KEY_IS_FILLED);
+    }
+
+    public void setIsFilled() {
+        put(KEY_IS_FILLED, true);
+    }
     /**
      * Adds the user to this event's pending guests lists, and they must be accepted or denied
      * later by the host
@@ -215,12 +239,25 @@ public class Event extends ParseObject {
         List<ParseUser> tempList = new ArrayList<>();
         tempList.add(user);
         removeAll(KEY_PENDING_GUESTS, tempList);
+        int guestSize = getAcceptedGuestsList().size();
 
         if (isAccepted) {
             if (getAcceptedGuests() == null)
-                put(KEY_ACCEPTED_GUESTS, new JSONArray());
+                { put(KEY_ACCEPTED_GUESTS, new JSONArray()); }
             add(KEY_ACCEPTED_GUESTS, user);
+            if (getNoRatingSubmitted() == null)
+                { put (KEY_NO_RATING, new JSONArray()); }
+            add(KEY_NO_RATING, user);
+            if (getMaxGuests() == guestSize + 1) {
+                setIsFilled();
+            }
         }
+    }
+
+    public void ratingSubmitted(ParseUser user) {
+        List<ParseUser> tempList = new ArrayList<>();
+        tempList.add(user);
+        removeAll(KEY_NO_RATING, tempList);
     }
 
     // inner class to query event model
@@ -251,6 +288,12 @@ public class Event extends ParseObject {
             return this;
         }
 
+        public Query getTopAscending() {
+            setLimit(20);
+            orderByAscending(KEY_DATE);
+            return this;
+        }
+
         public Query ownEvent(ParseUser user) {
             whereEqualTo(KEY_HOST, user);
             return this;
@@ -271,8 +314,13 @@ public class Event extends ParseObject {
             return this;
         }
 
-        public Query notFilled(int guestArraySize) {
-            whereNotEqualTo(KEY_MAX_GUESTS, guestArraySize);
+        public Query notFilled() {
+            whereEqualTo(KEY_IS_FILLED, false);
+            return this;
+        }
+
+        public Query notRated(ParseUser user) {
+            whereEqualTo(KEY_NO_RATING, user);
             return this;
         }
     }

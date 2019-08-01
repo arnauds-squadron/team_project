@@ -27,12 +27,13 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <activity android:name=".profile.VisitorProfileActivity"></activity>
         <activity android:name=".RateUserActivity" />
         <activity android:name=".profile.ProfileImageActivity" />
         <activity android:name=".event_details.EventDetailsRestaurantActivity" />
         <activity android:name=".event_details.EventDetailsActivity" />
         <activity android:name=".login.SignupActivity" />
-        <activity android:name=".profile.ProfileActivity" />
+        <activity android:name=".profile.HostProfileActivity" />
 
         <service
             android:name=".utils.FetchAddressIntentService"
@@ -66,8 +67,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity
-            android:name=".MainActivity" />
+        <activity android:name=".MainActivity" />
         <activity
             android:name=".login.LoginActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">

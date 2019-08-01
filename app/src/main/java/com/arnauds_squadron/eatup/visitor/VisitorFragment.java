@@ -32,11 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.BuildConfig;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -49,9 +48,9 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
+import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -87,12 +86,10 @@ public class VisitorFragment extends Fragment {
     RecyclerView rvBrowse;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
-    @BindView(R.id.tvPrevLocation1)
-    TextView tvPrevLocation1;
-    @BindView(R.id.tvPrevLocation2)
-    TextView tvPrevLocation2;
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
+    @BindView(R.id.recyclerview_pager_indicator)
+    IndefinitePagerIndicator indefinitePagerIndicator;
 
     private Unbinder unbinder;
     private BrowseEventAdapter eventAdapter;
@@ -151,6 +148,8 @@ public class VisitorFragment extends Fragment {
         rvBrowse.setLayoutManager(gridLayoutManager);
         rvBrowse.setAdapter(eventAdapter);
 
+        indefinitePagerIndicator.attachToRecyclerView(rvBrowse);
+
         resultReceiver = new AddressResultReceiver(new Handler());
 
         // initialize current location services
@@ -192,10 +191,6 @@ public class VisitorFragment extends Fragment {
                 }
             }
         };
-
-        // TODO tag previous locations with latitude and longitude. default (0, 0)
-        tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
-        tvPrevLocation2.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
 
         // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -242,9 +237,8 @@ public class VisitorFragment extends Fragment {
     }
 
 
-    @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1, R.id.tvPrevLocation2})
+    @OnClick(R.id.tvCurrentLocation)
     public void searchLocation(TextView tvLocation) {
-        // TODO search the event database by current location. currently sends the lat/long data to SearchActivity
         Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
         i.putExtra("latitude", (Double) tvLocation.getTag(R.id.latitude));
         i.putExtra("longitude", (Double) tvLocation.getTag(R.id.longitude));
@@ -253,7 +247,7 @@ public class VisitorFragment extends Fragment {
 
     @OnClick(R.id.tvDisplayName)
     public void viewUserProfile() {
-        Intent i = new Intent(getActivity(), ProfileActivity.class);
+        Intent i = new Intent(getActivity(), HostProfileActivity.class);
         ParseUser user = ParseUser.getCurrentUser();
         i.putExtra("user", user);
         getActivity().startActivity(i);
@@ -263,7 +257,7 @@ public class VisitorFragment extends Fragment {
     private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
             eventAdapter.clear();
-            eventsQuery.getClosest(geoPoint).getTop().withHost().notOwnEvent(Constants.CURRENT_USER);
+            eventsQuery.getClosest(geoPoint).getTopAscending().withHost().notFilled().notOwnEvent(Constants.CURRENT_USER);
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override

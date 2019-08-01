@@ -8,9 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Rating;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.bumptech.glide.Glide;
@@ -18,9 +16,6 @@ import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.parceler.Parcels;
-
-import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,7 +26,7 @@ import static com.arnauds_squadron.eatup.utils.Constants.BIO;
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 
-public class ProfileActivity extends AppCompatActivity {
+public class HostProfileActivity extends AppCompatActivity {
     ParseUser user;
     @BindView(R.id.ivImage)
     ImageView ivProfile;
@@ -49,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_host_profile);
         ButterKnife.bind(this);
 
         user = getIntent().getParcelableExtra("user");

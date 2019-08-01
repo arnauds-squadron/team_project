@@ -63,9 +63,11 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
     // create ViewHolder class
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.ivEventImage)
-        public ImageView ivEventImage;
+        ImageView ivEventImage;
         @BindView(R.id.tvEventTitle)
-        public TextView tvEventTitle;
+        TextView tvEventTitle;
+        @BindView(R.id.tvDate)
+        TextView tvDate;
 
         // constructor takes in inflated layout
         public ViewHolder(View itemView) {
@@ -82,6 +84,7 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
             // populate views according to data
             tvEventTitle.setText(event.getTitle());
             tvEventTitle.setTag(distanceInMiles);
+            tvDate.setText(event.getDateString(context));
 
             ParseFile eventImage = event.getEventImage();
             if (eventImage != null) {

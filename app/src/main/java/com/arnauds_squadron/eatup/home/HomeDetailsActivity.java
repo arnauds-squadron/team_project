@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -18,7 +17,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Location;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
@@ -148,7 +147,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 tvPerson.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent i = new Intent(HomeDetailsActivity.this, ProfileActivity.class);
+                        Intent i = new Intent(HomeDetailsActivity.this, HostProfileActivity.class);
                         i.putExtra("user",user);
                         startActivity(i);
                     }
