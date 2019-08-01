@@ -2,8 +2,9 @@ package com.arnauds_squadron.eatup.chat.messaging;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Message;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -27,11 +29,11 @@ import butterknife.ButterKnife;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     private List<Message> messages;
     private Context context;
-    private ParseUser sender;
+    private ParseUser currentUser;
 
-    MessageAdapter(Context context, ParseUser sender, List<Message> messages) {
+    MessageAdapter(Context context, ParseUser currentUser, List<Message> messages) {
         this.messages = messages;
-        this.sender = sender;
+        this.currentUser = currentUser;
         this.context = context;
     }
 
@@ -46,24 +48,31 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Message message = messages.get(position);
-        String senderId = message.getSender().getObjectId();
-
         holder.tvContent.setText(message.getContent());
+        boolean isMe = message.getSender().getObjectId().equals(currentUser.getObjectId());
 
-        boolean isMe = senderId.equals(sender.getObjectId());
+        ConstraintSet newSet = new ConstraintSet();
+        newSet.clone(holder.constraintLayout);
+
+        int layoutId = holder.constraintLayout.getId();
+        int imageId = holder.ivProfileMe.getId();
+        int textId = holder.tvContent.getId();
+
+        // Change the anchoring of the profile image and text depending on who sent the message
         if (isMe) {
-            holder.ivProfileMe.setVisibility(View.VISIBLE);
-            holder.ivProfileOther.setVisibility(View.GONE);
-            holder.tvContent.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
+            newSet.clear(imageId, ConstraintSet.START);
+            newSet.clear(textId, ConstraintSet.START);
+            newSet.connect(imageId, ConstraintSet.END, layoutId, ConstraintSet.END, 8);
+            newSet.connect(textId, ConstraintSet.END, imageId, ConstraintSet.START, 24);
         } else {
-            holder.ivProfileOther.setVisibility(View.VISIBLE);
-            holder.ivProfileMe.setVisibility(View.GONE);
-            holder.tvContent.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+            newSet.clear(imageId, ConstraintSet.END);
+            newSet.clear(textId, ConstraintSet.END);
+            newSet.connect(imageId, ConstraintSet.START, layoutId, ConstraintSet.START, 8);
+            newSet.connect(textId, ConstraintSet.START, imageId, ConstraintSet.END, 24);
         }
-
-        final ImageView profileView = isMe ? holder.ivProfileMe : holder.ivProfileOther;
+        holder.constraintLayout.setConstraintSet(newSet);
 
         message.getSender().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
             @Override
@@ -72,7 +81,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 if (profilePicture != null) {
                     Glide.with(context)
                             .load(profilePicture.getUrl())
-                            .into(profileView);
+                            .transform(new CircleCrop())
+                            .into(holder.ivProfileMe);
                 }
             }
         });
@@ -85,8 +95,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.ivProfileOther)
-        ImageView ivProfileOther;
+        @BindView(R.id.constraintLayout)
+        ConstraintLayout constraintLayout;
+
+        //@BindView(R.id.ivProfileOther)
+        //ImageView ivProfileOther;
 
         @BindView(R.id.ivProfileMe)
         ImageView ivProfileMe;
