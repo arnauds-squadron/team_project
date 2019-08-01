@@ -126,6 +126,15 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
                     btSubmitRating.setOnClickListener(null);
                 }
             });
+
+            userRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    if(getAdapterPosition() < mUsers.size() - 1) {
+                        rvUsers.smoothScrollToPosition(getAdapterPosition());
+                    }
+                }
+            });
         }
     }
 
