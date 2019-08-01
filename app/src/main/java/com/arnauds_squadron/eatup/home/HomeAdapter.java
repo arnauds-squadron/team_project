@@ -65,8 +65,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
             if (event.getDate() != null) {
                 // event has already passed
-                if (event.getDate().before(localCalendar.getTime())) {
-                    viewHolder.tvDate.setTextColor(Color.RED);
+                if (event.getDate().after(localCalendar.getTime())) {
+                    viewHolder.tvDate.setTextColor(Color.BLACK);
                     // check if current user is the host
                     if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                         if(event.getAcceptedGuestsList() != null) {
@@ -85,10 +85,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     }
                 }
                 // event is in the future
-                else {
-                    viewHolder.tvDate.setTextColor(Color.BLACK);
-                }
-                viewHolder.tvDate.setText(event.getDate().toString());
+                String[] split = event.getDate().toString().split(" ");
+                viewHolder.tvDate.setText(split[1] + "\n" + split[2]);
             }
         }
         if (event.getTitle() != null) {
@@ -104,10 +102,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
         }
-        if (event.getEventImage() != null) {
-            viewHolder.ivImage.setParseFile(event.getEventImage());
-            viewHolder.ivImage.loadInBackground();
-        }
+//        if (event.getEventImage() != null) {
+//            viewHolder.ivImage.setParseFile(event.getEventImage());
+//            viewHolder.ivImage.loadInBackground();
+//        }
 
         try {
             viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
@@ -147,8 +145,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.ivImage)
-        ParseImageView ivImage;
+//        @BindView(R.id.ivImage)
+//        ParseImageView ivImage;
 
         @BindView(R.id.ibOpenChat)
         ImageButton ibOpenChat;
