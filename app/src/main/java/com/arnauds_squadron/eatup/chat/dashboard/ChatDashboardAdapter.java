@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
 import com.parse.GetCallback;
@@ -19,6 +20,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -50,9 +53,11 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
         viewHolder.tvName.setText(chat.getName());
         viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt(), context));
 
-        // TODO: image should never be null
-
         List<ParseUser> members = chat.getMembers();
+        for (int i = members.size() - 1; i >= 0; i--) {
+            if (members.get(i).getObjectId().equals(Constants.CURRENT_USER.getObjectId()))
+                members.remove(i);
+        }
 
         if (members.size() > 1) {
             viewHolder.ivImage.setVisibility(View.INVISIBLE);
@@ -72,12 +77,13 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
                     }
                 });
             }
-
         } else {
             viewHolder.ivImage.setVisibility(View.VISIBLE);
             viewHolder.ivSmallImage1.setVisibility(View.GONE);
             viewHolder.ivSmallImage2.setVisibility(View.GONE);
-            members.get(0).fetchInBackground(new GetCallback<ParseObject>() {
+            ParseUser member = members.size() == 1 ? members.get(0) : Constants.CURRENT_USER;
+
+            member.fetchInBackground(new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject object, ParseException e) {
                     ParseFile image = object.getParseFile("profilePicture");
