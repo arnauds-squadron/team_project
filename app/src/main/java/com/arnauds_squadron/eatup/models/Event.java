@@ -288,6 +288,12 @@ public class Event extends ParseObject {
             return this;
         }
 
+        public Query getTopAscending() {
+            setLimit(20);
+            orderByAscending(KEY_DATE);
+            return this;
+        }
+
         public Query ownEvent(ParseUser user) {
             whereEqualTo(KEY_HOST, user);
             return this;

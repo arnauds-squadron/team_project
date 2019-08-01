@@ -69,9 +69,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -154,11 +156,15 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     // code for permissions results request
     private static final int ALL_PERMISSIONS_RESULT = 1011;
 
+    private Date currentDate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visitor_search);
         ButterKnife.bind(this);
+
+        currentDate = Calendar.getInstance(TimeZone.getDefault()).getTime();
 
         /* Current user location: manage permissions
          * Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
@@ -514,11 +520,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
         queriedGeoPoint = geoPoint;
         final Event.Query eventsQuery = new Event.Query();
+        eventAdapter.clear();
         if (maxDate.equals(new Date(0))) {
-            eventAdapter.clear();
-            eventsQuery.getClosest(geoPoint).getTop().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
+            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
         } else {
-            eventsQuery.getOlder(maxDate).getClosest(geoPoint).getTop().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
+            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
@@ -542,7 +548,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 } else {
                     e.printStackTrace();
                 }
-//                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -551,11 +556,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         final Event.Query eventsQuery = new Event.Query();
         // if opening app for the first time, get top 20 and clear old items
         // otherwise, query for posts older than the oldest
+        eventAdapter.clear();
         if (maxDate.equals(new Date(0))) {
-            eventAdapter.clear();
-            eventsQuery.getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("host", user);
+            eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("host", user);
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("host", user);
+            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("host", user);
         }
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
@@ -586,11 +591,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         final Event.Query eventsQuery = new Event.Query();
         // if opening app for the first time, get top 20 and clear old items
         // otherwise, query for events older than the oldest
+        eventAdapter.clear();
         if (maxDate.equals(new Date(0))) {
-            eventAdapter.clear();
-            eventsQuery.getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", cuisineQuery);
+            eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", cuisineQuery);
         } else {
-            eventsQuery.getOlder(maxDate).getTop().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", cuisineQuery);
+            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", cuisineQuery);
         }
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override

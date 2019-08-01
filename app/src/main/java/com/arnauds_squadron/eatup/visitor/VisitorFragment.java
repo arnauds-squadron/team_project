@@ -259,7 +259,7 @@ public class VisitorFragment extends Fragment {
     private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
             eventAdapter.clear();
-            eventsQuery.getClosest(geoPoint).getTop().withHost().notFilled().notOwnEvent(Constants.CURRENT_USER);
+            eventsQuery.getClosest(geoPoint).getTopAscending().withHost().notFilled().notOwnEvent(Constants.CURRENT_USER);
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
