@@ -4,8 +4,10 @@ import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.Date;
+import java.util.List;
 
 @ParseClassName("Chat")
 public class Chat extends ParseObject {
@@ -34,8 +36,12 @@ public class Chat extends ParseObject {
         put(KEY_UPDATED_AT, new Date());
     }
 
-    public void addMember(String userId) {
-        add(KEY_MEMBERS, userId);
+    public void addMember(ParseUser user) {
+        add(KEY_MEMBERS, user);
+    }
+
+    public List<ParseUser> getMembers() {
+        return getList(KEY_MEMBERS);
     }
 
     // inner class to query event model
@@ -51,8 +57,8 @@ public class Chat extends ParseObject {
             return this;
         }
 
-        public Query matchesUserId(String userId) {
-            whereEqualTo(KEY_MEMBERS, userId);
+        public Query matchesUser(ParseUser user) {
+            whereEqualTo(KEY_MEMBERS, user);
             return this;
         }
     }

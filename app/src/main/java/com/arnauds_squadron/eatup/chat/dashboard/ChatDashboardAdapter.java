@@ -13,7 +13,11 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -40,17 +44,28 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         Chat chat = chatList.get(i);
 
         viewHolder.tvName.setText(chat.getName());
         viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt(), context));
 
-        ParseFile image = chat.getImage();
-
         // TODO: image should never be null
-        if (image != null) {
-            Glide.with(context).load(image.getUrl()).into(viewHolder.ivImage);
+
+        List<ParseUser> members = chat.getMembers();
+
+        if (members.size() > 1) {
+
+        } else {
+            members.get(0).fetchInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    ParseFile image = object.getParseFile("profilePicture");
+                    Glide.with(context)
+                            .load(image.getUrl())
+                            .into(viewHolder.ivImage);
+                }
+            });
         }
     }
 

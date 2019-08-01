@@ -227,7 +227,7 @@ public class LocalFragment extends Fragment implements
     private void createEventChat(String eventTitle) {
         final Chat chat = new Chat();
         chat.setName(eventTitle + " Chat");
-        chat.addMember(Constants.CURRENT_USER.getObjectId());
+        chat.addMember(Constants.CURRENT_USER);
 
         // TODO: ensure not null
         if (event.getEventImage() != null)
