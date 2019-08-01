@@ -49,6 +49,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
+import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,10 +88,10 @@ public class VisitorFragment extends Fragment {
     RecyclerView rvBrowse;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
-    @BindView(R.id.tvPrevLocation1)
-    TextView tvPrevLocation1;
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
+    @BindView(R.id.recyclerview_pager_indicator)
+    IndefinitePagerIndicator indefinitePagerIndicator;
 
     private Unbinder unbinder;
     private BrowseEventAdapter eventAdapter;
@@ -149,6 +150,8 @@ public class VisitorFragment extends Fragment {
         rvBrowse.setLayoutManager(gridLayoutManager);
         rvBrowse.setAdapter(eventAdapter);
 
+        indefinitePagerIndicator.attachToRecyclerView(rvBrowse);
+
         resultReceiver = new AddressResultReceiver(new Handler());
 
         // initialize current location services
@@ -190,9 +193,6 @@ public class VisitorFragment extends Fragment {
                 }
             }
         };
-
-        // TODO tag previous locations with latitude and longitude. default (0, 0)
-        tvPrevLocation1.setTag(String.format(Locale.getDefault(), "%f, %f", 0.0, 0.0));
 
         // initialize spinner_text_view for search filtering
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -239,9 +239,8 @@ public class VisitorFragment extends Fragment {
     }
 
 
-    @OnClick({R.id.tvCurrentLocation, R.id.tvPrevLocation1})
+    @OnClick(R.id.tvCurrentLocation)
     public void searchLocation(TextView tvLocation) {
-        // TODO search the event database by current location. currently sends the lat/long data to SearchActivity
         Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
         i.putExtra("latitude", (Double) tvLocation.getTag(R.id.latitude));
         i.putExtra("longitude", (Double) tvLocation.getTag(R.id.longitude));
