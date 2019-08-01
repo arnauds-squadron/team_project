@@ -475,6 +475,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         mEvents.clear();
         eventAdapter.notifyDataSetChanged();
         searchCategory = pos;
+        resultsSearchView.setQuery("", false);
 
         if(searchCategory == LOCATION_SEARCH) {
             setLocationSuggestions(resultsSearchView);
@@ -485,7 +486,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
-        // TODO what does this entail
     }
 
     // Methods to query parse server
@@ -512,6 +512,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     }
 
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
+        queriedGeoPoint = geoPoint;
         final Event.Query eventsQuery = new Event.Query();
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
@@ -529,7 +530,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                             mEvents.add(objects.get(i));
                             eventAdapter.notifyItemInserted(mEvents.size() - 1);
                             // on successful reload, signal that refresh has completed
-                            swipeContainer.setRefreshing(false);
                         }
                     }
                     else {
@@ -538,6 +538,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                             Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
                         }
                     }
+                    swipeContainer.setRefreshing(false);
                 } else {
                     e.printStackTrace();
                 }
@@ -564,8 +565,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                         for (int i = 0; i < objects.size(); ++i) {
                             mEvents.add(objects.get(i));
                             eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                            // on successful reload, signal that refresh has completed
-                            swipeContainer.setRefreshing(false);
                         }
                     }
                     else {
@@ -574,6 +573,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                             Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
                         }
                     }
+                    swipeContainer.setRefreshing(false);
                 } else {
                     e.printStackTrace();
                 }
@@ -582,6 +582,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     }
 
     protected void loadTopEvents(String cuisineQuery, Date maxDate) {
+        queriedCuisine = cuisineQuery;
         final Event.Query eventsQuery = new Event.Query();
         // if opening app for the first time, get top 20 and clear old items
         // otherwise, query for events older than the oldest
@@ -599,8 +600,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                         for (int i = 0; i < objects.size(); ++i) {
                             mEvents.add(objects.get(i));
                             eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                            // on successful reload, signal that refresh has completed
-                            swipeContainer.setRefreshing(false);
                         }
                     }
                     else {
@@ -609,6 +608,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                             Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
                         }
                     }
+                    swipeContainer.setRefreshing(false);
                 } else {
                     e.printStackTrace();
                 }

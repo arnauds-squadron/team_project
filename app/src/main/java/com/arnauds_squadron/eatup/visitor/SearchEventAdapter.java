@@ -24,17 +24,12 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
-import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 
 public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.ViewHolder> {
 
@@ -78,18 +73,12 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         ImageView ivEventImage;
         @BindView(R.id.tvEventName)
         TextView tvEventName;
-        @BindView(R.id.tvHostName)
-        TextView tvHostName;
         @BindView(R.id.tvDate)
         TextView tvDate;
         @BindView(R.id.tvTags)
         TextView tvCuisine;
         @BindView(R.id.tvDistance)
         TextView tvDistance;
-        @BindView(R.id.hostRating)
-        RatingBar hostRating;
-        @BindView(R.id.btRequest)
-        Button btRequest;
 
         // constructor takes in inflated layout
         public ViewHolder(View itemView) {
@@ -97,34 +86,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
 
-            btRequest.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                    int position = getAdapterPosition();
-                    Event event = events.get(position);
-
-                    // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
-                    // otherwise, create request/add to "allRequests" and send back to home screen
-
-                    if(event.checkRequest(Constants.CURRENT_USER)) {
-                        btRequest.setText("RSVP requested");
-                        Toast.makeText(context, "RSVP already requested", Toast.LENGTH_SHORT).show();
-                    } else {
-                        event.createRequest(Constants.CURRENT_USER, event);
-                        Toast.makeText(context, "RSVP requested", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-            tvHostName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ProfileActivity.class);
-                    i.putExtra("user", (ParseUser) tvHostName.getTag());
-                    context.startActivity(i);
-                }
-            });
         }
 
         public void bind(Event event) {
@@ -135,29 +97,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             tvDistance.setText(String.format(Locale.getDefault(), "%.2f mi", distanceInMiles));
             tvDistance.setTag(distanceInMiles);
             tvEventName.setText(event.getTitle());
-            tvHostName.setText(event.getHost().getString(DISPLAY_NAME));
-            tvHostName.setTag(event.getHost());
             tvDate.setText(event.getDateString(context));
-
-            // load user rating
-            ParseQuery<Rating> query = new Rating.Query();
-            query.whereEqualTo("user", event.getHost());
-            query.findInBackground(new FindCallback<Rating>() {
-                public void done(List<Rating> ratings, ParseException e) {
-                    if (e == null) {
-                        if(ratings.size() != 0) {
-                            Rating rating = ratings.get(0);
-                            float averageRating = rating.getAvgRatingHost().floatValue();
-                            hostRating.setRating(averageRating);
-                        }
-                        else {
-                            hostRating.setRating(NO_RATING);
-                        }
-                    } else {
-                        Toast.makeText(context, "Query for rating not successful", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
 
             List<String> cuisineTags = event.getTags();
             tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
