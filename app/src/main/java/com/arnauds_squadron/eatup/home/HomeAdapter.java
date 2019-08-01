@@ -82,7 +82,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                         if(event.getAcceptedGuestsList() != null) {
                             if(event.getAcceptedGuestsList().size() != 0) {
-                                viewHolder.btnCancel.setText("Rate guests");
+                                viewHolder.btnCancel.setText("    Rate guests    ");
                                 viewHolder.btnCancel.setTag(GUEST);
                             }
                         }
@@ -91,7 +91,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         }
                     }
                     else {
-                        viewHolder.btnCancel.setText("Rate host");
+                        viewHolder.btnCancel.setText("    Rate host    ");
                         viewHolder.btnCancel.setTag(HOST);
                     }
                 }
