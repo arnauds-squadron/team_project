@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/notification_red" />
+            <solid android:color="@color/red" />
             <size
                 android:width="16dp"
                 android:height="16dp" />
