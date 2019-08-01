@@ -1,13 +1,17 @@
 package com.arnauds_squadron.eatup.home;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -173,7 +177,13 @@ public class HomeFragment extends Fragment {
         });
     }
     //swipe to delete
+
+
     ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+        ColorDrawable background = new ColorDrawable(Color.RED);
+//        private Drawable icon = ContextCompat.getDrawable(homeAdapter.getContext(),
+//                R.drawable.ic_home_light);
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
             Toast.makeText(getContext(), "on Move", Toast.LENGTH_SHORT).show();
@@ -197,6 +207,36 @@ public class HomeFragment extends Fragment {
                     });
             snackbar.setActionTextColor(Color.YELLOW);
             snackbar.show();
+        }
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX,
+                    dY, actionState, isCurrentlyActive);
+            View itemView = viewHolder.itemView;
+//            int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+//            int iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+//            int iconBottom = iconTop + icon.getIntrinsicHeight();
+            int backgroundCornerOffset = 20;
+            if (dX > 0) { // Swiping to the right
+//                int iconLeft = itemView.getLeft() + iconMargin + icon.getIntrinsicWidth();
+//                int iconRight = itemView.getLeft() + iconMargin;
+//                icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+                background.setBounds(itemView.getLeft(), itemView.getTop(),
+                        itemView.getLeft() + ((int) dX) + backgroundCornerOffset,
+                        itemView.getBottom());
+
+            } else if (dX < 0) { // Swiping to the left
+//                int iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
+//                int iconRight = itemView.getRight() - iconMargin;
+//                icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+                background.setBounds(itemView.getRight() + ((int) dX) - backgroundCornerOffset,
+                        itemView.getTop(), itemView.getRight(), itemView.getBottom());
+            } else { // view is unSwiped
+//                icon.setBounds(0, 0, 0, 0);
+                background.setBounds(0, 0, 0, 0);
+            }
+            background.draw(c);
+//            icon.draw(c);
         }
     };
 
