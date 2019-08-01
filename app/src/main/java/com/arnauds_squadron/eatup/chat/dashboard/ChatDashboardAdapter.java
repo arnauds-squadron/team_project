@@ -11,10 +11,17 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,17 +47,51 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        Chat chat = chatList.get(i);
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
+        Chat chat = chatList.get(position);
 
         viewHolder.tvName.setText(chat.getName());
         viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt(), context));
 
-        ParseFile image = chat.getImage();
+        List<ParseUser> members = chat.getMembers();
+        for (int i = members.size() - 1; i >= 0; i--) {
+            if (members.get(i).getObjectId().equals(Constants.CURRENT_USER.getObjectId()))
+                members.remove(i);
+        }
 
-        // TODO: image should never be null
-        if (image != null) {
-            Glide.with(context).load(image.getUrl()).into(viewHolder.ivImage);
+        if (members.size() > 1) {
+            viewHolder.ivImage.setVisibility(View.INVISIBLE);
+            final ImageView[] imageViews = {viewHolder.ivSmallImage1, viewHolder.ivSmallImage2};
+
+            for (int i = 0; i < imageViews.length; i++) {
+                imageViews[i].setVisibility(View.VISIBLE);
+                final int finalI = i;
+
+                members.get(i).fetchInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject object, ParseException e) {
+                        ParseFile image = object.getParseFile("profilePicture");
+                        Glide.with(context)
+                                .load(image.getUrl())
+                                .into(imageViews[finalI]);
+                    }
+                });
+            }
+        } else {
+            viewHolder.ivImage.setVisibility(View.VISIBLE);
+            viewHolder.ivSmallImage1.setVisibility(View.GONE);
+            viewHolder.ivSmallImage2.setVisibility(View.GONE);
+            ParseUser member = members.size() == 1 ? members.get(0) : Constants.CURRENT_USER;
+
+            member.fetchInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject object, ParseException e) {
+                    ParseFile image = object.getParseFile("profilePicture");
+                    Glide.with(context)
+                            .load(image.getUrl())
+                            .into(viewHolder.ivImage);
+                }
+            });
         }
     }
 
@@ -63,6 +104,12 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
 
         @BindView(R.id.ivImage)
         ImageView ivImage;
+
+        @BindView(R.id.ivSmallImage1)
+        ImageView ivSmallImage1;
+
+        @BindView(R.id.ivSmallImage2)
+        ImageView ivSmallImage2;
 
         @BindView(R.id.tvName)
         TextView tvName;

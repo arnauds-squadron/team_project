@@ -16,6 +16,7 @@ import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,8 +107,8 @@ public class ChatDashboardFragment extends Fragment {
      */
     public void getChatsAsync() {
         Chat.Query query = new Chat.Query();
-        String userId = Constants.CURRENT_USER.getObjectId();
-        query.newestFirst().matchesUserId(userId).findInBackground(new FindCallback<Chat>() {
+        ParseUser user = Constants.CURRENT_USER;
+        query.newestFirst().matchesUser(user).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
                 if (e == null) {
