@@ -14,6 +14,7 @@ import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -26,6 +27,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.glide.transformations.BlurTransformation;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdapter.ViewHolder> {
 
@@ -54,12 +57,13 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
         viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt(), context));
 
         List<ParseUser> members = chat.getMembers();
+        // remove the current user if possible
         for (int i = members.size() - 1; i >= 0; i--) {
             if (members.get(i).getObjectId().equals(Constants.CURRENT_USER.getObjectId()))
                 members.remove(i);
         }
 
-        if (members.size() > 1) {
+        if (members.size() > 1) { // At least 2 other users
             viewHolder.ivImage.setVisibility(View.INVISIBLE);
             final ImageView[] imageViews = {viewHolder.ivSmallImage1, viewHolder.ivSmallImage2};
 
@@ -73,6 +77,7 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
                         ParseFile image = object.getParseFile("profilePicture");
                         Glide.with(context)
                                 .load(image.getUrl())
+                                .transform(new CircleCrop())
                                 .into(imageViews[finalI]);
                     }
                 });
@@ -89,6 +94,7 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
                     ParseFile image = object.getParseFile("profilePicture");
                     Glide.with(context)
                             .load(image.getUrl())
+                            .transform(new CircleCrop())
                             .into(viewHolder.ivImage);
                 }
             });
