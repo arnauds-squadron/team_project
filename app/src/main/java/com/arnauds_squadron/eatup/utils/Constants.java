@@ -39,6 +39,8 @@ public final class Constants {
 
     // PagerAdapter constants
     public static final int MAIN_PAGER_START_PAGE = 2;
+    public static final int ADDRESS_FRAGMENT_INDEX = 2;
+    public static final int DATE_FRAGMENT_INDEX = 3;
 
     // The logged in user, only changed in the login activity
     public static ParseUser CURRENT_USER;

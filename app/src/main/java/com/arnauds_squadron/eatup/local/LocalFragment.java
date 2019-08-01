@@ -166,8 +166,7 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void updateAddress() {
-        retreatViewPager();
-        retreatViewPager();
+        viewPager.setCurrentItem(Constants.ADDRESS_FRAGMENT_INDEX);
     }
 
     /**
@@ -177,7 +176,7 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void updateDate() {
-        retreatViewPager();
+        viewPager.setCurrentItem(Constants.DATE_FRAGMENT_INDEX);
     }
 
     /**
@@ -256,13 +255,6 @@ public class LocalFragment extends Fragment implements
                 }
             }
         });
-    }
-
-    /**
-     * Moves the pager one fragment backward
-     */
-    private void retreatViewPager() {
-        viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
     }
 
     /**
