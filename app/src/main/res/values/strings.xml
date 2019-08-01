@@ -22,7 +22,7 @@
     <string name="event_creation_tags_hint">Cuisine</string>
     <string name="event_creation_next_button_text">Next</string>
     <string name="event_creation_review_title">Confirm Your Event</string>
-    <string name="event_creation_start_new_event">\ \ \ \ Create a new event\ \ \ \ </string>
+    <string name="event_creation_start_new_event">Create a new event</string>
     <string name="event_creation_start_title">Set Up Your Event</string>
     <string name="event_creation_time_not_selected">Time not set</string>
     <string name="event_creation_title_caption">And give it a good name!</string>
