@@ -44,8 +44,8 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
-        Chat chat = chatList.get(i);
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
+        Chat chat = chatList.get(position);
 
         viewHolder.tvName.setText(chat.getName());
         viewHolder.tvUpdatedAt.setText(FormatHelper.formatTimestamp(chat.getUpdatedAt(), context));
@@ -55,8 +55,28 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
         List<ParseUser> members = chat.getMembers();
 
         if (members.size() > 1) {
+            viewHolder.ivImage.setVisibility(View.INVISIBLE);
+            final ImageView[] imageViews = {viewHolder.ivSmallImage1, viewHolder.ivSmallImage2};
+
+            for (int i = 0; i < imageViews.length; i++) {
+                imageViews[i].setVisibility(View.VISIBLE);
+                final int finalI = i;
+
+                members.get(i).fetchInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject object, ParseException e) {
+                        ParseFile image = object.getParseFile("profilePicture");
+                        Glide.with(context)
+                                .load(image.getUrl())
+                                .into(imageViews[finalI]);
+                    }
+                });
+            }
 
         } else {
+            viewHolder.ivImage.setVisibility(View.VISIBLE);
+            viewHolder.ivSmallImage1.setVisibility(View.GONE);
+            viewHolder.ivSmallImage2.setVisibility(View.GONE);
             members.get(0).fetchInBackground(new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject object, ParseException e) {
@@ -78,6 +98,12 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
 
         @BindView(R.id.ivImage)
         ImageView ivImage;
+
+        @BindView(R.id.ivSmallImage1)
+        ImageView ivSmallImage1;
+
+        @BindView(R.id.ivSmallImage2)
+        ImageView ivSmallImage2;
 
         @BindView(R.id.tvName)
         TextView tvName;
