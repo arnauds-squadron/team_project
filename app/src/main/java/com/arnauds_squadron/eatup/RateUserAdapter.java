@@ -131,7 +131,7 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
                 @Override
                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                     if(getAdapterPosition() < mUsers.size() - 1) {
-                        rvUsers.smoothScrollToPosition(getAdapterPosition());
+                        rvUsers.smoothScrollToPosition(getAdapterPosition() + 1);
                     }
                 }
             });
