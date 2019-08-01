@@ -213,7 +213,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     // if past event date, rate the attending users. otherwise cancel the event
                     Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
                     if (event.getDate() != null) {
-                        if (event.getDate().before(localCalendar.getTime())) {
+                        if (event.getDate().after(localCalendar.getTime())) {
                             Intent i = new Intent(context, RateUserActivity.class);
                             i.putExtra("event", event);
                             i.putExtra("ratingType", (String) btnCancel.getTag());
