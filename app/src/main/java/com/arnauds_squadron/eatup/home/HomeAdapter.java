@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -149,6 +150,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
      */
 
     private void getPendingRequests(Event event) {
+        // TODO always be continually refreshing for events??? how often does home fragment refresh?
         List<ParseUser> pending = event.getPendingRequests();
         String eventTitle = event.getTitle();
         if (pending != null && pending.size() > requests.size()) {
@@ -158,9 +160,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             // create notifications for each of the pending requests
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-//            Intent intent = new Intent(this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
             for (int i = 0; i < pending.size(); i++) {
                 // notificationId is a unique int for each notification that you must define
@@ -171,7 +173,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         .setSmallIcon(R.drawable.ic_home)
                         .setContentTitle("New request to join event")
                         .setContentText(contentText)
-//                        .setContentIntent(pendingIntent)
+                        .setContentIntent(pendingIntent)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setAutoCancel(true);
                 notificationManager.notify(notificationId, builder.build());
