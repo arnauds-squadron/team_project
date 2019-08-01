@@ -32,11 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.BuildConfig;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -52,7 +51,6 @@ import com.parse.ParseUser;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -249,7 +247,7 @@ public class VisitorFragment extends Fragment {
 
     @OnClick(R.id.tvDisplayName)
     public void viewUserProfile() {
-        Intent i = new Intent(getActivity(), ProfileActivity.class);
+        Intent i = new Intent(getActivity(), HostProfileActivity.class);
         ParseUser user = ParseUser.getCurrentUser();
         i.putExtra("user", user);
         getActivity().startActivity(i);

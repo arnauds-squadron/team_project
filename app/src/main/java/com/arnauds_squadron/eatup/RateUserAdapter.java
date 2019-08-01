@@ -2,9 +2,6 @@ package com.arnauds_squadron.eatup;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,12 +13,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Rating;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;

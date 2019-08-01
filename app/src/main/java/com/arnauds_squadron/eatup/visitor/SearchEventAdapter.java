@@ -7,21 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
-import com.arnauds_squadron.eatup.models.Rating;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 

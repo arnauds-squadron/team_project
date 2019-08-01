@@ -32,7 +32,7 @@
         <activity android:name=".event_details.EventDetailsRestaurantActivity" />
         <activity android:name=".event_details.EventDetailsActivity" />
         <activity android:name=".login.SignupActivity" />
-        <activity android:name=".profile.ProfileActivity" />
+        <activity android:name=".profile.HostProfileActivity" />
 
         <service
             android:name=".utils.FetchAddressIntentService"

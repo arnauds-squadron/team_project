@@ -18,7 +18,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Rating;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
 import com.parse.FindCallback;
@@ -29,7 +29,6 @@ import com.parse.ParseQuery;
 import org.parceler.Parcels;
 
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,7 +36,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATING_HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_RATING;
 
@@ -76,7 +74,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 @Override
                 public void onClick(View v) {
                     final Event event = (Event) v.getTag();
-                    Intent i = new Intent(context, ProfileActivity.class);
+                    Intent i = new Intent(context, HostProfileActivity.class);
                     i.putExtra("user", event.getHost());
                     Pair<View, String> imagePair = Pair.create((View) ivHostImage, "profileImage");
                     Pair<View, String> namePair = Pair.create((View) tvHostName, "hostName");
