@@ -134,9 +134,9 @@ public class ChatDashboardFragment extends Fragment {
         query.newestFirst().matchesUser(user).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
-                if (e == null && objects != null && objects.size() > 0) {
-                    String newestId = newestChat.getObjectId();
-                    if (newestChat == null || !objects.get(0).getObjectId().equals(newestId)) {
+                if (e == null && objects != null && objects.size() > 0 ) {
+                    if (newestChat == null ||
+                            !objects.get(0).getObjectId().equals(newestChat.getObjectId())) {
                         chatList.clear();
                         chatList.addAll(objects);
                         chatAdapter.notifyDataSetChanged();
