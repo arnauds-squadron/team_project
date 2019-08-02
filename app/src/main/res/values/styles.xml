@@ -23,7 +23,7 @@
         <item name="android:background">#507B91</item>
     </style>
 
-    <style name="button_default">
+    <style name="button_action">
         <item name="android:background">@xml/rounded_button</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>

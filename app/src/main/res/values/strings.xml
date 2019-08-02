@@ -6,7 +6,7 @@
     <string name="tvApproveTitle">Approve this request?</string>
     <string name="btBook">Request meal</string>
     <string name="visitor_tv_greeting">Hello, </string>
-    <string name="browse_nearby">Browse nearby meals</string>
+    <string name="browse_nearby">Browse nearby events</string>
     <string name="current_location_title">Use my current location</string>
     <string name="previous_location_title">Pick a previous location</string>
     <string name="previous_location_text">No previous meals yet!</string>
@@ -21,7 +21,7 @@
     <string name="event_creation_date_not_selected">Date not set</string>
     <string name="event_creation_tags_hint">Cuisine</string>
     <string name="event_creation_review_title">Confirm Your Event</string>
-    <string name="event_creation_start_new_event">Create a new event</string>
+    <string name="event_creation_start_new_event">New event</string>
     <string name="event_creation_start_title">Set Up Your Event</string>
     <string name="event_creation_time_not_selected">Time not set</string>
     <string name="event_creation_title_caption">And give it a good name!</string>
@@ -62,6 +62,7 @@
     <string name="chat_image">Chat Image</string>
     <string name="chats">Chats</string>
     <string name="skip">Skip</string>
+    <string name="event_image">Event Image</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

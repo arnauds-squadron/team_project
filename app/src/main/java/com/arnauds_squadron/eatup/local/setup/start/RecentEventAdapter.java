@@ -48,7 +48,7 @@ public class RecentEventAdapter extends RecyclerView.Adapter<RecentEventAdapter.
         if(event.getEventImage() != null)
             Glide.with(context)
                 .load(event.getEventImage().getUrl())
-                .into(viewHolder.ivImage);
+                .into(viewHolder.ivEventImage);
     }
 
     @Override
@@ -61,8 +61,8 @@ public class RecentEventAdapter extends RecyclerView.Adapter<RecentEventAdapter.
      */
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.ivImage)
-        ImageView ivImage;
+        @BindView(R.id.ivEventImage)
+        ImageView ivEventImage;
 
         @BindView(R.id.tvTitle)
         TextView tvTitle;

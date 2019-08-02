@@ -33,7 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.BuildConfig;
-import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
@@ -48,7 +47,6 @@ import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
@@ -61,7 +59,6 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
@@ -79,8 +76,6 @@ public class VisitorFragment extends Fragment {
 
     // TODO browsing nearby events - account for scenario in which user doesn't enable current location, use last remembered location or display a random array of events
 
-    @BindView(R.id.tvDisplayName)
-    TextView tvDisplayName;
     @BindView(R.id.tvBrowseTitle)
     TextView tvBrowseTitle;
     @BindView(R.id.rvBrowse)
@@ -131,8 +126,6 @@ public class VisitorFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
-        // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source
         adapterGeoPoint = new ParseGeoPoint(0, 0);
@@ -241,20 +234,15 @@ public class VisitorFragment extends Fragment {
         startActivity(i);
     }
 
-    @OnClick(R.id.tvDisplayName)
-    public void viewUserProfile() {
-        Intent i = new Intent(getActivity(), HostProfileActivity.class);
-        ParseUser user = ParseUser.getCurrentUser();
-        i.putExtra("user", user);
-        getActivity().startActivity(i);
-    }
-
-    // methods to load posts into the recyclerview based on location
+    // methods to load posts into the RecyclerView based on location
     private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
-            eventAdapter.clear();
-            eventsQuery.getClosest(geoPoint).getTopAscending().withHost().notFilled().notOwnEvent(Constants.CURRENT_USER);
-
+        eventsQuery.getClosest(geoPoint)
+                .getTopAscending()
+                .withHost()
+                .notFilled()
+                .notOwnEvent(Constants.CURRENT_USER);
+        eventAdapter.clear();
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {

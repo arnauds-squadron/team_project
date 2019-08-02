@@ -197,6 +197,7 @@
 
             <Button
                 android:id="@+id/btnCreateEvent"
+                style="@style/button_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
