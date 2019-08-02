@@ -63,6 +63,8 @@
     <string name="chats">Chats</string>
     <string name="skip">Skip</string>
     <string name="event_image">Event Image</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />
