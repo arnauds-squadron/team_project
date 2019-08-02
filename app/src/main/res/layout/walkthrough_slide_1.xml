@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/walkthrough_slide_1_background">
+    android:background="@drawable/walkthrough_gradient">
 
     <ImageView
         android:id="@+id/iv_sl1"
@@ -41,4 +42,14 @@
         android:text="Your Nearby places is just one click away."
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title1" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="246dp"
+        android:layout_height="74dp"
+        android:text="TextView"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="97dp"
+        tools:layout_editor_absoluteY="588dp" />
 </android.support.constraint.ConstraintLayout>

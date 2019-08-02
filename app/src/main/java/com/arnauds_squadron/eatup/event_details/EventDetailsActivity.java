@@ -35,10 +35,6 @@ import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 
 
 public class EventDetailsActivity extends AppCompatActivity {
-
-    // TODO sliding view to let user view details of the restaurant from the yelp API
-    // TODO add calculation for distance from the user
-
     @BindView(R.id.tvEventTitle)
     TextView tvEventTitle;
     @BindView(R.id.tvTags)
