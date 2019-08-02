@@ -64,9 +64,6 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -77,15 +74,6 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_ALIAS;
 import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_TITLE;
@@ -104,8 +92,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private ArrayList<Event> mEvents;
     private SwipeRefreshLayout swipeContainer;
     private EndlessRecyclerViewScrollListener scrollListener;
-    private ProgressBar progressBar;
-    private ParseUser currentUser;
 
     // variables to keep track of current query
     private int searchCategory;
@@ -157,6 +143,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private static final int ALL_PERMISSIONS_RESULT = 1011;
 
     private Date currentDate;
+    private Boolean useCurrentLocation = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,9 +200,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         resultsSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         resultsSearchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 
-        // initialize spinner for search filtering
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.search_categories, android.R.layout.simple_spinner_item);
+                // initialize spinner for search filtering
+                ArrayAdapter < CharSequence > adapter = ArrayAdapter.createFromResource(this,
+                        R.array.search_categories, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //c Apply the adapter to the spinner
@@ -337,11 +324,13 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // Permissions ok, we get last location
         currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
-        if (currentLocation != null) {
-            currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
-            eventAdapter.updateCurrentLocation(currentGeoPoint);
+        // if user didn't specify a location, search events by current location
+        if(useCurrentLocation) {
+            if (currentLocation != null) {
+                currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+                eventAdapter.updateCurrentLocation(currentGeoPoint);
+            }
         }
-
         startLocationUpdates();
     }
 
@@ -457,7 +446,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // otherwise called by a click on something in VisitorFragment
         else {
             searchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
-            // if not any of the categories, user clicked on current/previous location
+            // if not any of the categories, user clicked on current location
             switch(searchCategory) {
                 case NO_SEARCH:
                     Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
@@ -662,39 +651,41 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 String locationQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
                 String queryText;
                 if (locationQueryId.equals(CURRENT_LOCATION_ID)) {
-                    // TODO get users current location again
-                    Toast.makeText(getApplicationContext(), "search by user current location", Toast.LENGTH_SHORT).show();
+                    useCurrentLocation = true;
+                    eventAdapter.updateCurrentLocation(currentGeoPoint);
                     queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                    locationSearch(currentGeoPoint, new Date(0));
                 } else {
+                    useCurrentLocation = false;
                     queryText = String.format(Locale.getDefault(),
                             "%s, %s",
                             cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)),
                             cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_2)));
+                    List<Place.Field> placeFields = Arrays.asList(Place.Field.LAT_LNG);
+                    FetchPlaceRequest request = FetchPlaceRequest.builder(locationQueryId, placeFields).build();
+                    placesClient.fetchPlace(request).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
+                        @Override
+                        public void onSuccess(FetchPlaceResponse response) {
+                            Place place = response.getPlace();
+                            Double latitude = place.getLatLng().latitude;
+                            Double longitude = place.getLatLng().longitude;
+                            Log.i("Fetch Place Request", "Successful call");
+                            locationSearch(new ParseGeoPoint(latitude, longitude), new Date(0));
+                            eventAdapter.updateCurrentLocation(new ParseGeoPoint(latitude, longitude));
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            if (exception instanceof ApiException) {
+                                ApiException apiException = (ApiException) exception;
+                                int statusCode = apiException.getStatusCode();
+                                // Handle error with given status code.
+                                Log.e("Fetch Place Request", "Place not found: " + exception.getMessage());
+                            }
+                        }
+                    });
                 }
                 searchView.setQuery(queryText, false);
-
-                List<Place.Field> placeFields = Arrays.asList(Place.Field.LAT_LNG);
-                FetchPlaceRequest request = FetchPlaceRequest.builder(locationQueryId, placeFields).build();
-                placesClient.fetchPlace(request).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
-                    @Override
-                    public void onSuccess(FetchPlaceResponse response) {
-                        Place place = response.getPlace();
-                        Double latitude = place.getLatLng().latitude;
-                        Double longitude = place.getLatLng().longitude;
-                        Log.i("Fetch Place Request", "Successful call");
-                        locationSearch(new ParseGeoPoint(latitude, longitude), new Date(0));
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        if (exception instanceof ApiException) {
-                            ApiException apiException = (ApiException) exception;
-                            int statusCode = apiException.getStatusCode();
-                            // Handle error with given status code.
-                            Log.e("Fetch Place Request", "Place not found: " + exception.getMessage());
-                        }
-                    }
-                });
                 searchView.clearFocus();
                 return true;
             }
@@ -814,6 +805,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
             @Override
             public boolean onSuggestionClick(int position) {
+                useCurrentLocation = true;
+                eventAdapter.updateCurrentLocation(currentGeoPoint);
                 Cursor cursor = (Cursor) categorySuggestionAdapter.getItem(position);
                 String categoryQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
                 String queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));

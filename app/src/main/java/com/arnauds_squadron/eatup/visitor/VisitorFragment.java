@@ -14,6 +14,7 @@ import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -90,6 +91,8 @@ public class VisitorFragment extends Fragment {
     Spinner searchSpinner;
     @BindView(R.id.recyclerview_pager_indicator)
     IndefinitePagerIndicator indefinitePagerIndicator;
+    @BindView(R.id.constraintLayoutLocation)
+    ConstraintLayout constraintLayoutLocation;
 
     private Unbinder unbinder;
     private BrowseEventAdapter eventAdapter;
@@ -175,8 +178,8 @@ public class VisitorFragment extends Fragment {
                         // Start geocoder service and update UI to reflect the new address
                         startIntentService(location);
                     }
-                    tvCurrentLocation.setTag(R.id.latitude, location.getLatitude());
-                    tvCurrentLocation.setTag(R.id.longitude, location.getLongitude());
+                    constraintLayoutLocation.setTag(R.id.latitude, location.getLatitude());
+                    constraintLayoutLocation.setTag(R.id.longitude, location.getLongitude());
 
                     currentLatitude = location.getLatitude();
                     currentLongitude = location.getLongitude();
@@ -237,11 +240,11 @@ public class VisitorFragment extends Fragment {
     }
 
 
-    @OnClick(R.id.tvCurrentLocation)
-    public void searchLocation(TextView tvLocation) {
+    @OnClick(R.id.constraintLayoutLocation)
+    public void searchLocation(ConstraintLayout constraintLayoutLocation) {
         Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
-        i.putExtra("latitude", (Double) tvLocation.getTag(R.id.latitude));
-        i.putExtra("longitude", (Double) tvLocation.getTag(R.id.longitude));
+        i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
+        i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
         startActivity(i);
     }
 

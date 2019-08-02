@@ -28,13 +28,13 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
     private List<Event> events;
     // context defined as global variable so Glide in onBindViewHolder has access
     private Context context;
-    private ParseGeoPoint currentUserLocation;
+    private ParseGeoPoint userLocation;
 
     // pass event array in constructor
-    public SearchEventAdapter(Context context, List<Event> events, ParseGeoPoint currentUserLocation) {
+    public SearchEventAdapter(Context context, List<Event> events, ParseGeoPoint userLocation) {
         this.context = context;
         this.events = events;
-        this.currentUserLocation = currentUserLocation;
+        this.userLocation = userLocation;
     }
 
     // for each row, inflate layout and cache references into ViewHolder
@@ -77,14 +77,12 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
-
-
         }
 
         public void bind(Event event) {
             // populate views according to data
             ParseGeoPoint eventAddress = event.getAddress();
-            double distanceInMiles = eventAddress.distanceInMilesTo(currentUserLocation);
+            double distanceInMiles = eventAddress.distanceInMilesTo(userLocation);
 
             tvDistance.setText(String.format(Locale.getDefault(), "%.2f mi", distanceInMiles));
             tvDistance.setTag(distanceInMiles);
@@ -119,8 +117,8 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         }
     }
 
-    void updateCurrentLocation(ParseGeoPoint currentUserLocation) {
-        this.currentUserLocation = currentUserLocation;
+    void updateCurrentLocation(ParseGeoPoint userLocation) {
+        this.userLocation = userLocation;
     }
 
     // RecyclerView adapter helper methods to clear items from or add items to underlying dataset
