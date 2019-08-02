@@ -54,6 +54,7 @@
                     android:layout_marginLeft="24dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/detailview_host_name"
+                    android:textColor="@color/bottom_black"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:transitionName="hostName"
