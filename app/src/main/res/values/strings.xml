@@ -61,6 +61,7 @@
     <string name="your_recent_events_label">Your Recent Events</string>
     <string name="chat_image">Chat Image</string>
     <string name="chats">Chats</string>
+    <string name="skip">Skip</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

@@ -7,18 +7,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,8 +29,8 @@ public class WalkthroughActivity extends AppCompatActivity {
     @BindView(R.id.btnNext)
     Button btnNext;
 
-    @BindView(R.id.llDots)
-    LinearLayout llDots;
+    @BindView(R.id.pager_indicator)
+    IndefinitePagerIndicator pagerIndicator;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -56,8 +53,6 @@ public class WalkthroughActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                setDot(llDots, viewPager.getAdapter().getCount(), position);
-
                 if (position == Constants.LAST_WALKTHROUGH_SCREEN)
                     btnNext.setText(getString(R.string.done));
                 else
@@ -69,37 +64,27 @@ public class WalkthroughActivity extends AppCompatActivity {
             }
         });
         viewPager.setAdapter(new WalkthroughAdapter(this));
-        setDot(llDots, viewPager.getAdapter().getCount(), 0);
+        pagerIndicator.attachToViewPager(viewPager);
     }
 
+    /**
+     * Advances the ViewPager to the next slide or starts the MainActivity if the ViewPager is on
+     * the last slide
+     */
     @OnClick(R.id.btnNext)
     public void advanceViewPager() {
         if (viewPager.getCurrentItem() == Constants.LAST_WALKTHROUGH_SCREEN)
-            startHomeActivity();
+            startMainActivity();
         else
             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
     }
 
     @OnClick(R.id.btnSkip)
     public void skipWalkthrough() {
-        startHomeActivity();
+        startMainActivity();
     }
 
-    private void setDot(ViewGroup viewGroup, int count, int position) {
-        viewGroup.removeAllViews();
-        TextView[] dot = new TextView[count];
-
-        for (int i = 0; i < count; i++) {
-            dot[i] = new TextView(this);
-            dot[i].setText(Html.fromHtml("&#8226;"));
-            dot[i].setTextSize(50);
-            dot[i].setTextColor(Color.BLACK);
-            viewGroup.addView(dot[i]);
-        }
-        dot[position].setTextColor(Color.WHITE);
-    }
-
-    private void startHomeActivity() {
+    private void startMainActivity() {
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
