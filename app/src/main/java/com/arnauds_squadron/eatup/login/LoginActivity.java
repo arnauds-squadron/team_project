@@ -1,6 +1,7 @@
 package com.arnauds_squadron.eatup.login;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,12 +12,16 @@ import android.widget.EditText;
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.arnauds_squadron.eatup.walkthrough.WalkthroughActivity;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.arnauds_squadron.eatup.utils.Constants.FIRST_LOAD;
+import static com.arnauds_squadron.eatup.utils.Constants.PREFS_NAME;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -28,18 +33,26 @@ public class LoginActivity extends AppCompatActivity {
     Button btnLogin;
     @BindView(R.id.btnSignup)
     Button btnSignup;
+
     public static String name;
+    private boolean isFirstLoad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
             Constants.CURRENT_USER = currentUser;
             goToMainActivity();
         }
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        isFirstLoad = prefs.getBoolean(FIRST_LOAD, true);
+        prefs.edit().putBoolean(FIRST_LOAD, false).apply();
+
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,10 +71,10 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void login(final String username, String password) {
+    private void login(final String username, final String password) {
         ParseUser.becomeInBackground("session-token-here", new LogInCallback() {
             public void done(ParseUser user, ParseException e) {
-                if(user == null) {
+                if (user == null) {
                     Log.e("LoginActivity", "Unknown user");
                 }
             }
@@ -75,7 +88,11 @@ public class LoginActivity extends AppCompatActivity {
                         name = username;
                         user.setUsername(username);
                         Constants.CURRENT_USER = currentUser;
-                        goToMainActivity();
+
+                        if (isFirstLoad)
+                            gotoWelcomeActivity();
+                        else
+                            goToMainActivity();
                     }
 
                 } else {
@@ -86,11 +103,17 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void gotoWelcomeActivity() {
+        Log.d("LoginActivity", "Login Successful");
+        final Intent intent = new Intent(LoginActivity.this, WalkthroughActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private void goToMainActivity() {
         Log.d("LoginActivity", "Login Successful");
         final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
     }
-
 }

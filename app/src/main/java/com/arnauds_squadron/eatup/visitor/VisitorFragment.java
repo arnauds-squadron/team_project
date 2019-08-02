@@ -109,8 +109,8 @@ public class VisitorFragment extends Fragment {
     private boolean foundCurrentLocation = false;
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 14;
-    private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 2000; /* 2 sec */
+    private static final long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
+    private static final long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
@@ -121,15 +121,8 @@ public class VisitorFragment extends Fragment {
     public Double currentLatitude;
     public Double currentLongitude;
 
-    public static VisitorFragment newInstance() {
-        Bundle args = new Bundle();
-        VisitorFragment fragment = new VisitorFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_visitor, container, false);
         unbinder = ButterKnife.bind(this, view);
@@ -472,7 +465,6 @@ public class VisitorFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-
     // ResultReceiver to set current location field based on address of lat/long
     class AddressResultReceiver extends ResultReceiver {
         AddressResultReceiver(Handler handler) {
@@ -481,13 +473,11 @@ public class VisitorFragment extends Fragment {
 
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-
             if (resultData == null) {
                 return;
             }
 
-            // Display the address string
-            // or an error message sent from the intent service.
+            // Display the address string or an error message sent from the intent service.
             addressOutput = resultData.getString(RESULT_DATA_KEY);
             if (addressOutput == null) {
                 addressOutput = "";

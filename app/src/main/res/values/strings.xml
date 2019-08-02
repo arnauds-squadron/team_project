@@ -20,7 +20,6 @@
     <string name="event_creation_create_event_text">Create Event</string>
     <string name="event_creation_date_not_selected">Date not set</string>
     <string name="event_creation_tags_hint">Cuisine</string>
-    <string name="event_creation_next_button_text">Next</string>
     <string name="event_creation_review_title">Confirm Your Event</string>
     <string name="event_creation_start_new_event">Create a new event</string>
     <string name="event_creation_start_title">Set Up Your Event</string>
@@ -43,6 +42,8 @@
     <string name="search_results_title">Results</string>
     <string name="search_again">Search again</string>
     <string name="about">About</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
     <string name="no_bio">This user hasn\'t set a bio</string>
     <string name="num_ratings">numRatings</string>
     <string name="message_profile_image">my profile image</string>
@@ -60,6 +61,7 @@
     <string name="your_recent_events_label">Your Recent Events</string>
     <string name="chat_image">Chat Image</string>
     <string name="chats">Chats</string>
+    <string name="skip">Skip</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

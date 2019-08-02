@@ -21,19 +21,20 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/short_glass_white_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".profile.VisitorProfileActivity"></activity>
-        <activity android:name=".RateUserActivity" />
-        <activity android:name=".profile.ProfileImageActivity" />
-        <activity android:name=".event_details.EventDetailsRestaurantActivity" />
         <activity android:name=".event_details.EventDetailsActivity" />
+        <activity android:name=".event_details.EventDetailsRestaurantActivity" />
         <activity android:name=".login.SignupActivity" />
         <activity android:name=".profile.HostProfileActivity" />
+        <activity android:name=".profile.ProfileImageActivity" />
+        <activity android:name=".profile.VisitorProfileActivity" />
+        <activity android:name=".RateUserActivity" />
+        <activity android:name=".walkthrough.WalkthroughActivity" />
 
         <service
             android:name=".utils.FetchAddressIntentService"
