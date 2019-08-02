@@ -2,6 +2,7 @@ package com.arnauds_squadron.eatup.visitor;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,6 +72,8 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvCuisine;
         @BindView(R.id.tvDistance)
         TextView tvDistance;
+        @BindView(R.id.layoutOver21)
+        ConstraintLayout layoutOver21;
 
         // constructor takes in inflated layout
         public ViewHolder(View itemView) {
@@ -98,6 +101,12 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                         .load(eventImage.getUrl())
                         .centerCrop()
                         .into(ivEventImage);
+            }
+
+            if(event.getOver21()) {
+                layoutOver21.setVisibility(View.VISIBLE);
+            } else {
+                layoutOver21.setVisibility(View.INVISIBLE);
             }
         }
 
