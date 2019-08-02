@@ -3,39 +3,28 @@ package com.arnauds_squadron.eatup;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.arnauds_squadron.eatup.models.Rating;
 import com.bumptech.glide.Glide;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATINGS_GUEST;
-import static com.arnauds_squadron.eatup.utils.Constants.AVG_RATING_HOST;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
-import static com.arnauds_squadron.eatup.utils.Constants.HOST;
+
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS_GUEST;
-import static com.arnauds_squadron.eatup.utils.Constants.NUM_RATINGS_HOST;
 
 // Provide the underlying view for an individual list item.
 public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
@@ -57,7 +46,7 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View itemView = inflater.inflate(R.layout.item_rate_user, parent, false);
-        return new VH(itemView, mContext);
+        return new VH(itemView);
     }
 
     // Display data at the specified position
@@ -104,7 +93,7 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
         @BindView(R.id.userRatingBar)
         RatingBar userRatingBar;
 
-        VH(View itemView, final Context context) {
+        VH(View itemView) {
             super(itemView);
             rootView = itemView;
             ButterKnife.bind(this, itemView);
@@ -118,76 +107,5 @@ public class RateUserAdapter extends RecyclerView.Adapter<RateUserAdapter.VH> {
                 }
             });
         }
-    }
-
-    void submitRating(final Context context, final ParseUser user, final float newRating, final String ratingType) {
-        ParseQuery<Rating> query = new Rating.Query();
-        query.whereEqualTo("user", user);
-        query.findInBackground(new FindCallback<Rating>() {
-            public void done(List<Rating> ratings, ParseException e) {
-                if (e == null) {
-                    if (ratings.size() != 0) {
-                        Rating rating = ratings.get(0);
-                        if (ratingType.equals(HOST)) {
-                            float averageRating = rating.getAvgRatingHost().floatValue();
-                            int numRatings = rating.getNumRatingsHost().intValue();
-
-                            rating.put(AVG_RATING_HOST, calculateRating(averageRating, numRatings, newRating));
-                            rating.increment(NUM_RATINGS_HOST);
-                        } else {
-                            float averageRating = rating.getAvgRatingGuest().floatValue();
-                            int numRatings = rating.getNumRatingsGuest().intValue();
-
-                            rating.put(AVG_RATINGS_GUEST, calculateRating(averageRating, numRatings, newRating));
-                            rating.increment(NUM_RATINGS_GUEST);
-                        }
-                        rating.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e == null) {
-                                    Toast.makeText(context, "User successfully rated.", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.d("RateUserActivity", "Error while saving");
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    } else {
-                        createRating(context, newRating, user, ratingType);
-                    }
-                } else {
-                    Toast.makeText(context, "Query for rating not successful", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    private float calculateRating(float averageRating, int numRatings, float newRating) {
-        float currentTotal = averageRating * numRatings;
-        return (currentTotal + newRating) / (numRatings + 1);
-    }
-
-    private void createRating(final Context context, float rating, ParseUser user, String ratingType) {
-        final Rating newRating = new Rating();
-        newRating.setUser(user);
-        if(ratingType.equals(HOST)) {
-            newRating.setAvgRatingHost(rating);
-            newRating.setNumRatingsHost(1);
-        } else {
-            newRating.setAvgRatingGuest(rating);
-            newRating.setNumRatingsGuest(1);
-        }
-        newRating.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("RateUserActivity", "Create new rating successful");
-                    Toast.makeText(context, "User successfully rated.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Log.d("PostDetailsActivity", "Error: unable to make new rating");
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 }
