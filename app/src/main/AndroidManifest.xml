@@ -34,14 +34,7 @@
         <activity android:name=".profile.ProfileImageActivity" />
         <activity android:name=".profile.VisitorProfileActivity" />
         <activity android:name=".RateUserActivity" />
-        <activity android:name=".walkthrough.WalkthroughActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
+        <activity android:name=".walkthrough.WalkthroughActivity" />
 
         <service
             android:name=".utils.FetchAddressIntentService"
@@ -82,11 +75,11 @@
         <activity
             android:name=".login.LoginActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
