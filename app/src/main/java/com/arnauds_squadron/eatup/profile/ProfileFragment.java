@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Rating;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -49,8 +51,6 @@ public class ProfileFragment extends Fragment {
     EditText etUsername;
     @BindView(R.id.tvUsername)
     TextView tvUsername;
-    @BindView(R.id.tvUsername2)
-    TextView tvUsername2;
     @BindView(R.id.tvBio)
     TextView tvBio;
     @BindView(R.id.tvRatings)
@@ -58,18 +58,20 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.ratingBar)
     RatingBar ratingBar;
     @BindView(R.id.btnNewProfileImage)
-    Button btnNewProfileImage;
-    @BindView(R.id.btnSave)
-    Button btnSave;
-    @BindView(R.id.btnCancel)
-    Button btnCancel;
-    @BindView(R.id.ivLogout)
-    ImageView ivLogout;
+    FloatingActionButton btnNewProfileImage;
+    @BindView(R.id.ivSave)
+    ImageView ivSave;
+    @BindView(R.id.ivCancel)
+    ImageView ivCancel;
+    @BindView(R.id.btLogout)
+    Button btLogout;
     @Nullable
     @BindView(R.id.ivImage)
     ImageView ivProfile;
-    @BindView(R.id.ivEditUsername)
-    ImageView ivEditUsername;
+    @BindView(R.id.btEditUsername)
+    Button btEditUsername;
+    @BindView(R.id.tvEditTitle)
+    TextView tvEditTitle;
 
     private OnFragmentInteractionListener mListener;
 
@@ -84,8 +86,9 @@ public class ProfileFragment extends Fragment {
         ButterKnife.bind(this, view);
         etBio.setVisibility(View.INVISIBLE);
         etUsername.setVisibility(View.INVISIBLE);
-        btnCancel.setVisibility(View.INVISIBLE);
-        btnSave.setVisibility(View.INVISIBLE);
+        tvEditTitle.setVisibility(View.INVISIBLE);
+        ivCancel.setVisibility(View.INVISIBLE);
+        ivSave.setVisibility(View.INVISIBLE);
         return view;
     }
     @Override
@@ -122,12 +125,12 @@ public class ProfileFragment extends Fragment {
         if (profileImage != null) {
             Glide.with(this)
                     .load(profileImage.getUrl())
+                    .transform(new CircleCrop())
                     .into(ivProfile);
         }
         String username = user.getUsername();
         if(user.getUsername() != null) {
             tvUsername.setText(username);
-            tvUsername2.setText(username);
             etUsername.setText(username);
         }
 
@@ -167,16 +170,17 @@ public class ProfileFragment extends Fragment {
 //        Intent cInt = new Intent(getActivity(), ProfileImageActivity.class);
 //        startActivity(cInt);
 //    }
-    @OnClick(R.id.ivEditUsername)
+    @OnClick(R.id.btEditUsername)
     public void editUsername () {
         tvBio.setVisibility(View.INVISIBLE);
         tvUsername.setVisibility(View.INVISIBLE);
         etUsername.setVisibility(View.VISIBLE);
         etBio.setVisibility(View.VISIBLE);
-        btnCancel.setVisibility(View.VISIBLE);
-        btnSave.setVisibility(View.VISIBLE);
+        tvEditTitle.setVisibility(View.VISIBLE);
+        ivCancel.setVisibility(View.VISIBLE);
+        ivSave.setVisibility(View.VISIBLE);
     }
-    @OnClick(R.id.btnSave)
+    @OnClick(R.id.ivSave)
     public void saveChanges () {
         //todo make changes update to ParseDashboard
         ParseUser user = Constants.CURRENT_USER;
@@ -200,22 +204,24 @@ public class ProfileFragment extends Fragment {
         tvUsername.setVisibility(View.VISIBLE);
         etBio.setVisibility(View.INVISIBLE);
         etUsername.setVisibility(View.INVISIBLE);
-        btnSave.setVisibility(View.INVISIBLE);
-        btnCancel.setVisibility(View.INVISIBLE);
+        tvEditTitle.setVisibility(View.INVISIBLE);
+        ivSave.setVisibility(View.INVISIBLE);
+        ivCancel.setVisibility(View.INVISIBLE);
     }
-    @OnClick(R.id.btnCancel)
+    @OnClick(R.id.ivCancel)
     public void cancelChanges () {
         tvBio.setVisibility(View.VISIBLE);
+        tvEditTitle.setVisibility(View.INVISIBLE);
         tvUsername.setVisibility(View.VISIBLE);
         etUsername.setVisibility(View.INVISIBLE);
         etUsername.setText(tvUsername.getText());
         etBio.setVisibility(View.INVISIBLE);
         etBio.setText(tvBio.getText());
-        btnCancel.setVisibility(View.INVISIBLE);
-        btnSave.setVisibility(View.INVISIBLE);
+        ivCancel.setVisibility(View.INVISIBLE);
+        ivSave.setVisibility(View.INVISIBLE);
     }
 
-    @OnClick(R.id.ivLogout)
+    @OnClick(R.id.btLogout)
     public void logout () {
         ParseUser.logOut();
         mListener.stopUpdatingEvents();

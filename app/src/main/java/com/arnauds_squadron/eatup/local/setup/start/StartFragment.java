@@ -3,8 +3,10 @@ package com.arnauds_squadron.eatup.local.setup.start;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +29,16 @@ import butterknife.OnClick;
  * Fragment that displays all the selected fields and will create the event when confirmed
  */
 public class StartFragment extends Fragment {
-    // TODO: Copy a recent event (have users working first)
 
     @BindView(R.id.rvRecentEvents)
     RecyclerView rvRecentEvents;
 
+    @BindView(R.id.pager_indicator)
+    IndefinitePagerIndicator pagerIndicator;
+
     private OnFragmentInteractionListener mListener;
     private List<Event> events;
     private RecentEventAdapter recentEventAdapter;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,10 +53,12 @@ public class StartFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         events = new ArrayList<>();
-        // construct adapter from data source
         recentEventAdapter = new RecentEventAdapter(this, events);
-        // RecyclerView setup
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        SnapHelper pagerSnapHelper = new PagerSnapHelper();
+        pagerSnapHelper.attachToRecyclerView(rvRecentEvents);
+        pagerIndicator.attachToRecyclerView(rvRecentEvents);
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1,
+                GridLayoutManager.HORIZONTAL, false);
         rvRecentEvents.setLayoutManager(layoutManager);
         rvRecentEvents.setAdapter(recentEventAdapter);
 

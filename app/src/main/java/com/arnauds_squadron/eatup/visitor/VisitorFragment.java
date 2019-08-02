@@ -14,6 +14,7 @@ import android.os.ResultReceiver;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -32,7 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.BuildConfig;
-import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
@@ -47,7 +47,6 @@ import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
@@ -60,7 +59,6 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
@@ -78,8 +76,6 @@ public class VisitorFragment extends Fragment {
 
     // TODO browsing nearby events - account for scenario in which user doesn't enable current location, use last remembered location or display a random array of events
 
-    @BindView(R.id.tvDisplayName)
-    TextView tvDisplayName;
     @BindView(R.id.tvBrowseTitle)
     TextView tvBrowseTitle;
     @BindView(R.id.rvBrowse)
@@ -90,6 +86,8 @@ public class VisitorFragment extends Fragment {
     Spinner searchSpinner;
     @BindView(R.id.recyclerview_pager_indicator)
     IndefinitePagerIndicator indefinitePagerIndicator;
+    @BindView(R.id.constraintLayoutLocation)
+    ConstraintLayout constraintLayoutLocation;
 
     private Unbinder unbinder;
     private BrowseEventAdapter eventAdapter;
@@ -128,8 +126,6 @@ public class VisitorFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        tvDisplayName.setText(ParseUser.getCurrentUser().getString(DISPLAY_NAME));
-        // initialize data source
         mEvents = new ArrayList<>();
         // construct adapter from data source
         adapterGeoPoint = new ParseGeoPoint(0, 0);
@@ -168,8 +164,8 @@ public class VisitorFragment extends Fragment {
                         // Start geocoder service and update UI to reflect the new address
                         startIntentService(location);
                     }
-                    tvCurrentLocation.setTag(R.id.latitude, location.getLatitude());
-                    tvCurrentLocation.setTag(R.id.longitude, location.getLongitude());
+                    constraintLayoutLocation.setTag(R.id.latitude, location.getLatitude());
+                    constraintLayoutLocation.setTag(R.id.longitude, location.getLongitude());
 
                     currentLatitude = location.getLatitude();
                     currentLongitude = location.getLongitude();
@@ -230,28 +226,23 @@ public class VisitorFragment extends Fragment {
     }
 
 
-    @OnClick(R.id.tvCurrentLocation)
-    public void searchLocation(TextView tvLocation) {
+    @OnClick(R.id.constraintLayoutLocation)
+    public void searchLocation(ConstraintLayout constraintLayoutLocation) {
         Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
-        i.putExtra("latitude", (Double) tvLocation.getTag(R.id.latitude));
-        i.putExtra("longitude", (Double) tvLocation.getTag(R.id.longitude));
+        i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
+        i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
         startActivity(i);
     }
 
-    @OnClick(R.id.tvDisplayName)
-    public void viewUserProfile() {
-        Intent i = new Intent(getActivity(), HostProfileActivity.class);
-        ParseUser user = ParseUser.getCurrentUser();
-        i.putExtra("user", user);
-        getActivity().startActivity(i);
-    }
-
-    // methods to load posts into the recyclerview based on location
+    // methods to load posts into the RecyclerView based on location
     private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
-            eventAdapter.clear();
-            eventsQuery.getClosest(geoPoint).getTopAscending().withHost().notFilled().notOwnEvent(Constants.CURRENT_USER);
-
+        eventsQuery.getClosest(geoPoint)
+                .getTopAscending()
+                .withHost()
+                .notFilled()
+                .notOwnEvent(Constants.CURRENT_USER);
+        eventAdapter.clear();
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {

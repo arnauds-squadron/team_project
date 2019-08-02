@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowContentTransitions" tools:targetApi="lollipop">true</item>
+        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -23,7 +24,7 @@
         <item name="android:background">#507B91</item>
     </style>
 
-    <style name="button_default">
+    <style name="button_action">
         <item name="android:background">@xml/rounded_button</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>
@@ -32,10 +33,15 @@
 
     <style name="textview_message">
         <item name="android:background">@xml/rounded_text</item>
+        <item name="android:breakStrategy" tools:targetApi="m">simple</item>
         <item name="android:gravity">center_vertical</item>
+        <item name="android:maxWidth">250dp</item>
+        <item name="android:paddingBottom">8dp</item>
         <item name="android:paddingLeft">12dp</item>
         <item name="android:paddingRight">12dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:singleLine">false</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">18dp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 </resources>
