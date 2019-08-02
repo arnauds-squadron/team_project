@@ -31,6 +31,7 @@ import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import org.json.JSONArray;
 
@@ -94,7 +95,7 @@ public class HomeFragment extends Fragment {
         //swipe to delete
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(rvAgenda);
-        ArrayAdapter adapter = ArrayAdapter.createFromResource(getContext(), R.array.date, R.layout.spinner_item1);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(getContext(), R.array.host, R.layout.spinner_item1);
         spinner.setAdapter(adapter);
         String value = spinner.getSelectedItem().toString();
         setSpinnerToValue(spinner, value);
@@ -148,16 +149,12 @@ public class HomeFragment extends Fragment {
         final String userId = Constants.CURRENT_USER.getObjectId();
         final Event.Query query = new Event.Query();
 
-        Date date = Calendar.getInstance(TimeZone.getDefault()).getTime();
-
         if(filterType == 1) {
-            query.getOlder(date).notRated(Constants.CURRENT_USER);
+            query.withHost().ownEvent(ParseUser.getCurrentUser());
         } else if (filterType == 2) {
-            query.getAvailable(date).notRated(Constants.CURRENT_USER);
-        } else{
-            query.withHost().notRated(Constants.CURRENT_USER).orderByDescending("createdAt");
-
+            query.withHost().notOwnEvent(ParseUser.getCurrentUser());
         }
+        query.orderByDescending("date");
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {

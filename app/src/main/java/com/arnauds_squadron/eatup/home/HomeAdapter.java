@@ -1,13 +1,16 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,14 +27,22 @@ import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
+import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
+import com.arnauds_squadron.eatup.yelp_api.YelpData;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -40,11 +51,14 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CHANNEL_ID;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
 import static com.arnauds_squadron.eatup.utils.Constants.HOST;
+import static com.parse.Parse.getApplicationContext;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
@@ -97,7 +111,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 }
                 // event is in the future
                 String[] split = event.getDate().toString().split(" ");
-                viewHolder.tvDate.setText(split[1] + "\n" + split[2]);
+                viewHolder.tvDate.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
             }
         }
         if (event.getTitle() != null) {
@@ -118,12 +132,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 //            viewHolder.ivImage.loadInBackground();
 //        }
 
-        try {
-            viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(event.getAddressString() != null) {
+            viewHolder.tvPlace.setText(event.getAddressString());
         }
-
         // Display requests if the current user is the host of this event
         if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
             requests = new ArrayList<>();
@@ -137,12 +148,28 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             getPendingRequests(event);
         }
         ParseUser parseUser = event.getHost();
-//        if (parseUser.equals(ParseUser.getCurrentUser())) {
-//            viewHolder.ivProfileImage.setParseFile(ParseUser.getCurrentUser().getParseFile("profilePicture"));
-//        } else {
-//            viewHolder.ivProfileImage.setParseFile(parseUser.getParseFile("profilePicture"));
-//        }
-//        viewHolder.ivProfileImage.loadInBackground();
+        File parseFile = null;
+        if (parseUser.equals(ParseUser.getCurrentUser()) && ParseUser.getCurrentUser().getParseFile("profilePicture") != null) {
+            try {
+                parseFile = ParseUser.getCurrentUser().getParseFile("profilePicture").getFile();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            if (parseUser.getParseFile("profilePicture") != null){
+                try {
+                    parseFile = parseUser.getParseFile("profilePicture").getFile();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        viewHolder.ivProfileImage.loadInBackground();
+        Glide.with(context)
+                .load(parseFile)
+                .transform(new CircleCrop())
+                .into(viewHolder.ivProfileImage);
+
     }
 
     @Override
@@ -193,8 +220,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         @BindView(R.id.ibOpenChat)
         ImageButton ibOpenChat;
 
-//        @BindView(R.id.ivProfileImage)
-//        ParseImageView ivProfileImage;
+        @BindView(R.id.ivProfileImage)
+        ParseImageView ivProfileImage;
 
         @BindView(R.id.btnCancel)
         Button btnCancel;
@@ -211,14 +238,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         @BindView(R.id.rvRequests)
         RecyclerView rvRequests;
 
-        ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int eventPosition = getAdapterPosition();
-                    Event event = mAgenda.get(eventPosition);
+                    final int eventPosition = getAdapterPosition();
+                    final Event event = mAgenda.get(eventPosition);
 
                     // if past event date, rate the attending users. otherwise cancel the event
                     Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
@@ -233,6 +260,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         mAgenda.remove(eventPosition);
                         notifyItemRemoved(eventPosition);
                         notifyItemRangeChanged(eventPosition, mAgenda.size());
+                        Snackbar snackbar = Snackbar.make(itemView, "DELETED!", Snackbar.LENGTH_LONG)
+                                .setAction("UNDO", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        mAgenda.add(eventPosition, event);
+                                        notifyDataSetChanged();
+                                    }
+                                });
+                        snackbar.setActionTextColor(Color.YELLOW);
+                        snackbar.show();
                     }
                 }
             });

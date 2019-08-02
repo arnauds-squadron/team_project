@@ -81,16 +81,16 @@ public class HomeDetailsActivity extends AppCompatActivity {
         // if we have a response, then get the specific information defined in the Business Class
         Call<YelpApiResponse> meetUp = null;
         if (event.getTags() != null){
-            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().get(0));
+            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().get(0), 50);
         } else {
-            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine());
+            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 50);
         }
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the
         // ApiResponse if we have a response, then get the specific information defined in the
         // Business Class
         meetUp = YelpData.retrofit(context).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),
-                event.getTags().get(0));
+                event.getTags().get(0), 50);
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @SuppressLint("SetTextI18n")
@@ -103,7 +103,8 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     if (yelpApiResponse != null) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
                         Location location = restaurant.location;
-                        tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
+                        //tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
+                        tvPlace.setText(event.getAddressString());
                         tvYelp.setText(restaurant.name);
                         final String url = restaurant.url;
 
