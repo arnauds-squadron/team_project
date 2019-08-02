@@ -33,8 +33,6 @@ public class VisitorProfileActivity extends AppCompatActivity {
     ImageView ivProfile;
     @BindView(R.id.tvUsername)
     TextView tvUsername;
-    @BindView(R.id.tvUsername2)
-    TextView tvUsername2;
     @BindView(R.id.tvBio)
     TextView tvBio;
     @BindView(R.id.tvRatings)
@@ -83,7 +81,6 @@ public class VisitorProfileActivity extends AppCompatActivity {
         String username = user.getUsername();
         if(user.getUsername() != null) {
             tvUsername.setText(username);
-            tvUsername2.setText(username);
         }
 
         // load user bio
