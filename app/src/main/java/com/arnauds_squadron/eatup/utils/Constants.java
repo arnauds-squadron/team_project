@@ -45,6 +45,10 @@ public final class Constants {
     // The logged in user, only changed in the login activity
     public static ParseUser CURRENT_USER;
 
+    public static final String PREFS_NAME = "preferences";
+    public static final String FIRST_LOAD = "first_load";
+    public static final int LAST_WALKTHROUGH_SCREEN = 2;
+
     // Channel id for push notifications
     public final static String CHANNEL_ID = "Toast";
 
