@@ -62,6 +62,7 @@
     <string name="chat_image">Chat Image</string>
     <string name="chats">Chats</string>
     <string name="skip">Skip</string>
+    <string name="set">Set</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

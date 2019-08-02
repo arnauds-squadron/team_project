@@ -1,13 +1,18 @@
 package com.arnauds_squadron.eatup.local.setup;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.Locale;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -114,13 +119,29 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      * of guests by 1
      */
     @OnClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
-    public void addGuest() {
-        int newAmount = Integer.parseInt(tvMaxGuests.getText().toString()) + 1;
-        if (newAmount < Constants.MAX_GUESTS) {
-            String text = Integer.toString(newAmount);
-            event.setMaxGuests(newAmount);
-            tvMaxGuests.setText(text);
-        }
+    public void editMaxGuests() {
+        final Dialog d = new Dialog(getActivity());
+        d.setTitle("NumberPicker");
+        d.setContentView(R.layout.dialog_max_guests);
+        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        final NumberPicker npMaxGuests = d.findViewById(R.id.npMaxGuests);
+        npMaxGuests.setMinValue(1);
+        npMaxGuests.setMaxValue(Constants.MAX_GUESTS);
+        npMaxGuests.setWrapSelectorWheel(false);
+
+        Button btnSet = d.findViewById(R.id.btnSet);
+        btnSet.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                String text = npMaxGuests.getValue() + "";
+                tvMaxGuests.setText(text);
+                event.setMaxGuests(npMaxGuests.getValue());
+                d.hide();
+            }
+        });
+        d.show();
     }
 
     /**
@@ -182,12 +203,23 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      * Initialize all the TextViews and details of the current event
      */
     private void initializeViews() {
-        tvTags.setText(FormatHelper.listToString(event.getTags()));
-        tvMaxGuests.setText(String.format(Locale.ENGLISH, "%d", event.getMaxGuests()));
-        cbOver21.setChecked(event.getOver21());
-        tvAddress.setText(event.getAddressString());
-        tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
-        tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));
+        List<String> tags = event.getTags();
+
+        if(tags != null) { // recent event
+            tvTags.setText(FormatHelper.listToString(event.getTags()));
+            tvMaxGuests.setText(event.getMaxGuests());
+            cbOver21.setChecked(event.getOver21());
+            tvAddress.setText(event.getAddressString());
+            tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
+            tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));
+        } else {
+            tvTags.setText("No tags set");
+            tvMaxGuests.setText("1");
+            cbOver21.setChecked(false);
+            tvAddress.setText("No location set");
+            tvSelectedDate.setText("No date set");
+            tvSelectedTime.setText("No time set");
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getChildFragmentManager().findFragmentById(R.id.mapFragment);
@@ -201,17 +233,19 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LatLng eventLocation = new LatLng(event.getAddress().getLatitude(),
-                event.getAddress().getLongitude());
+        if(event.getAddress() != null) {
+            LatLng eventLocation = new LatLng(event.getAddress().getLatitude(),
+                    event.getAddress().getLongitude());
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
-                UIHelper.DETAILED_MAP_ZOOM_LEVEL));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
+                    UIHelper.DETAILED_MAP_ZOOM_LEVEL));
 
-        googleMap.addMarker(new MarkerOptions()
-                .position(eventLocation)
-                .title(event.getTitle())
-                .snippet("snippet")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            googleMap.addMarker(new MarkerOptions()
+                    .position(eventLocation)
+                    .title(event.getTitle())
+                    .snippet("snippet")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        }
     }
 
     public interface OnFragmentInteractionListener {

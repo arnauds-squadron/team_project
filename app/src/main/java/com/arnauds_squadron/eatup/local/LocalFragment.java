@@ -85,7 +85,8 @@ public class LocalFragment extends Fragment implements
     @Override
     public void startEventCreation() {
         usingRecentEvent = false;
-        advanceViewPager();
+        event = new Event();
+        viewPager.setCurrentItem(Constants.REVIEW_FRAGMENT_INDEX);
     }
 
     /**
