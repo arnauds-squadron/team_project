@@ -15,9 +15,9 @@
         <item>Restaurant</item>
         <item>Home-cooked</item>
     </array>
-    <string-array name="date">
+    <string-array name="host">
         <item>All</item>
-        <item>Past</item>
-        <item>Available</item>
+        <item>Hosting</item>
+        <item>Visiting</item>
     </string-array>
 </resources>

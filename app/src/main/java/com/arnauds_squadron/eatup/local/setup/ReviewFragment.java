@@ -1,5 +1,7 @@
 package com.arnauds_squadron.eatup.local.setup;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,10 +14,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.utils.UIHelper;
+import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
+import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,6 +37,10 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+
+import static com.parse.Parse.getApplicationContext;
 
 /**
  * Fragment that displays all the selected fields and will create the event when confirmed
@@ -170,6 +180,40 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      */
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
+       Context context = getApplicationContext();
+        //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
+        // if we have a response, then get the specific information defined in the Business Class
+        Call<YelpApiResponse> meetUp;
+        if (event.getTags() != null){
+            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().get(0), 50);
+        } else {
+            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 50);
+        }
+        meetUp = YelpData.retrofit(context).getLocation(
+                event.getAddress().getLatitude(), event.getAddress().getLongitude(),
+                event.getTags().get(0), 50);
+
+        meetUp.enqueue(new Callback<YelpApiResponse>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onResponse(@NonNull Call<YelpApiResponse> call,
+                                   @NonNull retrofit2.Response<YelpApiResponse> response) {
+                if (response.isSuccessful()) {
+
+                    YelpApiResponse yelpApiResponse = response.body();
+                    if (yelpApiResponse != null) {
+                        Business restaurant = yelpApiResponse.businessList.get(0);
+                        Location location = restaurant.location;
+                        event.setAddressString(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
+
+                    }
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<YelpApiResponse> call, @NonNull Throwable t) {
+                t.printStackTrace();
+            }
+        });
         String eventTitle = etEventTitle.getText().toString().trim();
 
         if (!eventTitle.isEmpty())
