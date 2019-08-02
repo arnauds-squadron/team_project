@@ -43,14 +43,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseUser currentUser = null;
         if (currentUser != null) {
             Constants.CURRENT_USER = currentUser;
             goToMainActivity();
         }
 
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        isFirstLoad = prefs.getBoolean(FIRST_LOAD, true);
+        isFirstLoad = true;
         prefs.edit().putBoolean(FIRST_LOAD, false).apply();
 
         btnSignup.setOnClickListener(new View.OnClickListener() {

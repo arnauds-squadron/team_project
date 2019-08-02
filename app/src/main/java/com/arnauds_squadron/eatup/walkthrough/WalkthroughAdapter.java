@@ -20,7 +20,8 @@ public class WalkthroughAdapter extends PagerAdapter {
     private final Context context;
     private int[] layoutIds = {R.layout.walkthrough_slide_1,
             R.layout.walkthrough_slide_2,
-            R.layout.walkthrough_slide_3};
+            R.layout.walkthrough_slide_3,
+            R.layout.walkthrough_slide_4};
 
     WalkthroughAdapter(Context context) {
         this.context = context;

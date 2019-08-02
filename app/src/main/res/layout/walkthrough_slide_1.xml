@@ -1,44 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/walkthrough_slide_1_background">
+    android:background="@drawable/walkthrough_gradient">
 
     <ImageView
         android:id="@+id/iv_sl1"
-        android:layout_width="256dp"
-        android:layout_height="256dp"
+        android:layout_width="225dp"
+        android:layout_height="225dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="32dp"
-        android:src="@mipmap/short_glass_white_circle"
+        android:layout_marginTop="36dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.469"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_title1"
+        app:srcCompat="@drawable/toast_logo" />
 
     <TextView
         android:id="@+id/tv_title1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:text="Explore The whole World"
+        android:layout_marginTop="120dp"
+        android:text="@string/walkthrough_welcome"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
         android:textColor="@color/white"
-        android:textSize="30sp"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_sl1" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_des1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_title1"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:textColor="@color/black"
-        android:text="Your Nearby places is just one click away."
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="74dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginRight="60dp"
+        android:layout_marginBottom="150dp"
+        android:gravity="center_horizontal"
+        android:text="Meet new people and try the best local cuisines."
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title1" />
+        app:layout_constraintTop_toBottomOf="@+id/iv_sl1" />
 </android.support.constraint.ConstraintLayout>
