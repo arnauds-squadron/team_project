@@ -147,14 +147,15 @@ public class HomeFragment extends Fragment {
 
         final String userId = Constants.CURRENT_USER.getObjectId();
         final Event.Query query = new Event.Query();
+
         Date date = Calendar.getInstance(TimeZone.getDefault()).getTime();
 
         if(filterType == 1) {
-            query.getOlder(date);
+            query.getOlder(date).notRated(Constants.CURRENT_USER);
         } else if (filterType == 2) {
-            query.getAvailable(date);
+            query.getAvailable(date).notRated(Constants.CURRENT_USER);
         } else{
-            query.withHost().orderByDescending("createdAt");
+            query.withHost().notRated(Constants.CURRENT_USER).orderByDescending("createdAt");
 
         }
         query.findInBackground(new FindCallback<Event>() {

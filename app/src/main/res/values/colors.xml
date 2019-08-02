@@ -11,11 +11,18 @@
     <!--Eat up custom colors-->
     <color name="toast_red">#D81B34</color>
     <color name="view_background">#FAFAFA</color>
+    <color name="message_gray">#EAEAEA</color>
     <color name="accept_button_tint">#86db9a</color>
     <color name="deny_button_tint">#db8686</color>
 
+    <!--Walkthrough colors-->
+    <color name="walkthrough_slide_1_background">#11be28</color>
+    <color name="walkthrough_slide_2_background">#01579B</color>
+    <color name="walkthrough_slide_3_background">@color/toast_red</color>
+
     <!--Helpful colors-->
     <color name="red">#FF0000</color>
-    <color name="white">#FFFFFF</color>
+    <color name="white">#FFF</color>
+    <color name="black">#000</color>
 
 </resources>

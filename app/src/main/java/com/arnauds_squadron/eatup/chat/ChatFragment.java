@@ -158,7 +158,7 @@ public class ChatFragment extends Fragment implements
      */
     private void showMessengerFragment() {
         flMessenger.setVisibility(View.VISIBLE);
-        flDashboard.setVisibility(View.INVISIBLE);
+        flDashboard.setVisibility(View.GONE);
     }
 
     /**
@@ -167,7 +167,7 @@ public class ChatFragment extends Fragment implements
      */
     private void showDashboardFragment() {
         flDashboard.setVisibility(View.VISIBLE);
-        flMessenger.setVisibility(View.INVISIBLE);
+        flMessenger.setVisibility(View.GONE);
     }
 
     public interface OnFragmentInteractionListener {

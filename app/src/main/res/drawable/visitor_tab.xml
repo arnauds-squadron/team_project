@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_host_create"
+    <item android:drawable="@drawable/ic_visitor_red"
         android:state_selected="true"/>
-    <item android:drawable="@drawable/ic_host_create_light"
+    <item android:drawable="@drawable/ic_visitor_light"
         android:state_selected="false"/>
 </selector>

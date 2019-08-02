@@ -14,7 +14,8 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.profile.ProfileActivity;
+import com.arnauds_squadron.eatup.profile.HostProfileActivity;
+import com.arnauds_squadron.eatup.profile.VisitorProfileActivity;
 import com.bumptech.glide.Glide;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -122,7 +123,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, ProfileActivity.class);
+                    Intent intent = new Intent(context, VisitorProfileActivity.class);
                     ParseUser user = requests.get(getAdapterPosition());
                     intent.putExtra("user", user);
                     context.startActivity(intent);
