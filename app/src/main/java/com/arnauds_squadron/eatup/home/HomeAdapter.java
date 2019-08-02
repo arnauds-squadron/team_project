@@ -125,6 +125,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             getPendingRequests(event);
         }
+        ParseUser parseUser = event.getHost();
+        if (parseUser.equals(ParseUser.getCurrentUser())) {
+            viewHolder.ivProfileImage.setParseFile(ParseUser.getCurrentUser().getParseFile("profilePicture"));
+        } else {
+            viewHolder.ivProfileImage.setParseFile(parseUser.getParseFile("profilePicture"));
+        }
+        viewHolder.ivProfileImage.loadInBackground();
     }
 
     @Override
@@ -150,6 +157,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         @BindView(R.id.ibOpenChat)
         ImageButton ibOpenChat;
+
+        @BindView(R.id.ivProfileImage)
+        ParseImageView ivProfileImage;
 
         @BindView(R.id.btnCancel)
         Button btnCancel;
