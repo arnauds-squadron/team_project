@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/iv_sl1"
         android:layout_width="225dp"
-        android:layout_height="225dp"
+        android:layout_height="300dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="36dp"
@@ -17,7 +17,7 @@
         app:layout_constraintHorizontal_bias="0.469"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title1"
-        app:srcCompat="@drawable/toast_logo" />
+        app:srcCompat="@drawable/event_creation" />
 
     <TextView
         android:id="@+id/tv_title1"
