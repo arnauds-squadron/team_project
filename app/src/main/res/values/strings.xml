@@ -65,10 +65,10 @@
     <string name="event_image">Event Image</string>
     <string name="gallery">Gallery</string>
     <string name="camera">Camera</string>
-    <string name="walkthrough_welcome">Welcome</string>
-    <string name="walkthrough_guest">Attend</string>
-    <string name="walkthrough_host">Host</string>
-    <string name="walkthrough_cheers">Cheers\!</string>
+    <string name="walkthrough_0">Welcome to Toast</string>
+    <string name="walkthrough_1">Browse</string>
+    <string name="walkthrough_2">Dine</string>
+    <string name="walkthrough_3">Cheers\!</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

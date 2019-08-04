@@ -35,12 +35,13 @@
         android:id="@+id/pager_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:dotColor="@color/bottom_gray"
+        app:dotColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view"
-        app:selectedDotColor="@color/white" />
+        app:selectedDotColor="@color/white"
+        app:supportRTL="false"/>
 
     <Button
         android:id="@+id/btnNext"
