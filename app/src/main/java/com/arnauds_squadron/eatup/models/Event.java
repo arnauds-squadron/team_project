@@ -45,10 +45,14 @@ public class Event extends ParseObject {
     private static final String KEY_CREATED_AT = "createdAt";
     private static final String KEY_IS_FILLED = "isFilled";
     private static final String KEY_NO_RATING = "noRatingSubmitted";
+    private static final String KEY_YELP_IMAGE = "yelpImage";
 
     public static Event copyEvent(Event oldEvent) {
         Event newEvent = new Event();
-        newEvent.setEventImage(oldEvent.getEventImage());
+
+        if(oldEvent.getEventImage() != null)
+            newEvent.setEventImage(oldEvent.getEventImage());
+
         newEvent.setDate(oldEvent.getDate());
         newEvent.setTitle(oldEvent.getTitle());
         newEvent.setHost(oldEvent.getHost());
@@ -61,6 +65,9 @@ public class Event extends ParseObject {
         newEvent.setAcceptedGuests(new JSONArray());
         newEvent.setMaxGuests(oldEvent.getMaxGuests());
         newEvent.setOver21(oldEvent.getOver21());
+
+        if(oldEvent.getYelpImage() != null)
+            newEvent.setYelpImage(oldEvent.getYelpImage());
         // TODO;: remove when getYelpId is never null
         //newEvent.setYelpId(oldEvent.getYelpId());
         return newEvent;
@@ -200,6 +207,13 @@ public class Event extends ParseObject {
 
     public void setIsFilled() {
         put(KEY_IS_FILLED, true);
+    }
+
+    public void setYelpImage(String yelpImage) {
+        put(KEY_YELP_IMAGE, yelpImage);
+    }
+    public String getYelpImage() {
+        return getString(KEY_YELP_IMAGE);
     }
     /**
      * Adds the user to this event's pending guests lists, and they must be accepted or denied

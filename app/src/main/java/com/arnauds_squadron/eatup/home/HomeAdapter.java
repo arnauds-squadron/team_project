@@ -45,6 +45,7 @@ import org.parceler.Parcels;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -88,9 +89,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         Event event = mAgenda.get(i);
         if (event.getDate() != null) {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+            Date date = localCalendar.getTime();
             if (event.getDate() != null) {
-                // event has already passed
-                if (event.getDate().after(localCalendar.getTime())) {
+                // event has not passed
+                if (date.before(event.getDate())) {
                     viewHolder.tvDate.setTextColor(Color.BLACK);
                     // check if current user is the host
                     if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
@@ -109,7 +111,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         viewHolder.btnCancel.setTag(HOST);
                     }
                 }
-                // event is in the future
                 String[] split = event.getDate().toString().split(" ");
                 viewHolder.tvDate.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
             }

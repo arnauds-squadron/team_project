@@ -2,10 +2,12 @@ package com.arnauds_squadron.eatup.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.parse.ParseFile;
 
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
+import java.net.URL;
 import java.util.List;
 
 @Parcel
