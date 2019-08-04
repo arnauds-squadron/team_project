@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        isFirstLoad = true;
+        isFirstLoad = prefs.getBoolean(FIRST_LOAD, true);
         prefs.edit().putBoolean(FIRST_LOAD, false).apply();
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
