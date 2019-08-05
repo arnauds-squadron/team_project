@@ -25,6 +25,7 @@
     <!--Helpful colors-->
     <color name="red">#FF0000</color>
     <color name="white">#FFF</color>
+    <color name="white_transparent">#33FFFFFF</color>
     <color name="black">#000</color>
 
 </resources>

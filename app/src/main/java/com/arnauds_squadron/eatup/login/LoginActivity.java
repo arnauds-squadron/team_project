@@ -2,12 +2,14 @@ package com.arnauds_squadron.eatup.login;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
@@ -26,11 +28,14 @@ import static com.arnauds_squadron.eatup.utils.Constants.PREFS_NAME;
 public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.etUsername)
-    EditText etUsername;
+    TextInputEditText etUsername;
+
     @BindView(R.id.etPassword)
-    EditText etPassword;
+    TextInputEditText etPassword;
+
     @BindView(R.id.btnLogin)
     Button btnLogin;
+
     @BindView(R.id.btnSignup)
     Button btnSignup;
 
@@ -39,11 +44,12 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.LoginTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        ParseUser currentUser = null;
+        ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
             Constants.CURRENT_USER = currentUser;
             goToMainActivity();
@@ -52,6 +58,9 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         isFirstLoad = prefs.getBoolean(FIRST_LOAD, true);
         prefs.edit().putBoolean(FIRST_LOAD, false).apply();
+
+        etPassword.setTypeface(Typeface.DEFAULT);
+        etPassword.setTransformationMethod(new PasswordTransformationMethod());
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
