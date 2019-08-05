@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
-import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -24,7 +23,6 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -37,8 +35,7 @@ public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
         TagsFragment.OnFragmentInteractionListener,
-        DateFragment.OnFragmentInteractionListener,
-        ReviewFragment.OnFragmentInteractionListener {
+        DateFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.flNoEventsScheduled)
     NoSwipingViewPager viewPager;
@@ -95,8 +92,8 @@ public class LocalFragment extends Fragment implements
      * Updates some of the initial fields of the newly created event (tags, 21+, restaurant, etc)
      */
     @Override
-    public void updateTags(Event newEvent) {
-        event = newEvent;
+    public void updateTags(List<String> tagList) {
+        event.setTags(tagList);
         advanceViewPager();
     }
 
@@ -107,20 +104,10 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void updateAddress(ParseGeoPoint address, String addressString) {
+        event = new Event();
+        event.setHost(Constants.CURRENT_USER);
         event.setAddress(address);
         event.setAddressString(addressString);
-        advanceViewPager();
-    }
-
-    /**
-     * Overrides the DateFragment interface
-     * <p>
-     * Updates the date parameter on the event, also the last field to be called
-     * so we can save the event after this method runs
-     */
-    @Override
-    public void updateDate(Date date) {
-        event.setDate(date);
         advanceViewPager();
     }
 
@@ -142,16 +129,13 @@ public class LocalFragment extends Fragment implements
      * fragment
      */
     @Override
-    public void createEvent(final String eventTitle, String imageUrl) {
-        event.setTitle(eventTitle);
-        if (imageUrl != null)
-            event.setYelpImage(imageUrl);
+    public void createEvent() {
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_LONG).show();
-                    createEventChat(eventTitle); // create the corresponding chat
+                    createEventChat(event.getTitle()); // create the corresponding chat
                     updateRecentEvents(); // update the list of recent events in the start fragment
                     mListener.onEventCreated(); // notify the MainActivity to go to the HomeFragment
                     resetSetupViewPager(); // reset the ViewPager to the StartFragment
@@ -170,26 +154,6 @@ public class LocalFragment extends Fragment implements
     private void updateRecentEvents() {
         StartFragment startFragment = (StartFragment) getTypedFragment(StartFragment.class);
         startFragment.getEventsAsync();
-    }
-
-    /**
-     * Overrides the ReviewFragment interface
-     * <p>
-     * Moves the ViewPager to the AddressFragment so the user can update the address of their meal
-     */
-    @Override
-    public void updateAddress() {
-        viewPager.setCurrentItem(Constants.ADDRESS_FRAGMENT_INDEX);
-    }
-
-    /**
-     * Overrides the ReviewFragment interface
-     * <p>
-     * Moves the ViewPager to the DateFragment so the user can update the date
-     */
-    @Override
-    public void updateDate() {
-        viewPager.setCurrentItem(Constants.DATE_FRAGMENT_INDEX);
     }
 
     /**

@@ -15,36 +15,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tvAddress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="@android:color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <fragment
                 android:id="@+id/mapFragment"
                 class="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.6"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvAddress" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvTags"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
@@ -57,7 +46,7 @@
                 android:id="@+id/separator"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:background="@color/toast_red_diluted"
                 app:layout_constraintTop_toBottomOf="@id/tvTags" />
 
@@ -97,7 +86,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginLeft="32dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:contentDescription="@string/calendar_icon_text"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
@@ -110,7 +99,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginLeft="32dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:contentDescription="@string/clock_icon_text"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
@@ -132,7 +121,7 @@
                 android:id="@+id/ivMaxGuests"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:contentDescription="@string/message_profile_image"
                 android:scaleType="fitCenter"
                 android:visibility="invisible"
@@ -156,32 +145,28 @@
                 app:layout_constraintStart_toEndOf="@+id/ivMaxGuests"
                 app:layout_constraintTop_toTopOf="@+id/ivMaxGuests" />
 
-            <TextView
-                android:id="@+id/tvNameCaption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="@string/event_creation_title_caption"
-                android:textColor="@color/bottom_gray"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ivMaxGuests" />
-
-            <EditText
-                android:id="@+id/etEventTitle"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilEventTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginLeft="32dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="32dp"
                 android:layout_marginRight="32dp"
                 android:hint="@string/event_creation_title_hint"
-                android:inputType="textPersonName"
                 app:layout_constraintBottom_toTopOf="@+id/btnCreateEvent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvNameCaption" />
+                app:layout_constraintTop_toBottomOf="@+id/ivMaxGuests">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/etEventTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textPersonName" />
+
+            </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/btnCreateEvent"
@@ -191,7 +176,7 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/event_creation_create_event_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/etEventTitle"
+                app:layout_constraintTop_toBottomOf="@id/tilEventTitle"
                 app:layout_constraintStart_toStartOf="parent" />
 
         </android.support.constraint.ConstraintLayout>

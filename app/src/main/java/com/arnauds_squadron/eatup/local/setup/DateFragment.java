@@ -2,21 +2,25 @@ package com.arnauds_squadron.eatup.local.setup;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -24,6 +28,7 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.utils.UIHelper;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
@@ -52,9 +57,6 @@ import retrofit2.Callback;
  */
 public class DateFragment extends Fragment implements OnMapReadyCallback {
 
-    @BindView(R.id.tvAddress)
-    TextView tvAddress;
-
     @BindView(R.id.tvTags)
     TextView tvTags;
 
@@ -65,13 +67,16 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     TextView tvSelectedTime;
 
     @BindView(R.id.ivCalendar)
-    ImageView calendar;
+    ImageView ivCalendar;
 
     @BindView(R.id.ivClock)
-    ImageView clock;
+    ImageView ivClock;
 
     @BindView(R.id.tvMaxGuests)
     TextView tvMaxGuests;
+
+    @BindView(R.id.ivMaxGuests)
+    ImageView ivMaxGuests;
 
     @BindView(R.id.cbOver21)
     CheckBox cbOver21;
@@ -118,10 +123,12 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                     getChildFragmentManager().findFragmentById(R.id.mapFragment);
             mapFragment.getMapAsync(this); // update the map
 
+            selectedTime = Calendar.getInstance();
             if (event.getDate() != null) { // recent event, fill in all the fields
+                selectedTime.setTime(event.getDate());
                 setPreviousFields();
             } else {
-               showDatePickerDialog();
+                showDatePickerDialog(true);
             }
         }
     }
@@ -159,10 +166,12 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
 
-        Context context = getContext();
-        //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
-        // if we have a response, then get the specific information defined in the Business Class
-        Call<YelpApiResponse> meetUp = YelpData.retrofit(context).getLocation(
+        event.setTitle(eventTitle);
+        updateEventFields();
+        //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the
+        // ApiResponse if we have a response, then get the specific information defined in the
+        // Business Class
+        Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),
                 event.getTags().get(0), 50);
 
@@ -175,13 +184,10 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                     YelpApiResponse yelpApiResponse = response.body();
                     if (yelpApiResponse != null && yelpApiResponse.businessList.size() > 0) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
-                        mListener.createEvent(eventTitle, restaurant.imageUrl);
-                    } else {
-                        mListener.createEvent(eventTitle, null);
+                        event.setYelpImage(restaurant.imageUrl);
                     }
-                } else {
-                    mListener.createEvent(eventTitle, null);
                 }
+                mListener.createEvent();
             }
 
             @Override
@@ -191,12 +197,34 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
+    private void updateEventFields() {
+        event.setMaxGuests(Integer.parseInt(tvMaxGuests.getText().toString()));
+        event.setDate(selectedTime.getTime());
+        event.setOver21(cbOver21.isChecked());
+    }
+
     /**
-     * Can't just call showDatePickerDialog because we don't also want to query the user for a new
-     * time if they just messed up the date
+     * Updates the date parameter and updates only the date TextView when a new date is set
      */
     @OnClick(R.id.tvSelectedDate)
     public void updateDate() {
+        showDatePickerDialog(false);
+    }
+
+    /**
+     * Updates the time parameter and updates only the time TextView when a new time is set
+     */
+    @OnClick(R.id.tvSelectedTime)
+    public void updateTime() {
+        showTimePickerDialog(false);
+    }
+
+    /**
+     * Shows the user a popup to select the date of the event. Default date is the current date
+     * @param shouldShowNextDialog Shows the TimePickerDialog if true, just updates the date
+     *                             TextView if false
+     */
+    private void showDatePickerDialog(final boolean shouldShowNextDialog) {
         int currentYear = selectedTime.get(Calendar.YEAR);
         int currentMonth = selectedTime.get(Calendar.MONTH);
         int currentDay = selectedTime.get(Calendar.DAY_OF_MONTH);
@@ -208,57 +236,24 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                 selectedTime.set(Calendar.MONTH, month);
                 selectedTime.set(Calendar.DAY_OF_MONTH, day);
                 dateSet = true;
-                updateTimeTextViews();
+                if (shouldShowNextDialog) {
+                    showTimePickerDialog(true);
+                } else {
+                    updateNewFieldTextViews();
+                }
             }
         }, currentYear, currentMonth, currentDay);
 
+        datePicker.setCanceledOnTouchOutside(false);
         datePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int buttonId) {
                 dateSet = false;
+                if (!shouldShowNextDialog) {
+                    updateNewFieldTextViews();
+                }
             }
         });
-
-        datePicker.show();
-    }
-
-    /**
-     * Allows the user to change the time they already set.
-     */
-    @OnClick(R.id.tvSelectedTime)
-    public void updateTime() {
-        showTimePickerDialog();
-    }
-
-    /**
-     * Creates the DatePickerDialog programmatically and initializes it with the current date
-     */
-    private void showDatePickerDialog() {
-        selectedTime = Calendar.getInstance();
-        int currentYear = selectedTime.get(Calendar.YEAR);
-        int currentMonth = selectedTime.get(Calendar.MONTH);
-        int currentDay = selectedTime.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePicker = new DatePickerDialog(getActivity(),
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {
-                        selectedTime.set(Calendar.YEAR, year);
-                        selectedTime.set(Calendar.MONTH, month);
-                        selectedTime.set(Calendar.DAY_OF_MONTH, day);
-                        dateSet = true;
-                        showTimePickerDialog();
-                    }
-                }, currentYear, currentMonth, currentDay);
-
-        datePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int buttonId) {
-                        dateSet = false;
-                        showTimePickerDialog();
-                    }
-                });
         datePicker.show();
     }
 
@@ -266,7 +261,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
      * Creates the TimePickerDialog programmatically after the DatePickerDialog has finished,
      * and initializes it with the current time
      */
-    private void showTimePickerDialog() {
+    private void showTimePickerDialog(final boolean shouldShowNextDialog) {
         int currentHour = selectedTime.get(Calendar.HOUR_OF_DAY);
         int currentMinute = selectedTime.get(Calendar.MINUTE);
 
@@ -277,25 +272,68 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                         selectedTime.set(Calendar.HOUR_OF_DAY, hour);
                         selectedTime.set(Calendar.MINUTE, minute);
                         timeSet = true;
-                        updateTimeTextViews();
+                        if (shouldShowNextDialog) {
+                            showMaxGuestsDialog();
+                        } else {
+                            updateNewFieldTextViews();
+                        }
                     }
                 }, currentHour, currentMinute, true);
 
+        timePicker.setCanceledOnTouchOutside(false);
         timePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int buttonId) {
                         timeSet = false;
-                        updateTimeTextViews();
+                        if (!shouldShowNextDialog) {
+                            updateNewFieldTextViews();
+                        }
                     }
                 });
         timePicker.show();
     }
 
     /**
+     * Shows a popup for the user to select the maximum number of guests for their event. Minimum is
+     * 1 guest, maximum is 100 guests
+     */
+    @OnClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
+    public void showMaxGuestsDialog() {
+        final Dialog d = new Dialog(getActivity());
+        d.setTitle("NumberPicker");
+        d.setContentView(R.layout.dialog_max_guests);
+        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        d.setCanceledOnTouchOutside(false);
+
+        final NumberPicker npMaxGuests = d.findViewById(R.id.npMaxGuests);
+        npMaxGuests.setMinValue(1);
+        npMaxGuests.setMaxValue(Constants.MAX_GUESTS);
+        npMaxGuests.setWrapSelectorWheel(false);
+
+        int startVal = event.getMaxGuests();
+        npMaxGuests.setValue(startVal == 0 ? 1 : startVal);
+
+        Button btnSet = d.findViewById(R.id.btnSet);
+        btnSet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = npMaxGuests.getValue() + "";
+                tvMaxGuests.setText(text);
+                event.setMaxGuests(npMaxGuests.getValue());
+                d.hide();
+                updateNewFieldTextViews();
+            }
+        });
+        d.show();
+    }
+
+    /**
      * Update the date and time text views and handle if the time wasn't set
      */
-    private void updateTimeTextViews() {
+    private void updateNewFieldTextViews() {
+        showImageViews();
+
         if (!dateSet)
             tvSelectedDate.setText(getString(R.string.event_creation_date_not_selected));
         else
@@ -305,21 +343,30 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
             tvSelectedTime.setText(getString(R.string.event_creation_time_not_selected));
         else
             tvSelectedTime.setText(FormatHelper.formatTime(selectedTime.getTime(), getActivity()));
-
-        calendar.setVisibility(View.VISIBLE);
-        clock.setVisibility(View.VISIBLE);
     }
 
     /**
-     * Initialize all the TextViews and details of the recent event
+     * Initialize all the fields that already have values in the recent event the user selected.
+     * Also sets the images to visible.
      */
     private void setPreviousFields() {
+        showImageViews();
+
         tvTags.setText(FormatHelper.listToString(event.getTags()));
         tvMaxGuests.setText(String.format(Locale.ENGLISH, "%d", event.getMaxGuests()));
         cbOver21.setChecked(event.getOver21());
-        tvAddress.setText(event.getAddressString());
         tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
         tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));
+    }
+
+    /**
+     * Show all the ImageViews that are hidden by default if the user hasn't set a date, time, etc.
+     */
+    private void showImageViews() {
+        ivCalendar.setVisibility(View.VISIBLE);
+        ivClock.setVisibility(View.VISIBLE);
+        ivMaxGuests.setVisibility(View.VISIBLE);
+        cbOver21.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -351,6 +398,6 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         /**
          * Method that triggers the event creation method in the parent fragment
          */
-        void createEvent(String eventTitle, String imageUrl);
+        void createEvent();
     }
 }
