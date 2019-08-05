@@ -28,9 +28,8 @@ public final class Constants {
     // search constants
     public static final String SEARCH_CATEGORY = "searchCategory";
     public static final int NO_SEARCH = 0;
-    public static final int USER_SEARCH = 1;
-    public static final int CUISINE_SEARCH = 2;
-    public static final int LOCATION_SEARCH = 3;
+    public static final int CUISINE_SEARCH = 1;
+    public static final int LOCATION_SEARCH = 2;
 
     // Update speed to refresh messages: 1 second
     public static final int CHAT_UPDATE_SPEED_MILLIS = 2000;
