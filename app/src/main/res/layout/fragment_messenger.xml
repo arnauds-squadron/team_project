@@ -79,7 +79,7 @@
         android:id="@+id/separator"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/bottom_gray"
+        android:background="@color/toast_red_diluted"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <EditText
