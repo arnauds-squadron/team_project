@@ -157,12 +157,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 e.printStackTrace();
             }
         } else {
-            if (parseUser.getParseFile("profilePicture") != null){
-                try {
-                    parseFile = parseUser.getParseFile("profilePicture").getFile();
-                } catch (ParseException e) {
-                    e.printStackTrace();
+            try {
+                if (parseUser.fetchIfNeeded().getParseFile("profilePicture") != null){
+                    try {
+                        parseFile = parseUser.getParseFile("profilePicture").getFile();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
         viewHolder.ivProfileImage.loadInBackground();
@@ -170,7 +174,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 .load(parseFile)
                 .transform(new CircleCrop())
                 .into(viewHolder.ivProfileImage);
-
     }
 
     @Override

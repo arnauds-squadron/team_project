@@ -21,11 +21,14 @@ import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -133,10 +136,35 @@ public class HomeDetailsActivity extends AppCompatActivity {
         if (event.getTitle() != null) {
             tvTitle.setText(event.getTitle());
         }
-        if (event.getEventImage() != null) {
-            ivProfile.setParseFile(event.getEventImage());
-            ivProfile.loadInBackground();
+
+        //load the profile image
+        ParseUser parseUser = event.getHost();
+        File parseFile = null;
+        if (parseUser.equals(ParseUser.getCurrentUser()) && ParseUser.getCurrentUser().getParseFile("profilePicture") != null) {
+            try {
+                parseFile = ParseUser.getCurrentUser().getParseFile("profilePicture").getFile();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                if (parseUser.fetchIfNeeded().getParseFile("profilePicture") != null){
+                    try {
+                        parseFile = parseUser.getParseFile("profilePicture").getFile();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
+        ivProfile.loadInBackground();
+        Glide.with(context)
+                .load(parseFile)
+                .transform(new CircleCrop())
+                .into(ivProfile);
+
         if (event.getCuisine() != null) {
             tvFood.setText(event.getCuisine());
         }

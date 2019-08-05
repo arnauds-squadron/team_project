@@ -93,6 +93,12 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
                         .centerCrop()
                         .into(ivEventImage);
             }
+            if (event.getYelpImage() != null) {
+                Glide.with(context)
+                        .load(event.getYelpImage())
+                        .centerCrop()
+                        .into(ivEventImage);
+            }
         }
 
         @Override
