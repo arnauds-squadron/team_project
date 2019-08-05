@@ -30,7 +30,6 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.Message;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.google.android.gms.common.ConnectionResult;
@@ -465,11 +464,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         }
         // get events according to tag
         else {
-            if(queriedLocationString.equals("Current location")) {
-                useCurrentLocation = true;
-                queriedGeoPoint = currentGeoPoint;
-                eventAdapter.updateCurrentLocation(currentGeoPoint);
-            }
             final Event.Query eventsQuery = new Event.Query();
             // if opening app for the first time, get top 20 and clear old items
             // otherwise, query for events older than the oldest
