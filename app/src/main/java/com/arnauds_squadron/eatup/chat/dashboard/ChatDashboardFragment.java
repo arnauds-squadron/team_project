@@ -1,6 +1,7 @@
 package com.arnauds_squadron.eatup.chat.dashboard;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -24,6 +25,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -50,7 +52,19 @@ public class ChatDashboardFragment extends Fragment {
     private ChatDashboardAdapter chatAdapter;
 
     // Variable to keep track of the newest updated chat so we don't always reload the views
-    private Chat newestChat;
+    private Date lastUpdated;
+    // Boolean to ensure we only have one refresh runnable
+    private boolean refreshRunnableNotStarted = false;
+    // Handler to post the runnable on the Looper's queue every second
+    private Handler updateHandler = new Handler();
+    // Refresh runnable that refreshes the messages every second
+    private Runnable refreshChatsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            getChatsAsync();
+            updateHandler.postDelayed(this, Constants.CHAT_UPDATE_SPEED_MILLIS);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +90,7 @@ public class ChatDashboardFragment extends Fragment {
             }
         });
 
+        swipeContainer.setColorSchemeResources(R.color.toast_red);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -83,17 +98,12 @@ public class ChatDashboardFragment extends Fragment {
             }
         });
 
-        // TODO: standardize
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
         chatList = new ArrayList<>();
         chatAdapter = new ChatDashboardAdapter(this, chatList);
         rvChats.setAdapter(chatAdapter);
         rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
-        getChatsAsync();
+
+        startChatRefresh();
 
         return view;
     }
@@ -119,6 +129,15 @@ public class ChatDashboardFragment extends Fragment {
     }
 
     /**
+     * Called by the parent fragment to stop the runnable so the messages aren't being refreshed
+     * after the user is logged out
+     */
+    public void stopRefreshingMessages() {
+        updateHandler.removeCallbacks(refreshChatsRunnable);
+        refreshRunnableNotStarted = false;
+    }
+
+    /**
      * Communicates with the parent ChatFragment through the listener to open the selected Chat
      */
     public void openChat(Chat chat) {
@@ -129,7 +148,6 @@ public class ChatDashboardFragment extends Fragment {
      * Queries the ParseServer for all the chats that the current user is a member of, adding
      * them to the chatList and notifying the adapter
      */
-    // TODO: update constantly and show the newest message on the dashboard screen
     public void getChatsAsync() {
         Chat.Query query = new Chat.Query();
         ParseUser user = Constants.CURRENT_USER;
@@ -137,12 +155,11 @@ public class ChatDashboardFragment extends Fragment {
             @Override
             public void done(List<Chat> objects, ParseException e) {
                 if (e == null && objects != null && objects.size() > 0 ) {
-                    if (newestChat == null ||
-                            !objects.get(0).getObjectId().equals(newestChat.getObjectId())) {
+                    if (!objects.get(0).getUpdatedAt().equals(lastUpdated)) {
                         chatList.clear();
                         chatList.addAll(objects);
                         chatAdapter.notifyDataSetChanged();
-                        newestChat = objects.get(0);
+                        lastUpdated = objects.get(0).getUpdatedAt();
                     }
                 } else if (e != null) {
                     Toast.makeText(getActivity(), "Could not load chats",
@@ -152,6 +169,17 @@ public class ChatDashboardFragment extends Fragment {
                 swipeContainer.setRefreshing(false);
             }
         });
+    }
+
+    /**
+     * Queries the user's chats once and starts the runnable to continuously update the chat list
+     */
+    private void startChatRefresh() {
+        getChatsAsync();
+        if (!refreshRunnableNotStarted) { // only one runnable
+            refreshChatsRunnable.run();
+            refreshRunnableNotStarted = true;
+        }
     }
 
     public interface OnFragmentInteractionListener {

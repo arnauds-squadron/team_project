@@ -66,7 +66,7 @@ public class MessengerFragment extends Fragment {
     private Runnable refreshMessageRunnable = new Runnable() {
         @Override
         public void run() {
-            refreshMessagesAsync();
+            getMessagesAsync();
             updateHandler.postDelayed(this, Constants.CHAT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -172,7 +172,7 @@ public class MessengerFragment extends Fragment {
         if (!chat.equals(this.chat)) { // only clear if there was a chat loaded before
             this.chat = chat;
             resetMessages();
-            refreshMessagesAsync();
+            getMessagesAsync();
 
             chat.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
                 @Override
@@ -190,7 +190,7 @@ public class MessengerFragment extends Fragment {
 
     /**
      * Called by the parent fragment to stop the runnable so the messages aren't being refreshed
-     * after the fragment is closed.
+     * after the user is logged out.
      */
     public void stopRefreshingMessages() {
         updateHandler.removeCallbacks(refreshMessageRunnable);
@@ -245,7 +245,7 @@ public class MessengerFragment extends Fragment {
      * Searches the Messages table for a0ny new messages that match the current chat's objectId.
      * Appends messages, does not clear and addAll()
      */
-    private void refreshMessagesAsync() {
+    private void getMessagesAsync() {
         Message.Query messageQuery = new Message.Query();
         messageQuery.newestFirst().matchesChat(chat);
 

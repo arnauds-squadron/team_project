@@ -148,8 +148,13 @@ public class ChatFragment extends Fragment implements
         }
     }
 
+    /**
+     * Called in the MainActivity if the user logs out, since the queries will always return nothing
+     * and resources will be saved if the handlers are stopped
+     */
     public void stopUpdatingMessages() {
         messengerFragment.stopRefreshingMessages();
+        dashboardFragment.stopRefreshingMessages();
     }
 
     /**
@@ -181,6 +186,11 @@ public class ChatFragment extends Fragment implements
          */
         Chat getSelectedChat();
 
+        /**
+         * Notifies the parent Activity to update the tab icon with the number of unread messages in
+         * the currently opened chat
+         * @param notifications The number of unread messages
+         */
         void updateMessageNotifications(int notifications);
     }
 }
