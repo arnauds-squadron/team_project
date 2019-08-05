@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.utils.UIHelper;
@@ -30,9 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseFile;
 
-import java.net.URL;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -42,8 +39,6 @@ import butterknife.OnClick;
 import butterknife.OnLongClick;
 import retrofit2.Call;
 import retrofit2.Callback;
-
-import static com.parse.Parse.getApplicationContext;
 
 /**
  * Fragment that displays all the selected fields and will create the event when confirmed
@@ -137,9 +132,9 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * // TODO: replace with textview to input text
      * On a long click on the number of guests or the guests icon, the user can decrease the
      * max number of guests by 1
+     *
      * @return true
      */
     @OnLongClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
@@ -183,16 +178,14 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      */
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
-
-
         final String eventTitle = etEventTitle.getText().toString().trim();
 
-        if(TextUtils.isEmpty(eventTitle)) {
+        if (TextUtils.isEmpty(eventTitle)) {
             Toast.makeText(getActivity(), "Give your event a name!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-       Context context = getApplicationContext();
+        Context context = getContext();
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
         // if we have a response, then get the specific information defined in the Business Class
         Call<YelpApiResponse> meetUp = YelpData.retrofit(context).getLocation(
@@ -206,7 +199,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                                    @NonNull retrofit2.Response<YelpApiResponse> response) {
                 if (response.isSuccessful()) {
                     YelpApiResponse yelpApiResponse = response.body();
-                    if (yelpApiResponse != null) {
+                    if (yelpApiResponse != null && yelpApiResponse.businessList.size() > 0) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
                         mListener.createEvent(eventTitle, restaurant.imageUrl);
                     } else {
@@ -216,6 +209,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                     mListener.createEvent(eventTitle, null);
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<YelpApiResponse> call, @NonNull Throwable t) {
                 t.printStackTrace();

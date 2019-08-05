@@ -25,6 +25,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -141,17 +142,19 @@ public class LocalFragment extends Fragment implements
      * fragment
      */
     @Override
-    public void createEvent(String eventTitle, String imageUrl) {
-        createEventChat(eventTitle);
+    public void createEvent(final String eventTitle, String imageUrl) {
         event.setTitle(eventTitle);
-        event.setYelpImage(imageUrl);
+        if (imageUrl != null)
+            event.setYelpImage(imageUrl);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_LONG).show();
-                    mListener.onEventCreated();
-                    resetSetupViewPager();
+                    createEventChat(eventTitle); // create the corresponding chat
+                    updateRecentEvents(); // update the list of recent events in the start fragment
+                    mListener.onEventCreated(); // notify the MainActivity to go to the HomeFragment
+                    resetSetupViewPager(); // reset the ViewPager to the StartFragment
                 } else {
                     Toast.makeText(getActivity(), "Error creating event", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
@@ -161,8 +164,17 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
+     * After the event is saved to the Parse server, update the list of the user's recent events in
+     * the StartFragment to show their newest event
+     */
+    private void updateRecentEvents() {
+        StartFragment startFragment = (StartFragment) getTypedFragment(StartFragment.class);
+        startFragment.getEventsAsync();
+    }
+
+    /**
      * Overrides the ReviewFragment interface
-     *
+     * <p>
      * Moves the ViewPager to the AddressFragment so the user can update the address of their meal
      */
     @Override
@@ -172,7 +184,7 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Overrides the ReviewFragment interface
-     *
+     * <p>
      * Moves the ViewPager to the DateFragment so the user can update the date
      */
     @Override
@@ -252,6 +264,25 @@ public class LocalFragment extends Fragment implements
                 }
             }
         });
+    }
+
+    /**
+     * Given the class of a specific setup Fragment, this method searches through the child
+     * Fragments and returns the given fragment if found, or null if it's not found
+     *
+     * @param fragmentClass The class of the fragment you are trying to find
+     * @return The specified fragment with the matching class, or null if the fragment does not
+     * exist
+     */
+    private Fragment getTypedFragment(Class fragmentClass) {
+        List<Fragment> fragments = getChildFragmentManager().getFragments();
+
+        for (Fragment fragment : fragments) {
+            if (fragment.getClass().equals(fragmentClass)) {
+                return fragment;
+            }
+        }
+        return null;
     }
 
     /**

@@ -55,7 +55,6 @@ public class HomeFragment extends Fragment implements
     @BindView(R.id.spinner)
     Spinner spinner;
 
-    private NoEventsScheduledFragment noEventsScheduledFragment;
     private OnFragmentInteractionListener mListener;
     private List<Event> agenda;
     private HomeAdapter homeAdapter;
@@ -67,7 +66,7 @@ public class HomeFragment extends Fragment implements
     private Runnable refreshEventsRunnable = new Runnable() {
         @Override
         public void run() {
-//            refreshEventsAsync(0);
+            //refreshEventsAsync(0);
             updateHandler.postDelayed(this, Constants.EVENT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -193,7 +192,9 @@ public class HomeFragment extends Fragment implements
         //        private Drawable icon = ContextCompat.getDrawable(homeAdapter.getContext(),
 //                R.drawable.ic_home_light);
         @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+        public boolean onMove(@NonNull RecyclerView recyclerView,
+                              @NonNull RecyclerView.ViewHolder viewHolder,
+                              @NonNull RecyclerView.ViewHolder target) {
             Toast.makeText(getContext(), "on Move", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -219,7 +220,9 @@ public class HomeFragment extends Fragment implements
         }
 
         @Override
-        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                int actionState, boolean isCurrentlyActive) {
             super.onChildDraw(c, recyclerView, viewHolder, dX,
                     dY, actionState, isCurrentlyActive);
             View itemView = viewHolder.itemView;

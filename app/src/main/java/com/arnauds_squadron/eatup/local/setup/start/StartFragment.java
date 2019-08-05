@@ -62,18 +62,26 @@ public class StartFragment extends Fragment {
         rvRecentEvents.setLayoutManager(layoutManager);
         rvRecentEvents.setAdapter(recentEventAdapter);
 
+        getEventsAsync();
+
+        return view;
+    }
+
+    /**
+     * Queries the Parse server to get the user's most recent events as host
+     */
+    public void getEventsAsync() {
         Event.Query query = new Event.Query();
         query.newestFirst().getTop().withHost().ownEvent(Constants.CURRENT_USER);
 
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
+                events.clear();
                 events.addAll(objects);
-                recentEventAdapter.notifyItemRangeInserted(0, events.size());
+                recentEventAdapter.notifyDataSetChanged();
             }
         });
-
-        return view;
     }
 
     @Override

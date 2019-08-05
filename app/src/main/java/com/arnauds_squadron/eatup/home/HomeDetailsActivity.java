@@ -103,7 +103,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
 
                     YelpApiResponse yelpApiResponse = response.body();
-                    if (yelpApiResponse != null) {
+                    if (yelpApiResponse != null && yelpApiResponse.businessList.size() > 0) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
                         Location location = restaurant.location;
                         //tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
