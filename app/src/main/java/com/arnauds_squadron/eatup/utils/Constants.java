@@ -38,7 +38,11 @@ public final class Constants {
     public static final int EVENT_UPDATE_SPEED_MILLIS = 5000;
 
     // PagerAdapter constants
-    public static final int MAIN_PAGER_START_PAGE = 2;
+    public static final int LOCAL_FRAGMENT_INDEX = 1;
+    public static final int HOME_FRAGMENT_INDEX = 2;
+    public static final int VISITOR_FRAGMENT_INDEX = 3;
+
+    // Setup constants
     public static final int ADDRESS_FRAGMENT_INDEX = 2;
     public static final int DATE_FRAGMENT_INDEX = 3;
 

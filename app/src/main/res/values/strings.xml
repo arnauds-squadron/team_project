@@ -65,6 +65,9 @@
     <string name="event_image">Event Image</string>
     <string name="gallery">Gallery</string>
     <string name="camera">Camera</string>
+    <string name="find_an_event">Find an event</string>
+    <string name="create_an_event">Create an event</string>
+    <string name="no_events_scheduled">No events scheduled</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

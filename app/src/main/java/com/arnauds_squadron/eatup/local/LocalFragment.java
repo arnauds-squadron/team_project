@@ -39,7 +39,7 @@ public class LocalFragment extends Fragment implements
         DateFragment.OnFragmentInteractionListener,
         ReviewFragment.OnFragmentInteractionListener {
 
-    @BindView(R.id.frameLayout)
+    @BindView(R.id.flNoEventsScheduled)
     NoSwipingViewPager viewPager;
 
     private OnFragmentInteractionListener mListener;

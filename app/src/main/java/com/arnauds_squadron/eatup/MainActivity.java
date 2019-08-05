@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements
         ChatFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener {
 
-    @BindView(R.id.frameLayout)
+    @BindView(R.id.flNoEventsScheduled)
     ViewPager viewPager;
 
     @BindView(R.id.tab_bar)
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements
         viewPager.setOffscreenPageLimit(pagerAdapter.getCount() - 1);
 
         // Start on the HomeFragment
-        viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
+        viewPager.setCurrentItem(Constants.HOME_FRAGMENT_INDEX);
 
         // Set the correct keyboard layout for the MessengerFragment
         // (show the toolbar while typing)
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onEventCreated() {
-        viewPager.setCurrentItem(Constants.MAIN_PAGER_START_PAGE);
+        navigateToFragment(Constants.HOME_FRAGMENT_INDEX);
 
         ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
 
@@ -161,7 +161,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void switchToChatFragment(Chat chat) {
         this.chat = chat;
-        viewPager.setCurrentItem(0);
+        navigateToFragment(0);
+    }
+
+    @Override
+    public void navigateToFragment(int index) {
+        viewPager.setCurrentItem(index);
     }
 
     /**

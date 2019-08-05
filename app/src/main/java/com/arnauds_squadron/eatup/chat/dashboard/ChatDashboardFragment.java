@@ -67,10 +67,12 @@ public class ChatDashboardFragment extends Fragment {
         Constants.CURRENT_USER.fetchInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                Glide.with(ChatDashboardFragment.this)
-                        .load(object.getParseFile(KEY_PROFILE_PICTURE).getUrl())
-                        .transform(new CircleCrop())
-                        .into(ivProfile);
+                if(object.getParseFile(KEY_PROFILE_PICTURE) != null) {
+                    Glide.with(ChatDashboardFragment.this)
+                            .load(object.getParseFile(KEY_PROFILE_PICTURE).getUrl())
+                            .transform(new CircleCrop())
+                            .into(ivProfile);
+                }
             }
         });
 

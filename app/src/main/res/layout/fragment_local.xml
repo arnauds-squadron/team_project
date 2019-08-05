@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <com.arnauds_squadron.eatup.navigation.NoSwipingViewPager
-        android:id="@+id/frameLayout"
+        android:id="@+id/flNoEventsScheduled"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="1"
