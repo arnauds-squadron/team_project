@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.models.Message;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
 import com.google.android.gms.common.ConnectionResult;
@@ -178,6 +179,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         Double currentLatitude = getIntent().getDoubleExtra("latitude", 0);
         Double currentLongitude = getIntent().getDoubleExtra("longitude", 0);
         currentGeoPoint = new ParseGeoPoint(currentLatitude, currentLongitude);
+        queriedGeoPoint = currentGeoPoint;
 
         eventAdapter = new SearchEventAdapter(this, mEvents, currentGeoPoint);
         rvEvents.setAdapter(eventAdapter);
@@ -425,11 +427,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     // Methods to query parse server
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
         final Event.Query eventsQuery = new Event.Query();
-        eventAdapter.clear();
         if (maxDate.equals(new Date(0))) {
-            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
+            eventAdapter.clear();
+            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size());
         } else {
-            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
+            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size());
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
@@ -458,19 +460,24 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
 
     protected void loadTopEvents(Date maxDate) {
         // get all events in the area
-        if (queriedCuisineString.equals("All events")) {
+        if(queriedCuisineString.equals("All events")) {
             locationSearch(queriedGeoPoint, new Date(0));
         }
         // get events according to tag
         else {
+            if(queriedLocationString.equals("Current location")) {
+                useCurrentLocation = true;
+                queriedGeoPoint = currentGeoPoint;
+                eventAdapter.updateCurrentLocation(currentGeoPoint);
+            }
             final Event.Query eventsQuery = new Event.Query();
             // if opening app for the first time, get top 20 and clear old items
             // otherwise, query for events older than the oldest
-            eventAdapter.clear();
             if (maxDate.equals(new Date(0))) {
-                eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", queriedCuisineString);
+                eventAdapter.clear();
+                eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineString);
             } else {
-                eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", queriedCuisineString);
+                eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineString);
             }
             eventsQuery.findInBackground(new FindCallback<Event>() {
                 @Override
@@ -606,7 +613,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                         MatrixCursor cursor = new MatrixCursor(LOCATION_SEARCH_SUGGEST_COLUMNS);
                         cursor.addRow(new String[]{
                                 "1",
-                                "Current Location",
+                                "Current location",
                                 "Use my current location",
                                 CURRENT_LOCATION_ID
                         });

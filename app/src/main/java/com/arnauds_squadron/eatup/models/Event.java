@@ -337,5 +337,10 @@ public class Event extends ParseObject {
             whereEqualTo(KEY_NO_RATING, user);
             return this;
         }
+
+        public Query getPrevious(int skipAmount) {
+            setSkip(skipAmount);
+            return this;
+        }
     }
 }
