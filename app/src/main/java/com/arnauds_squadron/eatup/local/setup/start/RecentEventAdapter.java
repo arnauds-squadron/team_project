@@ -45,6 +45,11 @@ public class RecentEventAdapter extends RecyclerView.Adapter<RecentEventAdapter.
         viewHolder.tvTitle.setText(event.getTitle());
         viewHolder.tvPlace.setText(event.getAddressString());
 
+        if (event.getYelpImage() != null) {
+            Glide.with(context)
+                    .load(event.getYelpImage())
+                    .into(viewHolder.ivEventImage);
+        }
         if(event.getEventImage() != null)
             Glide.with(context)
                 .load(event.getEventImage().getUrl())

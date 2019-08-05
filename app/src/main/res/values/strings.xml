@@ -68,6 +68,10 @@
     <string name="find_an_event">Find an event</string>
     <string name="create_an_event">Create an event</string>
     <string name="no_events_scheduled">No events scheduled</string>
+    <string name="walkthrough_0">Welcome to Toast</string>
+    <string name="walkthrough_1">Browse</string>
+    <string name="walkthrough_2">Dine</string>
+    <string name="walkthrough_3">Cheers\!</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

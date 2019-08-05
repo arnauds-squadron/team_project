@@ -18,27 +18,21 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.EndlessRecyclerViewScrollListener;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
-import com.arnauds_squadron.eatup.yelp_api.YelpService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
@@ -78,7 +72,6 @@ import butterknife.ButterKnife;
 import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_ALIAS;
 import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_TITLE;
 import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
@@ -95,7 +88,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
     // variables to keep track of current query
     private int searchCategory;
-    private ParseUser queriedUser;
     private String queriedCuisine;
     private ParseGeoPoint queriedGeoPoint;
 
@@ -180,9 +172,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // Initialize data source for events recyclerview
         mEvents = new ArrayList<>();
         // RecyclerView setup
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-//        rvEvents.setLayoutManager(linearLayoutManager);
-
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1);
         rvEvents.setLayoutManager(gridLayoutManager);
 
@@ -254,7 +243,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 result.add(perm);
             }
         }
-
         return result;
     }
 
@@ -305,10 +293,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             } else {
                 finish();
             }
-
             return false;
         }
-
         return true;
     }
 
@@ -407,9 +393,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     // Handle the events being loaded into the recyclerview depending on search query
     private void handleRecyclerEvents(Date maxDate) {
         switch(searchCategory) {
-            case USER_SEARCH:
-                loadTopEvents(queriedUser, maxDate);
-                break;
             case CUISINE_SEARCH:
                 loadTopEvents(queriedCuisine, maxDate);
                 break;
@@ -432,9 +415,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
             Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
             switch(newSearchCategory) {
-                case USER_SEARCH:
-                    userSearch(query);
-                    break;
                 case CUISINE_SEARCH:
                     // handled in the automatic search
                     break;
@@ -484,28 +464,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     }
 
     // Methods to query parse server
-    private void userSearch(String userQuery) {
-        // query for user, then query for events containing user
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("displayName", userQuery);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            public void done(List<ParseUser> objects, ParseException e) {
-                if (e == null) {
-                    if(objects.size() != 0) {
-                        Log.d("VisitorSearchActivity", "found user");
-                        queriedUser = objects.get(0);
-                        loadTopEvents(queriedUser, new Date(0));
-                    } else {
-                        Toast.makeText(getApplicationContext(), "No users found with that username.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
-        resultsSearchView.clearFocus();
-    }
-
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
         queriedGeoPoint = geoPoint;
         final Event.Query eventsQuery = new Event.Query();

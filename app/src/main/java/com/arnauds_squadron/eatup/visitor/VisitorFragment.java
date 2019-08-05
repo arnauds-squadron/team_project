@@ -66,7 +66,6 @@ import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
 import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
-import static com.arnauds_squadron.eatup.utils.Constants.USER_SEARCH;
 
 /**
  * Fragment that allows the user to search through different events, view their details, and RSVP
@@ -196,16 +195,12 @@ public class VisitorFragment extends Fragment {
                     // search category hint
                     case 0:
                         break;
-                    // user
-                    case 1:
-                        searchCategoryCode = USER_SEARCH;
-                        break;
                     // cuisine
-                    case 2:
+                    case 1:
                         searchCategoryCode = CUISINE_SEARCH;
                         break;
                     // location
-                    case 3:
+                    case 2:
                         searchCategoryCode = LOCATION_SEARCH;
                         break;
                 }

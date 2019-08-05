@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.ParseFile;
 
+import java.net.URL;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -180,16 +183,19 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      */
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
+
+
+        final String eventTitle = etEventTitle.getText().toString().trim();
+
+        if(TextUtils.isEmpty(eventTitle)) {
+            Toast.makeText(getActivity(), "Give your event a name!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
        Context context = getApplicationContext();
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
         // if we have a response, then get the specific information defined in the Business Class
-        Call<YelpApiResponse> meetUp;
-        if (event.getTags() != null){
-            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().get(0), 50);
-        } else {
-            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 50);
-        }
-        meetUp = YelpData.retrofit(context).getLocation(
+        Call<YelpApiResponse> meetUp = YelpData.retrofit(context).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),
                 event.getTags().get(0), 50);
 
@@ -199,14 +205,15 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
             public void onResponse(@NonNull Call<YelpApiResponse> call,
                                    @NonNull retrofit2.Response<YelpApiResponse> response) {
                 if (response.isSuccessful()) {
-
                     YelpApiResponse yelpApiResponse = response.body();
                     if (yelpApiResponse != null) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
-                        Location location = restaurant.location;
-                        event.setAddressString(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
-
+                        mListener.createEvent(eventTitle, restaurant.imageUrl);
+                    } else {
+                        mListener.createEvent(eventTitle, null);
                     }
+                } else {
+                    mListener.createEvent(eventTitle, null);
                 }
             }
             @Override
@@ -214,12 +221,6 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                 t.printStackTrace();
             }
         });
-        String eventTitle = etEventTitle.getText().toString().trim();
-
-        if (!eventTitle.isEmpty())
-            mListener.createEvent(eventTitle);
-        else
-            Toast.makeText(getActivity(), "Give your event a name!", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -267,7 +268,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         /**
          * Method that triggers the event creation method in the parent fragment
          */
-        void createEvent(String eventTitle);
+        void createEvent(String eventTitle, String imageUrl);
 
         /**
          * Notifies the parent LocalFragment to go back to the AddressFragment so the user can

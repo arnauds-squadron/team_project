@@ -141,9 +141,10 @@ public class LocalFragment extends Fragment implements
      * fragment
      */
     @Override
-    public void createEvent(String eventTitle) {
+    public void createEvent(String eventTitle, String imageUrl) {
         createEventChat(eventTitle);
         event.setTitle(eventTitle);
+        event.setYelpImage(imageUrl);
         event.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
