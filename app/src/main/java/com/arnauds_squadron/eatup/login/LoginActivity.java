@@ -13,7 +13,6 @@ import android.widget.Button;
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.walkthrough.WalkthroughActivity;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
