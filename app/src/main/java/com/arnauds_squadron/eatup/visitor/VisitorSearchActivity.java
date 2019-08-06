@@ -25,6 +25,8 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -192,10 +194,16 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         svCuisine.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         svCuisine.setIconifiedByDefault(false); // expand search when clicking anywhere on the searchview
         svCuisine.setQueryHint("Mexican, pizza, etc.");
+        final AutoCompleteTextView cuisineTextView = (AutoCompleteTextView) svCuisine.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        cuisineTextView.setDropDownAnchor(R.id.svCuisine);
 
         svLocation.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         svLocation.setIconifiedByDefault(false);
         svLocation.setQueryHint("Address or street name");
+
+        final AutoCompleteTextView locationTextView = (AutoCompleteTextView) svLocation.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        locationTextView.setDropDownAnchor(R.id.svLocation);
+
         useCurrentLocation = true;
 
         setCategorySuggestions(svCuisine);
