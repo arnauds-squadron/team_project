@@ -69,10 +69,10 @@ public class RecentEventAdapter extends RecyclerView.Adapter<RecentEventAdapter.
         @BindView(R.id.ivEventImage)
         ImageView ivEventImage;
 
-        @BindView(R.id.tvTitle)
+        @BindView(R.id.tvEventTitle)
         TextView tvTitle;
 
-        @BindView(R.id.tvPlace)
+        @BindView(R.id.tvAddress)
         TextView tvPlace;
 
         ViewHolder(@NonNull View itemView) {

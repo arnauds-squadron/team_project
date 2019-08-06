@@ -35,7 +35,10 @@ import com.parse.ParseException;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -156,11 +159,16 @@ public class HomeFragment extends Fragment implements
         final String userId = Constants.CURRENT_USER.getObjectId();
         final Event.Query query = new Event.Query();
 
+        Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+        Date currentDate = localCalendar.getTime();
+
         if (filterType == 1) {
             query.withHost().ownEvent(Constants.CURRENT_USER);
         } else if (filterType == 2) {
             query.withHost().notOwnEvent(Constants.CURRENT_USER);
         }
+
+        // TODO add filter for events that don't have any guests and are already past, so we don't show them for rating
         query.orderByDescending("date");
         query.findInBackground(new FindCallback<Event>() {
             @Override

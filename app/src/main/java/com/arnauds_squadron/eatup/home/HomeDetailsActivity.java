@@ -49,10 +49,10 @@ public class HomeDetailsActivity extends AppCompatActivity {
     @BindView(R.id.cbLegal)
     CheckBox cbLegal;
 
-    @BindView(R.id.tvTitle)
+    @BindView(R.id.tvEventTitle)
     TextView tvTitle;
 
-    @BindView(R.id.tvPlace)
+    @BindView(R.id.tvAddress)
     TextView tvPlace;
 
     @BindView(R.id.tvPerson)
@@ -106,7 +106,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     if (yelpApiResponse != null && yelpApiResponse.businessList.size() > 0) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
                         Location location = restaurant.location;
-                        //tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
+                        //tvAddress.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
                         tvPlace.setText(event.getAddressString());
                         tvYelp.setText(restaurant.name);
                         final String url = restaurant.url;

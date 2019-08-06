@@ -21,8 +21,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 import java.util.Locale;
 
@@ -47,7 +45,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     Button btRequest;
     @BindView(R.id.tvNumGuests)
     TextView tvNumGuests;
-    @BindView(R.id.tvDate)
+    @BindView(R.id.tvDay)
     TextView tvDate;
 
     private Event currentEvent;

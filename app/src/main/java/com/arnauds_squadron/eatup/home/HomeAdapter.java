@@ -1,42 +1,31 @@
 package com.arnauds_squadron.eatup.home;
 
-import android.annotation.SuppressLint;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
-import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
-import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseUser;
 
@@ -52,14 +41,13 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CHANNEL_ID;
-import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
 import static com.arnauds_squadron.eatup.utils.Constants.HOST;
-import static com.parse.Parse.getApplicationContext;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateDay;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateMonth;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
@@ -90,12 +78,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         if (event.getDate() != null) {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
             Date date = localCalendar.getTime();
-            if (event.getDate() != null) {
                 // event has not passed
-                if (date.before(event.getDate())) {
-                    viewHolder.tvDate.setTextColor(Color.BLACK);
+                if (date.after(event.getDate())) {
                     // check if current user is the host
-                    if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                    if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
                         if(event.getAcceptedGuestsList() != null) {
                             if(event.getAcceptedGuestsList().size() != 0) {
                                 viewHolder.btnCancel.setText("    Rate guests    ");
@@ -111,31 +97,34 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         viewHolder.btnCancel.setTag(HOST);
                     }
                 }
-                String[] split = event.getDate().toString().split(" ");
-                viewHolder.tvDate.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
-            }
+
+                viewHolder.tvDay.setText(formatDateDay(event.getDate()));
+                viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
+                viewHolder.tvTime.setText(formatTime(event.getDate(), context));
+
+//                String[] split = event.getDate().toString().split(" ");
+//
+//                viewHolder.tvDay.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
         }
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
         }
 
         try {
-            viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
+            viewHolder.tvAddress.setText(event.getHost().fetchIfNeeded().getUsername());
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        if (event.getTitle() != null) {
-            viewHolder.tvTitle.setText(event.getTitle());
-        }
 //        if (event.getEventImage() != null) {
 //            viewHolder.ivImage.setParseFile(event.getEventImage());
 //            viewHolder.ivImage.loadInBackground();
 //        }
 
         if(event.getAddressString() != null) {
-            viewHolder.tvPlace.setText(event.getAddressString());
+            viewHolder.tvAddress.setText(event.getAddressString());
         }
+
         // Display requests if the current user is the host of this event
         if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
             requests = new ArrayList<>();
@@ -221,23 +210,37 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 //        @BindView(R.id.ivImage)
 //        ParseImageView ivImage;
 
-        @BindView(R.id.ibOpenChat)
-        ImageButton ibOpenChat;
+
+        @BindView(R.id.tvDay)
+        TextView tvDay;
+
+        @BindView(R.id.tvMonth)
+        TextView tvMonth;
+
+        @BindView(R.id.tvTime)
+        TextView tvTime;
 
         @BindView(R.id.ivProfileImage)
         ParseImageView ivProfileImage;
 
+        @BindView(R.id.tvEventTitle)
+        TextView tvTitle;
+
+        @BindView(R.id.tvRestaurant)
+        TextView tvRestaurant;
+
+        @BindView(R.id.constraintLayoutAddress)
+        ConstraintLayout constraintLayoutAddress;
+
+        @BindView(R.id.tvAddress)
+        TextView tvAddress;
+
+        @BindView(R.id.btnChat)
+        Button btnChat;
+
         @BindView(R.id.btnCancel)
         Button btnCancel;
 
-        @BindView(R.id.tvDate)
-        TextView tvDate;
-
-        @BindView(R.id.tvTitle)
-        TextView tvTitle;
-
-        @BindView(R.id.tvPlace)
-        TextView tvPlace;
 
         @BindView(R.id.rvRequests)
         RecyclerView rvRequests;
@@ -278,7 +281,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 }
             });
 
-            ibOpenChat.setOnClickListener(new View.OnClickListener() {
+            btnChat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Event event = mAgenda.get(getAdapterPosition());

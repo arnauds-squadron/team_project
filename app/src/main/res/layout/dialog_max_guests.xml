@@ -11,7 +11,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvEventTitle" />
 
     <Button
         android:id="@+id/btnSet"
@@ -24,7 +24,7 @@
         app:layout_constraintTop_toBottomOf="@+id/npMaxGuests" />
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvEventTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"

@@ -78,6 +78,7 @@
     <string name="password">password</string>
     <string name="username">username</string>
     <string name="set">Set</string>
+    <string name="chat_button">Chat</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />
