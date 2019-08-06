@@ -18,7 +18,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:background="@xml/rounded_button_light"
             android:text="@android:string/cancel"
+            android:textColor="@color/toast_red_diluted"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvPlace" />
 
@@ -64,7 +66,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="TextView"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/toast_red"
             android:textStyle="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
