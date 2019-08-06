@@ -21,15 +21,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,7 +58,6 @@ import butterknife.Unbinder;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
@@ -110,7 +105,7 @@ public class VisitorFragment extends Fragment {
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
 
-    // TODO public latitude and longitude of current location for victor to use
+    // public latitude and longitude of current location for victor to use
     public Double currentLatitude;
     public Double currentLongitude;
 
@@ -178,7 +173,6 @@ public class VisitorFragment extends Fragment {
                 }
             }
         };
-
     }
 
     @OnClick(R.id.constraintLayoutCuisine)
@@ -263,7 +257,6 @@ public class VisitorFragment extends Fragment {
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
 
-    // TODO account for case when device policy or previous settings set permission
     private void requestPermissions() {
         boolean shouldProvideRationale =
                 shouldShowRequestPermissionRationale(
@@ -273,7 +266,7 @@ public class VisitorFragment extends Fragment {
         // request previously, but didn't check the "Don't ask again" checkbox.
         if (shouldProvideRationale) {
             Log.i("LocationFragment", "Displaying permission rationale to provide additional context.");
-            showSnackbar("EatUp needs your current location to find hosts near you.", "Grant permission",
+            showSnackbar("Toast needs your current location to find events.", "Accept",
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -310,8 +303,7 @@ public class VisitorFragment extends Fragment {
                 // Notify the user that GPS is necessary to use the current location component of the app.
                 // Permission might have been rejected without asking the user for permission
                 // device policy or "Never ask again" prompts).
-                // TODO add ignore functionality so user can continue without inputting current location
-                showSnackbar("EatUp needs your current location to find hosts near you.", "Settings",
+                showSnackbar("Toast needs your current location to find events.", "Settings",
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -347,8 +339,6 @@ public class VisitorFragment extends Fragment {
                         if (task.isSuccessful() && task.getResult() != null) {
                             lastLocation = task.getResult();
 
-                            // TODO - tag current location with coordinates? or just store this information in the Parse database
-
                             // geocoder for translating coordinates to address
                             if (!Geocoder.isPresent()) {
                                 Toast.makeText(getActivity(),
@@ -363,16 +353,7 @@ public class VisitorFragment extends Fragment {
                             tvCurrentLocation.setTag(R.id.latitude, lastLocation.getLatitude());
                             tvCurrentLocation.setTag(R.id.longitude, lastLocation.getLongitude());
                         } else {
-                            // TODO add edge cases for nonsuccessful calls to getLastLocation
                             startLocationUpdates();
-//                            Log.d("LocationFragment", "getLastLocation:exception", task.getException());
-//                            showSnackbar("Could not obtain precise location.", "Try again", new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    startLocationUpdates();
-//                                    Log.d("Do something clicked", "start location updates");
-//                                }
-//                            });
                         }
                     }
                 });
@@ -386,14 +367,6 @@ public class VisitorFragment extends Fragment {
     private void startLocationUpdates() {
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
     }
-
-//    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-//                               View.OnClickListener listener) {
-//        Snackbar.make(getActivity().findViewById(android.R.id.content),
-//                getString(mainTextStringId),
-//                Snackbar.LENGTH_INDEFINITE)
-//                .setAction(getString(actionStringId), listener).show();
-//    }
 
     // rewrite above method to avoid int errors
     private void showSnackbar(String mainString, String actionString,
