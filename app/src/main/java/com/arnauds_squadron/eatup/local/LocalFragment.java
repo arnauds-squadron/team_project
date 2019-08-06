@@ -81,6 +81,7 @@ public class LocalFragment extends Fragment implements
      */
     @Override
     public void startEventCreation(Event newEvent) {
+        currentEvent = null;
         recentEvent = newEvent;
         advanceViewPager();
     }

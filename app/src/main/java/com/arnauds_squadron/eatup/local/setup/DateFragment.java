@@ -29,7 +29,6 @@ import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
-import com.arnauds_squadron.eatup.utils.UIHelper;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,7 +50,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 /**
- * Fragment that asks the user to input the date and time of their event through a series of
+ * Fragment that asks the user to input the date and time of their recentEvent through a series of
  * input dialogs.
  */
 public class DateFragment extends Fragment implements OnMapReadyCallback {
@@ -85,7 +84,8 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
 
     private OnFragmentInteractionListener mListener;
 
-    private Event event;
+    private Event currentEvent;
+    private Event recentEvent;
     // Calendar object that holds the date and time that the user selects
     private Calendar selectedTime;
     // Booleans to make sure the user selects a time before moving on
@@ -115,19 +115,21 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            UIHelper.hideKeyboard(getActivity(), getView());
-            event = mListener.getRecentEvent();
-
-            SupportMapFragment mapFragment = (SupportMapFragment)
-                    getChildFragmentManager().findFragmentById(R.id.mapFragment);
-            mapFragment.getMapAsync(this); // update the map
-
             selectedTime = Calendar.getInstance();
-            if (event.getDate() != null) { // recent event, fill in all the fields
-                selectedTime.setTime(event.getDate());
-                etEventTitle.setText(event.getTitle());
-                setPreviousFields();
-            } else {
+
+            currentEvent = mListener.getCurrentEvent();
+            recentEvent = mListener.getRecentEvent();
+            setCurrentEventFields();
+
+            if (recentEvent != null) { // recent event, fill in all the fields
+                selectedTime.setTime(recentEvent.getDate());
+                dateSet = true;
+                timeSet = true;
+                setRecentEventFields();
+            } else { // reset recent event fields in case the user undoes changes and returns
+                dateSet = false;
+                timeSet = false;
+                resetRecentEventFields();
                 showDatePickerDialog(true);
             }
         }
@@ -154,15 +156,15 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Communicates with the LocalFragment with the listener to create the event with the
-     * given event name. Requires the name to not be empty or just spaces.
+     * Communicates with the LocalFragment with the listener to create the recentEvent with the
+     * given recentEvent name. Requires the name to not be empty or just spaces.
      */
     @OnClick(R.id.btnCreateEvent)
     public void createEvent() {
         final String eventTitle = etEventTitle.getText().toString().trim();
 
         if (TextUtils.isEmpty(eventTitle)) {
-            Toast.makeText(getActivity(), "Give your event a name!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Give your recentEvent a name!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -170,8 +172,8 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         // ApiResponse if we have a response, then get the specific information defined in the
         // Business Class
         Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
-                event.getAddress().getLatitude(), event.getAddress().getLongitude(),
-                event.getTags().get(0), 50);
+                currentEvent.getAddress().getLatitude(), currentEvent.getAddress().getLongitude(),
+                currentEvent.getTags().get(0), 50);
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @SuppressLint("SetTextI18n")
@@ -182,7 +184,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                     YelpApiResponse yelpApiResponse = response.body();
                     if (yelpApiResponse != null && yelpApiResponse.businessList.size() > 0) {
                         Business restaurant = yelpApiResponse.businessList.get(0);
-                        event.setYelpImage(restaurant.imageUrl);
+                        currentEvent.setYelpImage(restaurant.imageUrl);
                     }
                 }
                 updateEventFields();
@@ -196,7 +198,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Calls the parent fragment to update the new event with the new fields
+     * Calls the parent fragment to update the new recentEvent with the new fields
      */
     private void updateEventFields() {
         String title = etEventTitle.getText().toString().trim();
@@ -224,7 +226,8 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Shows the user a popup to select the date of the event. Default date is the current date
+     * Shows the user a popup to select the date of the recentEvent. Default date is the current date
+     *
      * @param shouldShowNextDialog Shows the TimePickerDialog if true, just updates the date
      *                             TextView if false
      */
@@ -240,11 +243,10 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                 selectedTime.set(Calendar.MONTH, month);
                 selectedTime.set(Calendar.DAY_OF_MONTH, day);
                 dateSet = true;
-                if (shouldShowNextDialog) {
+                if (shouldShowNextDialog)
                     showTimePickerDialog(true);
-                } else {
+                else
                     updateNewFieldTextViews();
-                }
             }
         }, currentYear, currentMonth, currentDay);
 
@@ -253,9 +255,8 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(DialogInterface dialog, int buttonId) {
                 dateSet = false;
-                if (!shouldShowNextDialog) {
+                if (!shouldShowNextDialog)
                     updateNewFieldTextViews();
-                }
             }
         });
         datePicker.show();
@@ -299,7 +300,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Shows a popup for the user to select the maximum number of guests for their event. Minimum is
+     * Shows a popup for the user to select the maximum number of guests for their recentEvent. Minimum is
      * 1 guest, maximum is 100 guests
      */
     @OnClick({R.id.tvMaxGuests, R.id.ivMaxGuests})
@@ -314,9 +315,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         npMaxGuests.setMinValue(1);
         npMaxGuests.setMaxValue(Constants.MAX_GUESTS);
         npMaxGuests.setWrapSelectorWheel(false);
-
-        int startVal = event.getMaxGuests();
-        npMaxGuests.setValue(startVal == 0 ? 1 : startVal);
+        // TODO: set the start value to the previous selection?
 
         Button btnSet = d.findViewById(R.id.btnSet);
         btnSet.setOnClickListener(new View.OnClickListener() {
@@ -324,8 +323,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 String text = npMaxGuests.getValue() + "";
                 tvMaxGuests.setText(text);
-                event.setMaxGuests(npMaxGuests.getValue());
-                d.hide();
+                d.dismiss();
                 updateNewFieldTextViews();
             }
         });
@@ -336,7 +334,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
      * Update the date and time text views and handle if the time wasn't set
      */
     private void updateNewFieldTextViews() {
-        showImageViews();
+        toggleImageViews(true);
 
         if (!dateSet)
             tvSelectedDate.setText(getString(R.string.event_creation_date_not_selected));
@@ -350,56 +348,89 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
+     * Sets the values that have been set by the user through the wizard (address and tags)
+     */
+    private void setCurrentEventFields() {
+        SupportMapFragment mapFragment = (SupportMapFragment)
+                getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(this); // update the map
+
+        tvTags.setText(FormatHelper.listToString(currentEvent.getTags()));
+    }
+
+    /**
+     * Resets the recent event fields if the user goes back and starts a new event and returns to
+     * this fragment. Reverts everything done by setRecentEventFields()
+     */
+    private void resetRecentEventFields() {
+        toggleImageViews(false);
+
+        etEventTitle.setText("");
+        tvMaxGuests.setText("");
+        cbOver21.setChecked(false);
+        tvSelectedDate.setText("");
+        tvSelectedTime.setText("");
+    }
+
+    /**
      * Initialize all the fields that already have values in the recent event the user selected.
      * Also sets the images to visible.
      */
-    private void setPreviousFields() {
-        showImageViews();
+    private void setRecentEventFields() {
+        toggleImageViews(true);
 
-        tvTags.setText(FormatHelper.listToString(event.getTags()));
-        tvMaxGuests.setText(String.format(Locale.ENGLISH, "%d", event.getMaxGuests()));
-        cbOver21.setChecked(event.getOver21());
-        tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(event.getDate()));
-        tvSelectedTime.setText(FormatHelper.formatTime(event.getDate(), getActivity()));
+        etEventTitle.setText(recentEvent.getTitle());
+        tvMaxGuests.setText(String.format(Locale.ENGLISH, "%d", recentEvent.getMaxGuests()));
+        cbOver21.setChecked(recentEvent.getOver21());
+        tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(recentEvent.getDate()));
+        tvSelectedTime.setText(FormatHelper.formatTime(recentEvent.getDate(), getActivity()));
     }
 
     /**
      * Show all the ImageViews that are hidden by default if the user hasn't set a date, time, etc.
      */
-    private void showImageViews() {
-        ivCalendar.setVisibility(View.VISIBLE);
-        ivClock.setVisibility(View.VISIBLE);
-        ivMaxGuests.setVisibility(View.VISIBLE);
-        cbOver21.setVisibility(View.VISIBLE);
+    private void toggleImageViews(boolean isVisible) {
+        ivCalendar.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
+        ivClock.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
+        ivMaxGuests.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
+        cbOver21.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
     }
 
     /**
-     * Called whenever getMapAsync() is called, and sets up the map
+     * Called whenever getMapAsync() is called, and sets up the map. Uses the current event's
+     * location since that will always be set.
+     *
      * @param googleMap The map obtained from the maps API
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LatLng eventLocation = new LatLng(event.getAddress().getLatitude(),
-                event.getAddress().getLongitude());
+        LatLng eventLocation = new LatLng(currentEvent.getAddress().getLatitude(),
+                currentEvent.getAddress().getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
                 Constants.DETAILED_MAP_ZOOM));
 
         googleMap.addMarker(new MarkerOptions()
                 .position(eventLocation)
-                .title(event.getTitle())
+                .title(currentEvent.getTitle())
                 .snippet("snippet")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
     }
 
     public interface OnFragmentInteractionListener {
         /**
-         * Gets the created event from the parent fragment
+         * Gets the created recentEvent from the parent fragment
          */
         Event getRecentEvent();
 
         /**
-         * Method that triggers the event creation method in the parent fragment
+         * Gets the event currently being created from the parent fragment, only used to set the
+         * event's location and tags
+         */
+        Event getCurrentEvent();
+
+        /**
+         * Method that triggers the recentEvent creation method in the parent fragment
          */
         void updateFinalFields(String title, Date date, int maxGuests, boolean over21);
     }
