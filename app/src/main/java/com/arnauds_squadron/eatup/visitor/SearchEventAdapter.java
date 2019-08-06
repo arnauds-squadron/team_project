@@ -95,10 +95,10 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             List<String> cuisineTags = event.getTags();
             tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
 
-            ParseFile eventImage = event.getEventImage();
-            if (eventImage != null) {
+            String eventImageURL = event.getYelpImage();
+            if (eventImageURL != null) {
                 Glide.with(context)
-                        .load(eventImage.getUrl())
+                        .load(eventImageURL)
                         .centerCrop()
                         .into(ivEventImage);
             }
