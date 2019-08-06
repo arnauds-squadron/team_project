@@ -114,6 +114,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     SearchView svLocation;
     @BindView(R.id.tvSearchQuery)
     TextView tvSearchQuery;
+    @BindView(R.id.tvSearchResultsTitle)
+    TextView tvResultsTitle;
 
     // adapter for location search suggestions
     private PlacesClient placesClient;
@@ -229,6 +231,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                 getResources().getColor(android.R.color.holo_orange_light),
                 getResources().getColor(android.R.color.holo_red_light));
         tvSearchQuery.setVisibility(View.INVISIBLE);
+        tvResultsTitle.setVisibility(View.INVISIBLE);
     }
 
 
@@ -547,6 +550,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                     loadTopEvents(new Date(0));
                     tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                     tvSearchQuery.setVisibility(View.VISIBLE);
+                    tvResultsTitle.setVisibility(View.VISIBLE);
                 } else {
                     useCurrentLocation = false;
                     queryText = String.format(Locale.getDefault(),
@@ -568,6 +572,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                             loadTopEvents(new Date(0));
                             tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                             tvSearchQuery.setVisibility(View.VISIBLE);
+                            tvResultsTitle.setVisibility(View.VISIBLE);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -664,6 +669,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                     searchView.setQuery(query, false);
                     tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                     tvSearchQuery.setVisibility(View.VISIBLE);
+                    tvResultsTitle.setVisibility(View.VISIBLE);
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "Select a location from the drop-down menu", Toast.LENGTH_SHORT).show();
@@ -711,6 +717,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                 searchView.clearFocus();
                 tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                 tvSearchQuery.setVisibility(View.VISIBLE);
+                tvResultsTitle.setVisibility(View.VISIBLE);
                 return true;
             }
         });
@@ -777,6 +784,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                     searchView.setQuery(query, false);
                     tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                     tvSearchQuery.setVisibility(View.VISIBLE);
+                    tvResultsTitle.setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(getApplicationContext(), "Select a cuisine from the drop-down menu", Toast.LENGTH_SHORT).show();
                 }
