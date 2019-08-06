@@ -193,7 +193,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
 
         svLocation.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         svLocation.setIconifiedByDefault(false);
-        svCuisine.setQueryHint("Address or street name");
+        svLocation.setQueryHint("Address or street name");
         useCurrentLocation = true;
 
         setCategorySuggestions(svCuisine);
