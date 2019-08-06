@@ -73,6 +73,7 @@
     <string name="walkthrough_3">Cheers\!</string>
     <string name="toast">Toast</string>
     <string name="signup_message">Don\'t have an account? Sign up.</string>
+    <string name="login_message">Already have an account? Log in.</string>
     <string name="login">Login</string>
     <string name="password">password</string>
     <string name="username">username</string>

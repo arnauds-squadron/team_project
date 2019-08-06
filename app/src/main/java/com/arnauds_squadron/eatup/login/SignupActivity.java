@@ -27,16 +27,15 @@ public class SignupActivity extends AppCompatActivity {
     EditText etEmail;
     @BindView(R.id.btnCreate)
     Button btnCreate;
+    @BindView(R.id.btnLogin)
+    Button btnLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-
         ButterKnife.bind(this);
 
-
-// other fields can be set just like with ParseObject
-        //user.put("phone", "650-253-0000");
         btnCreate.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -58,6 +57,14 @@ public class SignupActivity extends AppCompatActivity {
                         }
                     }
                 });
+            }
+        });
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
     }
