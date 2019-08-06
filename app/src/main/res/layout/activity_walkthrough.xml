@@ -28,6 +28,7 @@
         android:background="@null"
         android:text="@string/skip"
         android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -41,7 +42,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view"
         app:selectedDotColor="@color/white"
-        app:supportRTL="false"/>
+        app:supportRTL="false" />
 
     <Button
         android:id="@+id/btnNext"
@@ -52,6 +53,7 @@
         android:background="@null"
         android:text="@string/next"
         android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/view" />
 

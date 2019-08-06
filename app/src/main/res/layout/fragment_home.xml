@@ -58,6 +58,15 @@
                 android:layout_height="wrap_content" />
         </FrameLayout>
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tvAgenda"
             android:layout_width="wrap_content"
