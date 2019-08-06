@@ -77,34 +77,29 @@ public class LocalFragment extends Fragment implements
     /**
      * Overrides the StartFragment interface
      * <p>
-     * Begin creating a completely new recentEvent
+     * Begin creating a completely new event
      */
     @Override
     public void startEventCreation(Event newEvent) {
-        if(newEvent == null) {
-            recentEvent = new Event();
-            recentEvent.setHost(Constants.CURRENT_USER);
-        } else {
-            recentEvent = newEvent;
-        }
+        recentEvent = newEvent;
         advanceViewPager();
     }
 
     /**
      * Overrides the TagsFragment interface
      * <p>
-     * Updates some of the initial fields of the newly created recentEvent (tags, 21+, restaurant, etc)
+     * Updates some of the initial fields of the newly created event (tags, 21+, restaurant, etc)
      */
     @Override
     public void updateTags(List<String> tagList) {
-        recentEvent.setTags(tagList);
+        currentEvent.setTags(tagList);
         advanceViewPager();
     }
 
     /**
      * Overrides the AddressFragment interface
      * <p>
-     * Updates the address of the local recentEvent with the ParseGeoPoint of the address of the recentEvent
+     * Updates the address of the local event with the ParseGeoPoint of the address of the event
      */
     @Override
     public void updateAddress(ParseGeoPoint address, String addressString) {
@@ -127,8 +122,7 @@ public class LocalFragment extends Fragment implements
     /**
      * Overrides the ReviewFragment interface
      *
-     * @return the current recentEvent so the ReviewFragment can display all the details of the created
-     * recentEvent
+     * @return the recent event so the map can set its position to the recent event's location
      */
     @Override
     public Event getRecentEvent() {
@@ -136,9 +130,19 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
+     * Overrides the DateFragment interface
+     *
+     * @return the current event so the map doesn't reset its position
+     */
+    @Override
+    public Event getCurrentEvent() {
+        return currentEvent;
+    }
+
+    /**
      * Overrides the ReviewFragment interface
      * <p>
-     * Saves the recentEvent to the parse server, resets the setup fragment, and switches to the home
+     * Saves the new event to the parse server, resets the setup fragment, and switches to the home
      * fragment
      */
     public void saveEvent() {
@@ -147,12 +151,12 @@ public class LocalFragment extends Fragment implements
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_LONG).show();
-                    createEventChat(recentEvent.getTitle()); // create the corresponding chat
+                    createEventChat(currentEvent.getTitle()); // create the corresponding chat
                     updateRecentEvents(); // update the list of recent events in the start fragment
                     mListener.onEventCreated(); // notify the MainActivity to go to the HomeFragment
                     resetSetupViewPager(); // reset the ViewPager to the StartFragment
                 } else {
-                    Toast.makeText(getActivity(), "Error creating recentEvent", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Error creating event", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
@@ -192,9 +196,9 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
-     * Creates the recentEvent's chat once the create recentEvent button is hit
+     * Creates the new event's chat once the create new event button is hit
      *
-     * @param eventTitle The title of the new recentEvent
+     * @param eventTitle The title of the new event
      */
     private void createEventChat(String eventTitle) {
         final Chat chat = new Chat();
@@ -203,13 +207,13 @@ public class LocalFragment extends Fragment implements
         chat.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e == null) { // Register chat to the current recentEvent
-                    recentEvent.setChat(chat);
-                    recentEvent.saveInBackground(new SaveCallback() {
+                if (e == null) { // Register chat to the current event
+                    currentEvent.setChat(chat);
+                    currentEvent.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e != null) {
-                                Toast.makeText(getActivity(), "Could not create the recentEvent's chat",
+                                Toast.makeText(getActivity(), "Could not create the event's chat",
                                         Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
@@ -252,7 +256,7 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Interface to communicate with the parent activity so the HomeFragment is navigated to
-     * after an recentEvent is created
+     * after an event is created
      */
     public interface OnFragmentInteractionListener {
         /**
