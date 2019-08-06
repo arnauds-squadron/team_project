@@ -82,34 +82,26 @@ public class HomeDetailsActivity extends AppCompatActivity {
         context = getApplicationContext();
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
         // if we have a response, then get the specific information defined in the Business Class
-        Call<YelpApiResponse> meetUp = null;
-        if (event.getTags() != null){
-            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getTags().get(0), 50);
-        } else {
-            YelpData.retrofit(context).getLocation(event.getAddress().getLatitude(), event.getAddress().getLongitude(), event.getCuisine(), 50);
-        }
+        Call<Business> meetUp;
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the
         // ApiResponse if we have a response, then get the specific information defined in the
         // Business Class
-        meetUp = YelpData.retrofit(context).getLocation(
-                event.getAddress().getLatitude(), event.getAddress().getLongitude(),
-                event.getTags().get(0), 50);
+        meetUp = YelpData.retrofit(context).getDetails(event.getYelpId());
 
-        meetUp.enqueue(new Callback<YelpApiResponse>() {
+        meetUp.enqueue(new Callback<Business>() {
             @SuppressLint("SetTextI18n")
             @Override
-            public void onResponse(@NonNull Call<YelpApiResponse> call,
-                                   @NonNull retrofit2.Response<YelpApiResponse> response) {
+            public void onResponse(@NonNull Call<Business> call,
+                                   @NonNull retrofit2.Response<Business> response) {
                 if (response.isSuccessful()) {
 
-                    YelpApiResponse yelpApiResponse = response.body();
-                    if (yelpApiResponse != null && yelpApiResponse.businessList.size() > 0) {
-                        Business restaurant = yelpApiResponse.businessList.get(0);
-                        Location location = restaurant.location;
+                    Business business = response.body();
+                    if (business != null) {
+                        Location location = business.location;
                         //tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
                         tvPlace.setText(event.getAddressString());
-                        tvYelp.setText(restaurant.name);
-                        final String url = restaurant.url;
+                        tvYelp.setText(business.name);
+                        final String url = business.url;
 
                         ivLink.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -121,15 +113,15 @@ public class HomeDetailsActivity extends AppCompatActivity {
                             }
                         });
                         Glide.with(HomeDetailsActivity.this)
-                                .load(restaurant.imageUrl)
+                                .load(business.imageUrl)
                                 .into(ivImage);
-                        rbYelp.setRating(restaurant.rating);
+                        rbYelp.setRating(business.rating);
                     }
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<YelpApiResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Business> call, @NonNull Throwable t) {
                 t.printStackTrace();
             }
         });

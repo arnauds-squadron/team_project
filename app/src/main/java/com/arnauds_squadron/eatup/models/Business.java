@@ -20,6 +20,10 @@ public class Business {
     @Expose
     public String name;
 
+    @SerializedName("id")
+    @Expose
+    public String id;
+
     @SerializedName("image_url")
     @Expose
     public String imageUrl;

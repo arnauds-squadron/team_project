@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
+import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -24,6 +26,7 @@ import com.parse.SaveCallback;
 
 import java.util.Date;
 import java.util.List;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +37,7 @@ import butterknife.ButterKnife;
 public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
+        YelpBusinessFragment.OnFragmentInteractionListener,
         TagsFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener {
 
@@ -253,6 +257,11 @@ public class LocalFragment extends Fragment implements
      */
     private void advanceViewPager() {
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+    }
+
+    public void updateBusinessId(String id) {
+        currentEvent.setYelpId(id);
+        advanceViewPager();
     }
 
     /**
