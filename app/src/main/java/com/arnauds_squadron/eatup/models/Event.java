@@ -212,6 +212,7 @@ public class Event extends ParseObject {
     public void setYelpImage(String yelpImage) {
         put(KEY_YELP_IMAGE, yelpImage);
     }
+
     public String getYelpImage() {
         return getString(KEY_YELP_IMAGE);
     }

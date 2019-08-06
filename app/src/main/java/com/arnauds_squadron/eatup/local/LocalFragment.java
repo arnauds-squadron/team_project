@@ -14,6 +14,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
+import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -35,6 +36,7 @@ import butterknife.ButterKnife;
 public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
+        YelpBusinessFragment.OnFragmentInteractionListener,
         TagsFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener,
         ReviewFragment.OnFragmentInteractionListener {
@@ -259,6 +261,12 @@ public class LocalFragment extends Fragment implements
      */
     private void advanceViewPager() {
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+    }
+
+    @Override
+    public void updateBusinessId(String id) {
+        event.setYelpId(id);
+        advanceViewPager();
     }
 
     /**

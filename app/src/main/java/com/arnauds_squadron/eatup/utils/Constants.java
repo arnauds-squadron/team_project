@@ -43,7 +43,8 @@ public final class Constants {
 
     // Setup constants
     public static final int ADDRESS_FRAGMENT_INDEX = 2;
-    public static final int DATE_FRAGMENT_INDEX = 3;
+//    public static final int YELP_BUSINESS_FRAGMENT = 3;
+    public static final int DATE_FRAGMENT_INDEX = 4;
 
     // The logged in user, only changed in the login activity
     public static ParseUser CURRENT_USER;
