@@ -1,7 +1,6 @@
 package com.arnauds_squadron.eatup.login;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
@@ -14,16 +13,12 @@ import android.widget.Button;
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.walkthrough.WalkthroughActivity;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.arnauds_squadron.eatup.utils.Constants.FIRST_LOAD;
-import static com.arnauds_squadron.eatup.utils.Constants.PREFS_NAME;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -40,7 +35,6 @@ public class LoginActivity extends AppCompatActivity {
     Button btnSignup;
 
     public static String name;
-    private boolean isFirstLoad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +48,6 @@ public class LoginActivity extends AppCompatActivity {
             Constants.CURRENT_USER = currentUser;
             goToMainActivity();
         }
-
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        isFirstLoad = prefs.getBoolean(FIRST_LOAD, true);
-        prefs.edit().putBoolean(FIRST_LOAD, false).apply();
 
         etPassword.setTypeface(Typeface.DEFAULT);
         etPassword.setTransformationMethod(new PasswordTransformationMethod());
@@ -97,11 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                         name = username;
                         user.setUsername(username);
                         Constants.CURRENT_USER = currentUser;
-
-                        if (isFirstLoad)
-                            gotoWelcomeActivity();
-                        else
-                            goToMainActivity();
+                        goToMainActivity();
                     }
 
                 } else {
@@ -110,13 +96,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void gotoWelcomeActivity() {
-        Log.d("LoginActivity", "Login Successful");
-        final Intent intent = new Intent(LoginActivity.this, WalkthroughActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     private void goToMainActivity() {

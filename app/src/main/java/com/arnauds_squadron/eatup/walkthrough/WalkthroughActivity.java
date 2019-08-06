@@ -2,10 +2,10 @@ package com.arnauds_squadron.eatup.walkthrough;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -13,14 +13,17 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.arnauds_squadron.eatup.utils.Constants.FIRST_LOAD;
+import static com.arnauds_squadron.eatup.utils.Constants.PREFS_NAME;
 
 public class WalkthroughActivity extends AppCompatActivity {
 
@@ -39,6 +42,12 @@ public class WalkthroughActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_walkthrough);
         ButterKnife.bind(this);
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        if (!prefs.getBoolean(FIRST_LOAD, true)) {
+            goToLoginActivity();
+        }
+        prefs.edit().putBoolean(FIRST_LOAD, false).apply();
 
         Window window = getWindow();
 
@@ -75,18 +84,18 @@ public class WalkthroughActivity extends AppCompatActivity {
     @OnClick(R.id.btnNext)
     public void advanceViewPager() {
         if (viewPager.getCurrentItem() == Constants.LAST_WALKTHROUGH_SCREEN)
-            startMainActivity();
+            goToLoginActivity();
         else
             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
     }
 
     @OnClick(R.id.btnSkip)
     public void skipWalkthrough() {
-        startMainActivity();
+        goToLoginActivity();
     }
 
-    private void startMainActivity() {
-        startActivity(new Intent(this, MainActivity.class));
+    private void goToLoginActivity() {
+        startActivity(new Intent(this, LoginActivity.class));
         finish();
     }
 

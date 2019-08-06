@@ -21,24 +21,19 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/short_glass_white_circle"
+        android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".event_details.EventDetailsActivity" />
-        <activity android:name=".event_details.EventDetailsRestaurantActivity" />
-        <activity android:name=".login.SignupActivity" />
-        <activity android:name=".profile.HostProfileActivity" />
-        <activity android:name=".profile.ProfileImageActivity" />
-        <activity android:name=".profile.VisitorProfileActivity" />
-        <activity android:name=".RateUserActivity" />
-        <activity android:name=".walkthrough.WalkthroughActivity" />
 
-        <service
-            android:name=".utils.FetchAddressIntentService"
-            android:exported="false" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_api_key" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -50,15 +45,26 @@
                 android:resource="@xml/fileprovider" />
         </provider>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_api_key" />
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
+        <service
+            android:name=".utils.FetchAddressIntentService"
+            android:exported="false" />
 
+        <activity android:name=".event_details.EventDetailsActivity" />
+        <activity android:name=".event_details.EventDetailsRestaurantActivity" />
         <activity android:name=".home.HomeDetailsActivity" />
         <activity android:name=".local.LocalConfirmationActivity" />
+        <activity android:name=".login.SignupActivity" />
+        <activity android:name=".profile.HostProfileActivity" />
+        <activity android:name=".profile.ProfileImageActivity" />
+        <activity android:name=".profile.VisitorProfileActivity" />
+        <activity android:name=".RateUserActivity" />
+        <activity android:name=".walkthrough.WalkthroughActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".visitor.VisitorSearchActivity"
             android:launchMode="singleTop"
@@ -74,7 +80,8 @@
         <activity android:name=".MainActivity" />
         <activity
             android:name=".login.LoginActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -82,5 +89,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">EatUp</string>
+    <string name="app_name">Toast</string>
     <string name="visitor_search_hint">Search</string>
     <string name="btAccept">Accept</string>
     <string name="btDeny">Deny</string>
     <string name="tvApproveTitle">Approve this request?</string>
     <string name="btBook">Request meal</string>
     <string name="visitor_tv_greeting">Hello, </string>
-    <string name="browse_nearby">Browse nearby events</string>
+    <string name="browse_nearby">Browse events nearby</string>
     <string name="current_location_title">Use my current location</string>
     <string name="previous_location_title">Pick a previous location</string>
     <string name="previous_location_text">No previous meals yet!</string>
@@ -24,7 +24,6 @@
     <string name="event_creation_start_new_event">New event</string>
     <string name="event_creation_start_title">Set Up Your Event</string>
     <string name="event_creation_time_not_selected">Time not set</string>
-    <string name="event_creation_title_caption">And give it a good name!</string>
     <string name="detailview_event_title">Event Title</string>
     <string name="detailview_cuisine_name">Cuisine</string>
     <string name="detailview_distance">Distance</string>
@@ -49,7 +48,7 @@
     <string name="message_profile_image">my profile image</string>
     <string name="message_other_profile_image">profile image</string>
     <string name="messenger_message_hint">Type a message</string>
-    <string name="event_creation_title_hint">Name</string>
+    <string name="event_creation_title_hint">Event title</string>
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
     <string name="max_guests_label">Max Guests</string>
@@ -74,9 +73,11 @@
     <string name="walkthrough_3">Cheers\!</string>
     <string name="toast">Toast</string>
     <string name="signup_message">Don\'t have an account? Sign up.</string>
+    <string name="login_message">Already have an account? Log in.</string>
     <string name="login">Login</string>
     <string name="password">password</string>
     <string name="username">username</string>
+    <string name="set">Set</string>
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />

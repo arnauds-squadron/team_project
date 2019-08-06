@@ -86,16 +86,10 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
             tvEventTitle.setTag(distanceInMiles);
             tvDate.setText(event.getDateString(context));
 
-            ParseFile eventImage = event.getEventImage();
-            if (eventImage != null) {
+            String eventImageURL = event.getYelpImage();
+            if (eventImageURL != null) {
                 Glide.with(context)
-                        .load(eventImage.getUrl())
-                        .centerCrop()
-                        .into(ivEventImage);
-            }
-            if (event.getYelpImage() != null) {
-                Glide.with(context)
-                        .load(event.getYelpImage())
+                        .load(eventImageURL)
                         .centerCrop()
                         .into(ivEventImage);
             }

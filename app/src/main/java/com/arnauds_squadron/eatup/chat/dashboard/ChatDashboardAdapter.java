@@ -14,6 +14,7 @@ import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -21,14 +22,10 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import jp.wasabeef.glide.transformations.BlurTransformation;
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdapter.ViewHolder> {
 
@@ -78,6 +75,7 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
                         Glide.with(context)
                                 .load(image.getUrl())
                                 .transform(new CircleCrop())
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(imageViews[finalI]);
                     }
                 });
@@ -95,6 +93,7 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
                     Glide.with(context)
                             .load(image.getUrl())
                             .transform(new CircleCrop())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .into(viewHolder.ivImage);
                 }
             });

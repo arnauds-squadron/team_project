@@ -26,9 +26,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,7 +58,6 @@ import butterknife.Unbinder;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_DATA_EXTRA;
 import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.RECEIVER;
 import static com.arnauds_squadron.eatup.utils.Constants.RESULT_DATA_KEY;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
@@ -81,10 +77,10 @@ public class VisitorFragment extends Fragment {
     RecyclerView rvBrowse;
     @BindView(R.id.tvCurrentLocation)
     TextView tvCurrentLocation;
-    @BindView(R.id.searchSpinner)
-    Spinner searchSpinner;
     @BindView(R.id.recyclerview_pager_indicator)
     IndefinitePagerIndicator indefinitePagerIndicator;
+    @BindView(R.id.constraintLayoutCuisine)
+    ConstraintLayout constraintLayoutCuisine;
     @BindView(R.id.constraintLayoutLocation)
     ConstraintLayout constraintLayoutLocation;
 
@@ -109,9 +105,7 @@ public class VisitorFragment extends Fragment {
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
 
-    private int searchCategoryCode;
-
-    // TODO public latitude and longitude of current location for victor to use
+    // public latitude and longitude of current location for victor to use
     public Double currentLatitude;
     public Double currentLongitude;
 
@@ -147,6 +141,7 @@ public class VisitorFragment extends Fragment {
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -158,7 +153,6 @@ public class VisitorFragment extends Fragment {
                                 R.string.no_geocoder_available,
                                 Toast.LENGTH_LONG).show();
                         tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
-
                     } else {
                         // Start geocoder service and update UI to reflect the new address
                         startIntentService(location);
@@ -179,51 +173,21 @@ public class VisitorFragment extends Fragment {
                 }
             }
         };
-
-        // initialize spinner_text_view for search filtering
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.search_categories, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner_text_view
-        searchSpinner.setAdapter(adapter);
-        searchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            // when item selected, bring user to the new search activity with search bar and search category packaged as intent extra
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    // search category hint
-                    case 0:
-                        break;
-                    // cuisine
-                    case 1:
-                        searchCategoryCode = CUISINE_SEARCH;
-                        break;
-                    // location
-                    case 2:
-                        searchCategoryCode = LOCATION_SEARCH;
-                        break;
-                }
-                if (searchCategoryCode != 0) {
-                    searchSpinner.setSelection(NO_SEARCH);
-                    Intent i = new Intent(getContext(), VisitorSearchActivity.class);
-                    i.putExtra(SEARCH_CATEGORY, searchCategoryCode);
-                    i.putExtra("latitude", (Double) tvCurrentLocation.getTag(R.id.latitude));
-                    i.putExtra("longitude", (Double) tvCurrentLocation.getTag(R.id.longitude));
-                    getContext().startActivity(i);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
     }
 
+    @OnClick(R.id.constraintLayoutCuisine)
+    public void startSearchCuisine() {
+        Intent i = new Intent(getContext(), VisitorSearchActivity.class);
+        i.putExtra(SEARCH_CATEGORY, CUISINE_SEARCH);
+        i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
+        i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
+        startActivity(i);
+    }
 
     @OnClick(R.id.constraintLayoutLocation)
-    public void searchLocation(ConstraintLayout constraintLayoutLocation) {
-        Intent i = new Intent(getActivity(), VisitorSearchActivity.class);
+    public void startSearchLocation() {
+        Intent i = new Intent(getContext(), VisitorSearchActivity.class);
+        i.putExtra(SEARCH_CATEGORY, LOCATION_SEARCH);
         i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
         i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
         startActivity(i);
@@ -293,7 +257,6 @@ public class VisitorFragment extends Fragment {
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
 
-    // TODO account for case when device policy or previous settings set permission
     private void requestPermissions() {
         boolean shouldProvideRationale =
                 shouldShowRequestPermissionRationale(
@@ -303,7 +266,7 @@ public class VisitorFragment extends Fragment {
         // request previously, but didn't check the "Don't ask again" checkbox.
         if (shouldProvideRationale) {
             Log.i("LocationFragment", "Displaying permission rationale to provide additional context.");
-            showSnackbar("EatUp needs your current location to find hosts near you.", "Grant permission",
+            showSnackbar("Toast needs your current location to find events.", "Accept",
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -340,8 +303,7 @@ public class VisitorFragment extends Fragment {
                 // Notify the user that GPS is necessary to use the current location component of the app.
                 // Permission might have been rejected without asking the user for permission
                 // device policy or "Never ask again" prompts).
-                // TODO add ignore functionality so user can continue without inputting current location
-                showSnackbar("EatUp needs your current location to find hosts near you.", "Settings",
+                showSnackbar("Toast needs your current location to find events.", "Settings",
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -377,8 +339,6 @@ public class VisitorFragment extends Fragment {
                         if (task.isSuccessful() && task.getResult() != null) {
                             lastLocation = task.getResult();
 
-                            // TODO - tag current location with coordinates? or just store this information in the Parse database
-
                             // geocoder for translating coordinates to address
                             if (!Geocoder.isPresent()) {
                                 Toast.makeText(getActivity(),
@@ -393,16 +353,7 @@ public class VisitorFragment extends Fragment {
                             tvCurrentLocation.setTag(R.id.latitude, lastLocation.getLatitude());
                             tvCurrentLocation.setTag(R.id.longitude, lastLocation.getLongitude());
                         } else {
-                            // TODO add edge cases for nonsuccessful calls to getLastLocation
                             startLocationUpdates();
-//                            Log.d("LocationFragment", "getLastLocation:exception", task.getException());
-//                            showSnackbar("Could not obtain precise location.", "Try again", new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    startLocationUpdates();
-//                                    Log.d("Do something clicked", "start location updates");
-//                                }
-//                            });
                         }
                     }
                 });
@@ -416,14 +367,6 @@ public class VisitorFragment extends Fragment {
     private void startLocationUpdates() {
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
     }
-
-//    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-//                               View.OnClickListener listener) {
-//        Snackbar.make(getActivity().findViewById(android.R.id.content),
-//                getString(mainTextStringId),
-//                Snackbar.LENGTH_INDEFINITE)
-//                .setAction(getString(actionStringId), listener).show();
-//    }
 
     // rewrite above method to avoid int errors
     private void showSnackbar(String mainString, String actionString,

@@ -62,18 +62,26 @@ public class StartFragment extends Fragment {
         rvRecentEvents.setLayoutManager(layoutManager);
         rvRecentEvents.setAdapter(recentEventAdapter);
 
+        getEventsAsync();
+
+        return view;
+    }
+
+    /**
+     * Queries the Parse server to get the user's most recent events as host
+     */
+    public void getEventsAsync() {
         Event.Query query = new Event.Query();
         query.newestFirst().getTop().withHost().ownEvent(Constants.CURRENT_USER);
 
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
+                events.clear();
                 events.addAll(objects);
-                recentEventAdapter.notifyItemRangeInserted(0, events.size());
+                recentEventAdapter.notifyDataSetChanged();
             }
         });
-
-        return view;
     }
 
     @Override
@@ -99,21 +107,21 @@ public class StartFragment extends Fragment {
 
     @OnClick(R.id.btnStartNewEvent)
     public void startEventCreation() {
-        mListener.startEventCreation();
+        mListener.startEventCreation(null);
     }
 
-    public void useRecentEvent(Event event) {
-        mListener.useRecentEvent(Event.copyEvent(event));
-
+    /**
+     * Calls the LocalFragment to pass the event selected by the user from the recent event list
+     * @param event The event to use in the setup wizard
+     */
+    public void startEventCreation(Event event) {
+        mListener.startEventCreation(Event.copyEvent(event));
     }
 
     public interface OnFragmentInteractionListener {
-
         /**
          * Method that triggers the event creation method in the parent fragment
          */
-        void startEventCreation();
-
-        void useRecentEvent(Event event);
+        void startEventCreation(Event event);
     }
 }

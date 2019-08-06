@@ -24,7 +24,6 @@ import butterknife.ButterKnife;
 
 public class EventDetailsRestaurantActivity extends AppCompatActivity {
 
-    Event event;
     @BindView(R.id.ivEventImage)
     ImageView ivEventImage;
     @BindView(R.id.tvRestaurantName)

@@ -13,20 +13,21 @@ import android.os.Build;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
-import android.widget.SearchView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
+import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -55,8 +56,6 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,13 +70,10 @@ import butterknife.ButterKnife;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_ALIAS;
 import static com.arnauds_squadron.eatup.utils.Constants.CATEGORY_TITLE;
-import static com.arnauds_squadron.eatup.utils.Constants.NO_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.CUISINE_SEARCH;
-import static com.arnauds_squadron.eatup.utils.Constants.LOCATION_SEARCH;
 import static com.arnauds_squadron.eatup.utils.Constants.SEARCH_CATEGORY;
 
-
-public class VisitorSearchActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks,
+public class VisitorSearchActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     // initialize adapter, views, scroll listener
@@ -86,9 +82,15 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     private SwipeRefreshLayout swipeContainer;
     private EndlessRecyclerViewScrollListener scrollListener;
 
+    private String CURRENT_LOCATION_ID = "currentLocation";
+    private String ALL_EVENTS_ID = "allEvents";
+    private String CURRENT_LOCATION_STRING = "Current location";
+    private String ALL_EVENTS_STRING = "All events";
+
     // variables to keep track of current query
     private int searchCategory;
-    private String queriedCuisine;
+    private String queriedCuisineString = ALL_EVENTS_STRING;
+    private String queriedLocationString = CURRENT_LOCATION_STRING;
     private ParseGeoPoint queriedGeoPoint;
 
     private final static Double DEFAULT_COORD = 0.0;
@@ -97,7 +99,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             BaseColumns._ID,
             SearchManager.SUGGEST_COLUMN_TEXT_1,
             SearchManager.SUGGEST_COLUMN_TEXT_2,
-                                SearchManager.SUGGEST_COLUMN_INTENT_DATA
+            SearchManager.SUGGEST_COLUMN_INTENT_DATA
     };
 
     String[] CATEGORY_SEARCH_SUGGEST_COLUMNS = {
@@ -106,14 +108,16 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             SearchManager.SUGGEST_COLUMN_INTENT_DATA
     };
 
-    private String CURRENT_LOCATION_ID = "currentLocation";
-
     @BindView(R.id.rvSearchResults)
     RecyclerView rvEvents;
-    @BindView(R.id.resultsSearchView)
-    SearchView resultsSearchView;
-    @BindView(R.id.searchSpinner)
-    Spinner searchSpinner;
+    @BindView(R.id.svCuisine)
+    SearchView svCuisine;
+    @BindView(R.id.svLocation)
+    SearchView svLocation;
+    @BindView(R.id.tvSearchQuery)
+    TextView tvSearchQuery;
+    @BindView(R.id.tvSearchResultsTitle)
+    TextView tvResultsTitle;
 
     // adapter for location search suggestions
     private PlacesClient placesClient;
@@ -178,6 +182,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         Double currentLatitude = getIntent().getDoubleExtra("latitude", 0);
         Double currentLongitude = getIntent().getDoubleExtra("longitude", 0);
         currentGeoPoint = new ParseGeoPoint(currentLatitude, currentLongitude);
+        queriedGeoPoint = currentGeoPoint;
 
         eventAdapter = new SearchEventAdapter(this, mEvents, currentGeoPoint);
         rvEvents.setAdapter(eventAdapter);
@@ -186,17 +191,23 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         // Assumes current activity is the searchable activity
-        resultsSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        resultsSearchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        svCuisine.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        svCuisine.setIconifiedByDefault(false); // expand search when clicking anywhere on the searchview
+        svCuisine.setQueryHint("Mexican, pizza, etc.");
+        final AutoCompleteTextView cuisineTextView = (AutoCompleteTextView) svCuisine.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        cuisineTextView.setDropDownAnchor(R.id.svCuisine);
 
-                // initialize spinner for search filtering
-                ArrayAdapter < CharSequence > adapter = ArrayAdapter.createFromResource(this,
-                        R.array.search_categories, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //c Apply the adapter to the spinner
-        searchSpinner.setAdapter(adapter);
-        searchSpinner.setOnItemSelectedListener(this);
+        svLocation.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        svLocation.setIconifiedByDefault(false);
+        svLocation.setQueryHint("Address or street name");
+
+        final AutoCompleteTextView locationTextView = (AutoCompleteTextView) svLocation.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        locationTextView.setDropDownAnchor(R.id.svLocation);
+
+        useCurrentLocation = true;
+
+        setCategorySuggestions(svCuisine);
+        setLocationSuggestions(svLocation);
 
         // handle search intent
         handleIntent(getIntent());
@@ -208,7 +219,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Date maxEventId = getMaxDate();
                 Log.d("DATE", maxEventId.toString());
-                handleRecyclerEvents(getMaxDate());
+                loadTopEvents(getMaxDate());
             }
         };
         // add endless scroll listener to RecyclerView and load items
@@ -219,7 +230,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                handleRecyclerEvents(new Date(0));
+                loadTopEvents(new Date(0));
             }
         });
         // configure refreshing colors
@@ -227,7 +238,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                 getResources().getColor(android.R.color.holo_green_light),
                 getResources().getColor(android.R.color.holo_orange_light),
                 getResources().getColor(android.R.color.holo_red_light));
-
+        tvSearchQuery.setVisibility(View.INVISIBLE);
+        tvResultsTitle.setVisibility(View.INVISIBLE);
     }
 
 
@@ -277,7 +289,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         super.onPause();
 
         // stop location updates
-        if (googleApiClient != null  &&  googleApiClient.isConnected()) {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
             googleApiClient.disconnect();
         }
@@ -302,7 +314,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
     public void onConnected(Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                &&  ActivityCompat.checkSelfPermission(this,
+                && ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -310,8 +322,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         // Permissions ok, we get last location
         currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
-        // if user didn't specify a location, search events by current location
-        if(useCurrentLocation) {
+        // if user didn't specify a location, display event distance using current location
+        if (useCurrentLocation) {
             if (currentLocation != null) {
                 currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
                 eventAdapter.updateCurrentLocation(currentGeoPoint);
@@ -328,7 +340,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                &&  ActivityCompat.checkSelfPermission(this,
+                && ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Permissions necessary for EatUp to use your location", Toast.LENGTH_SHORT).show();
         }
@@ -353,7 +365,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
+        switch (requestCode) {
             case ALL_PERMISSIONS_RESULT:
                 for (String perm : permissionsToRequest) {
                     if (!hasPermission(perm)) {
@@ -389,18 +401,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         }
     }
 
-
-    // Handle the events being loaded into the recyclerview depending on search query
-    private void handleRecyclerEvents(Date maxDate) {
-        switch(searchCategory) {
-            case CUISINE_SEARCH:
-                loadTopEvents(queriedCuisine, maxDate);
-                break;
-            case LOCATION_SEARCH:
-                break;
-        }
-    }
-
     // Get the intent, verify the action and get the query
     @Override
     protected void onNewIntent(Intent intent) {
@@ -414,80 +414,50 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
             int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
             Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
-            switch(newSearchCategory) {
-                case CUISINE_SEARCH:
-                    // handled in the automatic search
-                    break;
-                case LOCATION_SEARCH:
-                    // handled in the automatic search suggestion
-                    break;
-            }
+            loadTopEvents(new Date(0));
         }
         // otherwise called by a click on something in VisitorFragment
         else {
             searchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
-            // if not any of the categories, user clicked on current location
-            switch(searchCategory) {
-                case NO_SEARCH:
-                    Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
-                    Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
-                    queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
-                    locationSearch(queriedGeoPoint, new Date(0));
-                    break;
-                case LOCATION_SEARCH:
-                    setLocationSuggestions(resultsSearchView);
-                    break;
-                case CUISINE_SEARCH:
-                    setCategorySuggestions(resultsSearchView);
-                    break;
+            // either cuisine or location search
+            if(searchCategory == CUISINE_SEARCH) {
+                // set default location to current location from visitor fragment
+                Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
+                Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
+                queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
+                svLocation.setQuery("Current location", false);
+                svCuisine.onActionViewExpanded();
+            } else {
+                svCuisine.setQuery("All events", false);
+                svLocation.onActionViewExpanded();
             }
-            searchSpinner.setSelection(searchCategory);
         }
     }
 
-    // Methods for search category spinner
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        mEvents.clear();
-        eventAdapter.notifyDataSetChanged();
-        searchCategory = pos;
-        resultsSearchView.setQuery("", false);
-
-        if(searchCategory == LOCATION_SEARCH) {
-            setLocationSuggestions(resultsSearchView);
-        }
-        else if (searchCategory == CUISINE_SEARCH) {
-            setCategorySuggestions(resultsSearchView);
-        }
-    }
-
-    public void onNothingSelected(AdapterView<?> parent) {
-    }
 
     // Methods to query parse server
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
-        queriedGeoPoint = geoPoint;
         final Event.Query eventsQuery = new Event.Query();
-        eventAdapter.clear();
         if (maxDate.equals(new Date(0))) {
-            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
+            eventAdapter.clear();
+            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size());
         } else {
-            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled();
+            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size());
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
-                    if(objects.size() != 0) {
+                    if (objects.size() != 0) {
                         for (int i = 0; i < objects.size(); ++i) {
                             mEvents.add(objects.get(i));
                             eventAdapter.notifyItemInserted(mEvents.size() - 1);
                             // on successful reload, signal that refresh has completed
                         }
-                    }
-                    else {
+                    } else {
                         // only notify user if no events to show
-                        if(mEvents.size() == 0) {
+                        if (mEvents.size() == 0) {
                             Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -499,73 +469,44 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
         });
     }
 
-    protected void loadTopEvents(ParseUser user, Date maxDate) {
-        final Event.Query eventsQuery = new Event.Query();
-        // if opening app for the first time, get top 20 and clear old items
-        // otherwise, query for posts older than the oldest
-        eventAdapter.clear();
-        if (maxDate.equals(new Date(0))) {
-            eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("host", user);
-        } else {
-            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("host", user);
+    protected void loadTopEvents(Date maxDate) {
+        // get all events in the area
+        if(queriedCuisineString.equals("All events")) {
+            locationSearch(queriedGeoPoint, new Date(0));
         }
-        eventsQuery.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    if(objects.size() != 0) {
-                        for (int i = 0; i < objects.size(); ++i) {
-                            mEvents.add(objects.get(i));
-                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                        }
-                    }
-                    else {
-                        // only notify user if no events to show
-                        if(mEvents.size() == 0) {
-                            Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    swipeContainer.setRefreshing(false);
-                } else {
-                    e.printStackTrace();
-                }
+        // get events according to tag
+        else {
+            final Event.Query eventsQuery = new Event.Query();
+            // if opening app for the first time, get top 20 and clear old items
+            // otherwise, query for events older than the oldest
+            if (maxDate.equals(new Date(0))) {
+                eventAdapter.clear();
+                eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineString);
+            } else {
+                eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineString);
             }
-        });
-    }
-
-    protected void loadTopEvents(String cuisineQuery, Date maxDate) {
-        queriedCuisine = cuisineQuery;
-        final Event.Query eventsQuery = new Event.Query();
-        // if opening app for the first time, get top 20 and clear old items
-        // otherwise, query for events older than the oldest
-        eventAdapter.clear();
-        if (maxDate.equals(new Date(0))) {
-            eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", cuisineQuery);
-        } else {
-            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(currentGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().whereEqualTo("tags", cuisineQuery);
+            eventsQuery.findInBackground(new FindCallback<Event>() {
+                @Override
+                public void done(List<Event> objects, ParseException e) {
+                    if (e == null) {
+                        if (objects.size() != 0) {
+                            for (int i = 0; i < objects.size(); ++i) {
+                                mEvents.add(objects.get(i));
+                                eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                            }
+                        } else {
+                            // only notify user if no events to show
+                            if (mEvents.size() == 0) {
+                                Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        swipeContainer.setRefreshing(false);
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
-        eventsQuery.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    if(objects.size() != 0) {
-                        for (int i = 0; i < objects.size(); ++i) {
-                            mEvents.add(objects.get(i));
-                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                        }
-                    }
-                    else {
-                        // only notify user if no events to show
-                        if(mEvents.size() == 0) {
-                            Toast.makeText(getApplicationContext(), "No events found.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    swipeContainer.setRefreshing(false);
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     // get date of oldest post
@@ -612,13 +553,19 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                     useCurrentLocation = true;
                     eventAdapter.updateCurrentLocation(currentGeoPoint);
                     queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
-                    locationSearch(currentGeoPoint, new Date(0));
+                    queriedLocationString = queryText;
+                    queriedGeoPoint = currentGeoPoint;
+                    loadTopEvents(new Date(0));
+                    tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
+                    tvSearchQuery.setVisibility(View.VISIBLE);
+                    tvResultsTitle.setVisibility(View.VISIBLE);
                 } else {
                     useCurrentLocation = false;
                     queryText = String.format(Locale.getDefault(),
                             "%s, %s",
                             cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)),
                             cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_2)));
+                    queriedLocationString = queryText;
                     List<Place.Field> placeFields = Arrays.asList(Place.Field.LAT_LNG);
                     FetchPlaceRequest request = FetchPlaceRequest.builder(locationQueryId, placeFields).build();
                     placesClient.fetchPlace(request).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
@@ -628,8 +575,12 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                             Double latitude = place.getLatLng().latitude;
                             Double longitude = place.getLatLng().longitude;
                             Log.i("Fetch Place Request", "Successful call");
-                            locationSearch(new ParseGeoPoint(latitude, longitude), new Date(0));
                             eventAdapter.updateCurrentLocation(new ParseGeoPoint(latitude, longitude));
+                            queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
+                            loadTopEvents(new Date(0));
+                            tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
+                            tvSearchQuery.setVisibility(View.VISIBLE);
+                            tvResultsTitle.setVisibility(View.VISIBLE);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -651,7 +602,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextChange(String incompleteQuery) {
+            public boolean onQueryTextChange(final String incompleteQuery) {
 
                 AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
@@ -670,7 +621,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                         MatrixCursor cursor = new MatrixCursor(LOCATION_SEARCH_SUGGEST_COLUMNS);
                         cursor.addRow(new String[]{
                                 "1",
-                                "Current Location",
+                                "Current location",
                                 "Use my current location",
                                 CURRENT_LOCATION_ID
                         });
@@ -696,7 +647,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
                         MatrixCursor cursor = new MatrixCursor(LOCATION_SEARCH_SUGGEST_COLUMNS);
                         cursor.addRow(new String[]{
                                 "2",
-                                "No places found",
+                                String.format(Locale.getDefault(), "No results found for \'%s\'", incompleteQuery),
                                 "Try searching again",
                                 "No results"
                         });
@@ -713,30 +664,25 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mEvents.clear();
-                eventAdapter.notifyDataSetChanged();
-                searchCategory = searchSpinner.getSelectedItemPosition();
-                if (searchCategory != NO_SEARCH) {
-                    if (searchCategory == LOCATION_SEARCH) {
-                        Toast.makeText(getApplicationContext(), "Select an address.", Toast.LENGTH_SHORT).show();
-                        return true;
-                    } else {
-                        Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
-                        searchIntent.putExtra(SearchManager.QUERY, query);
-                        searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
-                        searchIntent.setAction(Intent.ACTION_SEARCH);
-                        startActivity(searchIntent);
-                        // clear focus so search doesn't fire twice
-                        searchView.clearFocus();
-                        searchView.setQuery(query, false);
-                        return true;
-                    }
-                } else {
-                    // prevent submission if no category selected
+                if(query.toLowerCase().equals("current location")) {
+                    queriedLocationString = CURRENT_LOCATION_STRING;
+                    mEvents.clear();
+                    eventAdapter.notifyDataSetChanged();
+                    Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
+                    searchIntent.putExtra(SearchManager.QUERY, query);
+                    searchIntent.setAction(Intent.ACTION_SEARCH);
+                    startActivity(searchIntent);
+                    // clear focus so search doesn't fire twice
+                    searchView.clearFocus();
                     searchView.setQuery(query, false);
-                    Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
-                    return true;
+                    tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
+                    tvSearchQuery.setVisibility(View.VISIBLE);
+                    tvResultsTitle.setVisibility(View.VISIBLE);
                 }
+                else {
+                    Toast.makeText(getApplicationContext(), "Select a location from the drop-down menu", Toast.LENGTH_SHORT).show();
+                }
+                return true;
             }
         });
     }
@@ -763,15 +709,23 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
             @Override
             public boolean onSuggestionClick(int position) {
+                // set default parameters for location: use current location
                 useCurrentLocation = true;
                 eventAdapter.updateCurrentLocation(currentGeoPoint);
+                queriedGeoPoint = currentGeoPoint;
+
                 Cursor cursor = (Cursor) categorySuggestionAdapter.getItem(position);
                 String categoryQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
                 String queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
                 searchView.setQuery(queryText, false);
+
                 // TODO modify loadTopEvents to search by categoryQueryId
-                loadTopEvents(queryText, new Date(0));
+                queriedCuisineString = queryText;
+                loadTopEvents(new Date(0));
                 searchView.clearFocus();
+                tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
+                tvSearchQuery.setVisibility(View.VISIBLE);
+                tvResultsTitle.setVisibility(View.VISIBLE);
                 return true;
             }
         });
@@ -780,29 +734,43 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
             @Override
             public boolean onQueryTextChange(String incompleteQuery) {
 
-                if(incompleteQuery.equals("")) {
+                if (incompleteQuery.equals("")) {
                     MatrixCursor cursor = new MatrixCursor(CATEGORY_SEARCH_SUGGEST_COLUMNS);
+                    cursor.addRow(new String[]{
+                            "1",
+                            "All events",
+                            ALL_EVENTS_ID
+                    });
                     categorySuggestionAdapter.swapCursor(cursor);
                 } else {
                     MatrixCursor cursor = new MatrixCursor(CATEGORY_SEARCH_SUGGEST_COLUMNS);
-                    int predictionCounter = 1;
-                    for(int i = 0; i < CATEGORY_TITLE.length; i++) {
-                        if(CATEGORY_TITLE[i].toLowerCase().startsWith(incompleteQuery.toLowerCase())) {
+                    cursor.addRow(new String[]{
+                            "1",
+                            "All events",
+                            ALL_EVENTS_ID
+                    });
+                    int predictionCounter = 2;
+                    for (int i = 0; (i < CATEGORY_TITLE.length); i++) {
+                        if (CATEGORY_TITLE[i].toLowerCase().startsWith(incompleteQuery.toLowerCase())) {
                             Log.i("findCategorySuggestions", CATEGORY_TITLE[i] + CATEGORY_ALIAS[i]);
-                            cursor.addRow(new String[]{
-                                    Integer.toString(predictionCounter),
-                                    CATEGORY_TITLE[i],
-                                    CATEGORY_ALIAS[i]
-                            });
-                            predictionCounter++;
+                            if(predictionCounter < 7) {
+                                cursor.addRow(new String[]{
+                                        Integer.toString(predictionCounter),
+                                        CATEGORY_TITLE[i],
+                                        CATEGORY_ALIAS[i]
+                                });
+                                predictionCounter++;
+                            }
                         }
                     }
-                    if(predictionCounter == 1) {
-                        cursor.addRow(new String[]{
-                                "1",
-                                "No categories found",
-                                "No results"
-                        });
+                    if (predictionCounter == 2) {
+                        if(!ALL_EVENTS_STRING.toLowerCase().startsWith(incompleteQuery.toLowerCase())) {
+                            cursor.addRow(new String[]{
+                                    "2",
+                                    String.format(Locale.getDefault(), "No categories found for \'%s\'", incompleteQuery),
+                                    "No results"
+                            });
+                        }
                     }
                     categorySuggestionAdapter.swapCursor(cursor);
                 }
@@ -811,30 +779,24 @@ public class VisitorSearchActivity extends AppCompatActivity implements AdapterV
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mEvents.clear();
-                eventAdapter.notifyDataSetChanged();
-                searchCategory = searchSpinner.getSelectedItemPosition();
-                if (searchCategory != NO_SEARCH) {
-                    if ((searchCategory == LOCATION_SEARCH) || (searchCategory == CUISINE_SEARCH)) {
-                        Toast.makeText(getApplicationContext(), "Select from the dropdown.", Toast.LENGTH_SHORT).show();
-                        return true;
-                    } else {
-                        Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
-                        searchIntent.putExtra(SearchManager.QUERY, query);
-                        searchIntent.putExtra(SEARCH_CATEGORY, searchSpinner.getSelectedItemPosition());
-                        searchIntent.setAction(Intent.ACTION_SEARCH);
-                        startActivity(searchIntent);
-                        // clear focus so search doesn't fire twice
-                        searchView.clearFocus();
-                        searchView.setQuery(query, false);
-                        return true;
-                    }
-                } else {
-                    // prevent submission if no category selected
+                if (query.toLowerCase().equals("all events")) {
+                    queriedCuisineString = ALL_EVENTS_STRING;
+                    mEvents.clear();
+                    eventAdapter.notifyDataSetChanged();
+                    Intent searchIntent = new Intent(getApplicationContext(), VisitorSearchActivity.class);
+                    searchIntent.putExtra(SearchManager.QUERY, query);
+                    searchIntent.setAction(Intent.ACTION_SEARCH);
+                    startActivity(searchIntent);
+                    // clear focus so search doesn't fire twice
+                    searchView.clearFocus();
                     searchView.setQuery(query, false);
-                    Toast.makeText(getApplicationContext(), "Select a search category.", Toast.LENGTH_SHORT).show();
-                    return true;
+                    tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
+                    tvSearchQuery.setVisibility(View.VISIBLE);
+                    tvResultsTitle.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Select a cuisine from the drop-down menu", Toast.LENGTH_SHORT).show();
                 }
+                return true;
             }
         });
     }
