@@ -10,14 +10,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +35,8 @@ public class TagsFragment extends Fragment {
     @BindView(R.id.lvTagList)
     ListView lvTagList;
 
-    @BindView(R.id.cbIs21Plus)
-    CheckBox cbIs21Plus;
-
-    @BindView(R.id.npMaxGuests)
-    NumberPicker npMaxGuests;
-
     private OnFragmentInteractionListener mListener;
+    private Event event;
     private Activity activity;
     private List<String> tagList;
     private TagAdapter tagAdapter;
@@ -64,8 +56,19 @@ public class TagsFragment extends Fragment {
 
         setupAutocompleteTextView();
         setupListView();
-        setUpNumberPicker();
         return view;
+    }
+
+    /**
+     * Method to create the date picker only when the date fragment is actually visible
+     * to the users
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser)
+            event = mListener.getRecentEvent();
     }
 
     @Override
@@ -102,12 +105,8 @@ public class TagsFragment extends Fragment {
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         if (!tagList.isEmpty()) {
-            Event event = new Event();
-            event.setHost(Constants.CURRENT_USER);
             event.setTags(tagList);
-            event.setOver21(cbIs21Plus.isChecked());
-            event.setMaxGuests(npMaxGuests.getValue());
-            mListener.updateTags(event);
+            mListener.updateTags(tagList);
         } else {
             Toast.makeText(activity, "Select at least 1 tag for your event",
                     Toast.LENGTH_SHORT).show();
@@ -165,20 +164,16 @@ public class TagsFragment extends Fragment {
         lvTagList.setAdapter(tagAdapter);
     }
 
-    /**
-     * Sets up the number picker widget so the user can select the max number of guests
-     */
-    private void setUpNumberPicker() {
-        npMaxGuests.setMinValue(1);
-        npMaxGuests.setMaxValue(Constants.MAX_GUESTS);
-        npMaxGuests.setWrapSelectorWheel(false);
-    }
-
     public interface OnFragmentInteractionListener {
+        /**
+         * Gets the created event from the parent fragment
+         */
+        Event getRecentEvent();
+
         /**
          * When called by the parent fragment, it should switch to the next fragment in the
          * setup queue
          */
-        void updateTags(Event event);
+        void updateTags(List<String> tagList);
     }
 }

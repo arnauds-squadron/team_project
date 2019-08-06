@@ -107,21 +107,21 @@ public class StartFragment extends Fragment {
 
     @OnClick(R.id.btnStartNewEvent)
     public void startEventCreation() {
-        mListener.startEventCreation();
+        mListener.startEventCreation(null);
     }
 
-    public void useRecentEvent(Event event) {
-        mListener.useRecentEvent(Event.copyEvent(event));
-
+    /**
+     * Calls the LocalFragment to pass the event selected by the user from the recent event list
+     * @param event The event to use in the setup wizard
+     */
+    public void startEventCreation(Event event) {
+        mListener.startEventCreation(Event.copyEvent(event));
     }
 
     public interface OnFragmentInteractionListener {
-
         /**
          * Method that triggers the event creation method in the parent fragment
          */
-        void startEventCreation();
-
-        void useRecentEvent(Event event);
+        void startEventCreation(Event event);
     }
 }

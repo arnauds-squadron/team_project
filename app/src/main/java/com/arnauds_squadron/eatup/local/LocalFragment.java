@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
-import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -31,24 +29,22 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Fragment that handles the creation of a new event
+ * Fragment that handles the creation of a new recentEvent
  */
 public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
         TagsFragment.OnFragmentInteractionListener,
-        DateFragment.OnFragmentInteractionListener,
-        ReviewFragment.OnFragmentInteractionListener {
+        DateFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.flNoEventsScheduled)
     NoSwipingViewPager viewPager;
 
     private OnFragmentInteractionListener mListener;
-
-    private SetupFragmentPagerAdapter setupAdapter;
-    // The local event variable that is updated as the user creates their event
-    private Event event;
-    private boolean usingRecentEvent;
+    // The local event variable that is updated as the user creates their recentEvent
+    private Event currentEvent;
+    // The previous event that has already been created
+    private Event recentEvent;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -56,7 +52,7 @@ public class LocalFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_local, container, false);
         ButterKnife.bind(this, view);
         // Set the viewpager's setupAdapter so that it can display the setup fragments
-        setupAdapter = new SetupFragmentPagerAdapter(getChildFragmentManager());
+        SetupFragmentPagerAdapter setupAdapter = new SetupFragmentPagerAdapter(getChildFragmentManager());
         viewPager.setAdapter(setupAdapter);
         viewPager.setOffscreenPageLimit(setupAdapter.getCount() - 1);
         return view;
@@ -81,129 +77,86 @@ public class LocalFragment extends Fragment implements
     /**
      * Overrides the StartFragment interface
      * <p>
-     * Begin creating a completely new event
+     * Begin creating a completely new recentEvent
      */
     @Override
-    public void startEventCreation() {
-        usingRecentEvent = false;
+    public void startEventCreation(Event newEvent) {
+        if(newEvent == null) {
+            recentEvent = new Event();
+            recentEvent.setHost(Constants.CURRENT_USER);
+        } else {
+            recentEvent = newEvent;
+        }
         advanceViewPager();
     }
 
     /**
      * Overrides the TagsFragment interface
      * <p>
-     * Updates some of the initial fields of the newly created event (tags, 21+, restaurant, etc)
+     * Updates some of the initial fields of the newly created recentEvent (tags, 21+, restaurant, etc)
      */
     @Override
-    public void updateTags(Event newEvent) {
-        event = newEvent;
+    public void updateTags(List<String> tagList) {
+        recentEvent.setTags(tagList);
         advanceViewPager();
     }
 
     /**
      * Overrides the AddressFragment interface
      * <p>
-     * Updates the address of the local event with the ParseGeoPoint of the address of the event
+     * Updates the address of the local recentEvent with the ParseGeoPoint of the address of the recentEvent
      */
     @Override
     public void updateAddress(ParseGeoPoint address, String addressString) {
-        event.setAddress(address);
-        event.setAddressString(addressString);
+        currentEvent = new Event();
+        currentEvent.setHost(Constants.CURRENT_USER);
+        currentEvent.setAddress(address);
+        currentEvent.setAddressString(addressString);
         advanceViewPager();
     }
 
-    /**
-     * Overrides the DateFragment interface
-     * <p>
-     * Updates the date parameter on the event, also the last field to be called
-     * so we can save the event after this method runs
-     */
     @Override
-    public void updateDate(Date date) {
-        event.setDate(date);
-        advanceViewPager();
+    public void updateFinalFields(String title, Date date, int maxGuests, boolean over21) {
+        currentEvent.setTitle(title);
+        currentEvent.setDate(date);
+        currentEvent.setMaxGuests(maxGuests);
+        currentEvent.setOver21(over21);
+        saveEvent();
     }
 
     /**
      * Overrides the ReviewFragment interface
      *
-     * @return the current event so the ReviewFragment can display all the details of the created
-     * event
+     * @return the current recentEvent so the ReviewFragment can display all the details of the created
+     * recentEvent
      */
     @Override
-    public Event getCurrentEvent() {
-        return event;
+    public Event getRecentEvent() {
+        return recentEvent;
     }
 
     /**
      * Overrides the ReviewFragment interface
      * <p>
-     * Saves the event to the parse server, resets the setup fragment, and switches to the home
+     * Saves the recentEvent to the parse server, resets the setup fragment, and switches to the home
      * fragment
      */
-    @Override
-    public void createEvent(final String eventTitle, String imageUrl) {
-        event.setTitle(eventTitle);
-        if (imageUrl != null)
-            event.setYelpImage(imageUrl);
-        event.saveInBackground(new SaveCallback() {
+    public void saveEvent() {
+        currentEvent.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(getActivity(), "Event created!", Toast.LENGTH_LONG).show();
-                    createEventChat(eventTitle); // create the corresponding chat
+                    createEventChat(recentEvent.getTitle()); // create the corresponding chat
                     updateRecentEvents(); // update the list of recent events in the start fragment
                     mListener.onEventCreated(); // notify the MainActivity to go to the HomeFragment
                     resetSetupViewPager(); // reset the ViewPager to the StartFragment
                 } else {
-                    Toast.makeText(getActivity(), "Error creating event", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Error creating recentEvent", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
         });
-    }
-
-    /**
-     * After the event is saved to the Parse server, update the list of the user's recent events in
-     * the StartFragment to show their newest event
-     */
-    private void updateRecentEvents() {
-        StartFragment startFragment = (StartFragment) getTypedFragment(StartFragment.class);
-        startFragment.getEventsAsync();
-    }
-
-    /**
-     * Overrides the ReviewFragment interface
-     * <p>
-     * Moves the ViewPager to the AddressFragment so the user can update the address of their meal
-     */
-    @Override
-    public void updateAddress() {
-        viewPager.setCurrentItem(Constants.ADDRESS_FRAGMENT_INDEX);
-    }
-
-    /**
-     * Overrides the ReviewFragment interface
-     * <p>
-     * Moves the ViewPager to the DateFragment so the user can update the date
-     */
-    @Override
-    public void updateDate() {
-        viewPager.setCurrentItem(Constants.DATE_FRAGMENT_INDEX);
-    }
-
-    /**
-     * Takes the selected event by the user and switches to the ReviewFragment so the user can
-     * create the event as soon as possible.
-     *
-     * @param event The event they want to replicate.
-     */
-    public void useRecentEvent(Event event) {
-        this.event = event;
-        usingRecentEvent = true;
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        viewPager.setCurrentItem(setupAdapter.getCount() - 1, false);
     }
 
     /**
@@ -217,10 +170,7 @@ public class LocalFragment extends Fragment implements
         if (viewPager.getCurrentItem() == 0) {
             return false;
         } else {
-            if (usingRecentEvent)
-                viewPager.setCurrentItem(0, false);
-            else
-                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
             return true;
         }
     }
@@ -233,25 +183,33 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
-     * Creates the event's chat once the create event button is hit
+     * After the recentEvent is saved to the Parse server, update the list of the user's recent events in
+     * the StartFragment to show their newest recentEvent
+     */
+    private void updateRecentEvents() {
+        StartFragment startFragment = (StartFragment) getTypedFragment(StartFragment.class);
+        startFragment.getEventsAsync();
+    }
+
+    /**
+     * Creates the recentEvent's chat once the create recentEvent button is hit
      *
-     * @param eventTitle The title of the new event
+     * @param eventTitle The title of the new recentEvent
      */
     private void createEventChat(String eventTitle) {
         final Chat chat = new Chat();
         chat.setName(eventTitle + " Chat");
         chat.addMember(Constants.CURRENT_USER);
-
         chat.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e == null) { // Register chat to the current event
-                    event.setChat(chat);
-                    event.saveInBackground(new SaveCallback() {
+                if (e == null) { // Register chat to the current recentEvent
+                    recentEvent.setChat(chat);
+                    recentEvent.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e != null) {
-                                Toast.makeText(getActivity(), "Could not create the event's chat",
+                                Toast.makeText(getActivity(), "Could not create the recentEvent's chat",
                                         Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
@@ -294,7 +252,7 @@ public class LocalFragment extends Fragment implements
 
     /**
      * Interface to communicate with the parent activity so the HomeFragment is navigated to
-     * after an event is created
+     * after an recentEvent is created
      */
     public interface OnFragmentInteractionListener {
         /**
