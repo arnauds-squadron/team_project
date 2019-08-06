@@ -68,7 +68,7 @@ public class TagsFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser)
-            event = mListener.getRecentEvent();
+            event = mListener.getCurrentEvent();
     }
 
     @Override
@@ -168,7 +168,7 @@ public class TagsFragment extends Fragment {
         /**
          * Gets the created event from the parent fragment
          */
-        Event getRecentEvent();
+        Event getCurrentEvent();
 
         /**
          * When called by the parent fragment, it should switch to the next fragment in the

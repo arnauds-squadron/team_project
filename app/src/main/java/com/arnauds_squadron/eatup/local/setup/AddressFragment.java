@@ -74,16 +74,21 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            Event event = mListener.getRecentEvent();
-            if (event != null) {
-                ParseGeoPoint point = event.getAddress();
+            Event recentEvent = mListener.getRecentEvent();
+            Event currentEvent = mListener.getCurrentEvent();
+            if (recentEvent != null) {
+                ParseGeoPoint point = recentEvent.getAddress();
                 LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
-                String address = event.getAddressString();
+                String address = recentEvent.getAddressString();
 
-                moveCamera(latLng, event.getTitle());
+                animateCamera(latLng, recentEvent.getTitle());
                 autocompleteFragment.a.setText(address); // EditText view
-
                 selectedPlace = Place.builder().setLatLng(latLng).setAddress(address).build();
+            } else if (currentEvent == null) {
+                map.clear();
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 1));
+                autocompleteFragment.a.setText("");
+                selectedPlace = null;
             }
         }
     }
@@ -102,7 +107,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        // TODO: move map to current location
     }
 
     /**
@@ -138,7 +142,7 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
      * @param latLng Object holding the latitude and longitude of the point the camera is moving to
      * @param title  title of the marker
      */
-    private void moveCamera(LatLng latLng, String title) {
+    private void animateCamera(LatLng latLng, String title) {
         try {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM));
             map.addMarker(new MarkerOptions()
@@ -177,7 +181,7 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 selectedPlace = place;
-                moveCamera(place.getLatLng(), place.getName());
+                animateCamera(place.getLatLng(), place.getName());
             }
 
             @Override
@@ -191,9 +195,17 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     public interface OnFragmentInteractionListener {
         /**
          * Gets the previously created event if it exists
+         *
          * @return The previous event if it exists, null otherwise
          */
         Event getRecentEvent();
+
+        /**
+         * Gets the event currently being created
+         *
+         * @return The current event if it exists, null otherwise
+         */
+        Event getCurrentEvent();
 
         /**
          * Method called in the parent to update the event object to have the user's selected
