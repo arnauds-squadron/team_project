@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EatUp</string>
+    <string name="app_name">Toast</string>
     <string name="visitor_search_hint">Search</string>
     <string name="btAccept">Accept</string>
     <string name="btDeny">Deny</string>
