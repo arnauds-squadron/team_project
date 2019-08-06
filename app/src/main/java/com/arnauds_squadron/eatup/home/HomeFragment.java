@@ -97,9 +97,9 @@ public class HomeFragment extends Fragment implements
         layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
-        RecyclerView.ItemDecoration itemDecoration = new
-                DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        rvAgenda.addItemDecoration(itemDecoration);
+//        RecyclerView.ItemDecoration itemDecoration = new
+//                DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+//        rvAgenda.addItemDecoration(itemDecoration);
         //swipe to delete
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(rvAgenda);

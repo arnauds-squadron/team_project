@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/ivImage"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginBottom="8dp"
         android:contentDescription="@string/message_other_profile_image"
         android:src="@android:color/black"
@@ -26,7 +26,7 @@
         android:layout_marginRight="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImage"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/ivImage" />
 
     <Button
         android:id="@+id/btnAccept"
