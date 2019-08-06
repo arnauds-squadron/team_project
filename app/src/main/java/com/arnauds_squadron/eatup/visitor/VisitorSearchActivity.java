@@ -189,10 +189,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         // Assumes current activity is the searchable activity
         svCuisine.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         svCuisine.setIconifiedByDefault(false); // expand search when clicking anywhere on the searchview
-        svCuisine.setQueryHint("Search by food type");
+        svCuisine.setQueryHint("Mexican, pizza, etc.");
 
         svLocation.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        svLocation.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        svLocation.setIconifiedByDefault(false);
+        svCuisine.setQueryHint("Address or street name");
         useCurrentLocation = true;
 
         setCategorySuggestions(svCuisine);
