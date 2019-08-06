@@ -3,20 +3,21 @@ package com.arnauds_squadron.eatup.local.setup;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.utils.UIHelper;
+import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -34,17 +35,12 @@ import butterknife.OnClick;
  * on the map fragment
  */
 public class AddressFragment extends Fragment implements OnMapReadyCallback {
-    private final static String TAG = "AddressFragment";
 
-    // The listener that communicates to the LocalFragment to update the address when
-    // the user hits the next button
     private OnFragmentInteractionListener mListener;
-
-    private GoogleMap mMap;
-    private SupportMapFragment mapFragment;
-
+    private GoogleMap map;
     // The place that the user selects after searching for its address
     private Place selectedPlace;
+    private AutocompleteSupportFragment autocompleteFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,20 +54,38 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_event_address, container, false);
         ButterKnife.bind(this, view);
 
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.mapFragment);
+
+        autocompleteFragment = (AutocompleteSupportFragment)
+                getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
         setupAutoCompleteFragment();
         initializePlaces(); // initialize the places sdk
         mapFragment.getMapAsync(this); // update the map
-        setupAutoCompleteFragment(); // set up the auto
-
         return view;
     }
 
+    /**
+     * Gets the selected event if any to set the previous location again
+     */
     @Override
-    public void onResume() {
-        super.onResume();
-        if (mMap != null)
-            mMap.clear();
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+            Event event = mListener.getRecentEvent();
+            if (event != null) {
+                ParseGeoPoint point = event.getAddress();
+                LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
+                String address = event.getAddressString();
+
+                moveCamera(latLng, event.getTitle());
+                autocompleteFragment.a.setText(address); // EditText view
+
+                selectedPlace = Place.builder().setLatLng(latLng).setAddress(address).build();
+            }
+        }
     }
 
     @Override
@@ -82,38 +96,25 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
 
     /**
      * Called whenever getMapAsync() is called, and sets up the map
+     *
      * @param googleMap The map obtained from the maps API
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        if(selectedPlace == null) {
-            // TODO: move map to current location
-            // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user.location.latlng, 1));
-        } else {
-            mMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(selectedPlace.getLatLng(),
-                            UIHelper.DEFAULT_MAP_ZOOM_LEVEL));
-
-            mMap.addMarker(new MarkerOptions()
-                    .position(selectedPlace.getLatLng())
-                    .title(selectedPlace.getName())
-                    .snippet("snippet")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-        }
+        map = googleMap;
+        // TODO: move map to current location
     }
 
     /**
      * Called in onCreate to bind the this child fragment to its parent, so the listener
      * can be used
+     *
      * @param fragment The parent fragment
      */
-    public void onAttachToParentFragment(Fragment fragment)
-    {
+    public void onAttachToParentFragment(Fragment fragment) {
         try {
             mListener = (OnFragmentInteractionListener) fragment;
-        }
-        catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(fragment.toString() + " must implement the interface");
         }
     }
@@ -131,7 +132,26 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Initalizes the places SDK within the main activity
+     * Moves the Google Map to the specified latitude and longitude, and makes a marker with the
+     * given title
+     *
+     * @param latLng Object holding the latitude and longitude of the point the camera is moving to
+     * @param title  title of the marker
+     */
+    private void moveCamera(LatLng latLng, String title) {
+        try {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM));
+            map.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Initializes the places SDK within the main activity
      */
     private void initializePlaces() {
         Places.initialize(getActivity(), getString(R.string.google_api_key));
@@ -143,12 +163,8 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
      */
     private void setupAutoCompleteFragment() {
         if (!Places.isInitialized()) {
-            Log.e(TAG, "Places should be initialized already");
             initializePlaces();
         }
-
-        final AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         autocompleteFragment.setHint("Address");
         autocompleteFragment.setPlaceFields(Arrays.asList(
@@ -161,19 +177,24 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 selectedPlace = place;
-                mapFragment.getMapAsync(AddressFragment.this);
+                moveCamera(place.getLatLng(), place.getName());
             }
 
             @Override
             public void onError(@NonNull Status status) {
                 Toast.makeText(getActivity(), "Error getting the address", Toast.LENGTH_SHORT)
                         .show();
-                Log.i(TAG, "An error occurred: " + status);
             }
         });
     }
 
     public interface OnFragmentInteractionListener {
+        /**
+         * Gets the previously created event if it exists
+         * @return The previous event if it exists, null otherwise
+         */
+        Event getRecentEvent();
+
         /**
          * Method called in the parent to update the event object to have the user's selected
          * address, and to switch to the next setup fragment

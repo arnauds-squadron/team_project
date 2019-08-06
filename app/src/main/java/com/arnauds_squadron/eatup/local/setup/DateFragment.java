@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -117,7 +116,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
 
         if (isVisibleToUser) {
             UIHelper.hideKeyboard(getActivity(), getView());
-            event = mListener.getCurrentEvent();
+            event = mListener.getRecentEvent();
 
             SupportMapFragment mapFragment = (SupportMapFragment)
                     getChildFragmentManager().findFragmentById(R.id.mapFragment);
@@ -126,6 +125,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
             selectedTime = Calendar.getInstance();
             if (event.getDate() != null) { // recent event, fill in all the fields
                 selectedTime.setTime(event.getDate());
+                etEventTitle.setText(event.getTitle());
                 setPreviousFields();
             } else {
                 showDatePickerDialog(true);
@@ -166,8 +166,6 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
 
-        event.setTitle(eventTitle);
-        updateEventFields();
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the
         // ApiResponse if we have a response, then get the specific information defined in the
         // Business Class
@@ -187,7 +185,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                         event.setYelpImage(restaurant.imageUrl);
                     }
                 }
-                mListener.createEvent();
+                updateEventFields();
             }
 
             @Override
@@ -197,10 +195,16 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
+    /**
+     * Calls the parent fragment to update the new event with the new fields
+     */
     private void updateEventFields() {
-        event.setMaxGuests(Integer.parseInt(tvMaxGuests.getText().toString()));
-        event.setDate(selectedTime.getTime());
-        event.setOver21(cbOver21.isChecked());
+        String title = etEventTitle.getText().toString().trim();
+        Date date = selectedTime.getTime();
+        int maxGuests = Integer.parseInt(tvMaxGuests.getText().toString());
+        boolean over21 = cbOver21.isChecked();
+
+        mListener.updateFinalFields(title, date, maxGuests, over21);
     }
 
     /**
@@ -371,7 +375,6 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
 
     /**
      * Called whenever getMapAsync() is called, and sets up the map
-     *
      * @param googleMap The map obtained from the maps API
      */
     @Override
@@ -380,7 +383,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
                 event.getAddress().getLongitude());
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation,
-                UIHelper.DETAILED_MAP_ZOOM_LEVEL));
+                Constants.DETAILED_MAP_ZOOM));
 
         googleMap.addMarker(new MarkerOptions()
                 .position(eventLocation)
@@ -393,11 +396,11 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         /**
          * Gets the created event from the parent fragment
          */
-        Event getCurrentEvent();
+        Event getRecentEvent();
 
         /**
          * Method that triggers the event creation method in the parent fragment
          */
-        void createEvent();
+        void updateFinalFields(String title, Date date, int maxGuests, boolean over21);
     }
 }

@@ -82,7 +82,7 @@ public class RecentEventAdapter extends RecyclerView.Adapter<RecentEventAdapter.
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startFragment.useRecentEvent(events.get(getAdapterPosition()));
+                    startFragment.startEventCreation(events.get(getAdapterPosition()));
                 }
             });
         }

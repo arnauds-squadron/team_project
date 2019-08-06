@@ -10,16 +10,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.utils.UIHelper;
-import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +34,6 @@ public class TagsFragment extends Fragment {
 
     @BindView(R.id.lvTagList)
     ListView lvTagList;
-
-    @BindView(R.id.cbIs21Plus)
-    CheckBox cbIs21Plus;
 
     private OnFragmentInteractionListener mListener;
     private Event event;
@@ -76,7 +68,7 @@ public class TagsFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser)
-            event = mListener.getCurrentEvent();
+            event = mListener.getRecentEvent();
     }
 
     @Override
@@ -176,7 +168,7 @@ public class TagsFragment extends Fragment {
         /**
          * Gets the created event from the parent fragment
          */
-        Event getCurrentEvent();
+        Event getRecentEvent();
 
         /**
          * When called by the parent fragment, it should switch to the next fragment in the

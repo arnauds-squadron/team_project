@@ -24,7 +24,11 @@ public final class Constants {
     public static final float NO_RATING = 0f;
     // Maximum number of guests
     public static final int MAX_GUESTS = 100;
-
+    // Map constants
+    // 1 (zoomed out) - 19 (too close)
+    public final static float DEFAULT_MAP_ZOOM = 15;
+    // Shows name of restaurant if it's decently well known
+    public final static float DETAILED_MAP_ZOOM = 18;
     // search constants
     public static final String SEARCH_CATEGORY = "searchCategory";
     public static final int NO_SEARCH = 0;
