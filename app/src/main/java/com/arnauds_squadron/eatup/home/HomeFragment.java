@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
@@ -51,6 +52,9 @@ public class HomeFragment extends Fragment implements
 
     @BindView(R.id.flNoEventsScheduled)
     FrameLayout flNoEventsScheduled;
+
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
 
     @BindView(R.id.spinner)
     Spinner spinner;
@@ -174,6 +178,7 @@ public class HomeFragment extends Fragment implements
                         agenda.addAll(tempEvents);
                         homeAdapter.notifyDataSetChanged();
                     }
+                    progressBar.setVisibility(View.INVISIBLE);
                     flNoEventsScheduled.setVisibility(agenda.size() == 0 ?
                             View.VISIBLE : View.INVISIBLE);
                 } else {
