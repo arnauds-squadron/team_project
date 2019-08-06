@@ -128,10 +128,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
         }
-//        if (event.getEventImage() != null) {
-//            viewHolder.ivImage.setParseFile(event.getEventImage());
-//            viewHolder.ivImage.loadInBackground();
-//        }
 
         if(event.getAddressString() != null) {
             viewHolder.tvPlace.setText(event.getAddressString());
@@ -218,8 +214,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-//        @BindView(R.id.ivImage)
-//        ParseImageView ivImage;
 
         @BindView(R.id.ibOpenChat)
         ImageButton ibOpenChat;
