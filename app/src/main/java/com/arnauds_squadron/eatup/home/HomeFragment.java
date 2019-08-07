@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -52,6 +53,9 @@ public class HomeFragment extends Fragment implements
 
     @BindView(R.id.flNoEventsScheduled)
     FrameLayout flNoEventsScheduled;
+
+    @BindView(R.id.tvNoEventsScheduled)
+    TextView tvNoEventsScheduled;
 
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
@@ -178,9 +182,14 @@ public class HomeFragment extends Fragment implements
                         agenda.addAll(tempEvents);
                         homeAdapter.notifyDataSetChanged();
                     }
+                    if (agenda.size() == 0) {
+                        tvNoEventsScheduled.setVisibility(View.VISIBLE);
+                        flNoEventsScheduled.setVisibility(View.VISIBLE);
+                    } else {
+                        tvNoEventsScheduled.setVisibility(View.INVISIBLE);
+                        flNoEventsScheduled.setVisibility(View.INVISIBLE);
+                    }
                     progressBar.setVisibility(View.INVISIBLE);
-                    flNoEventsScheduled.setVisibility(agenda.size() == 0 ?
-                            View.VISIBLE : View.INVISIBLE);
                 } else {
                     e.printStackTrace();
                 }

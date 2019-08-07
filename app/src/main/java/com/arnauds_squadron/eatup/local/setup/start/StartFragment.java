@@ -10,6 +10,7 @@ import android.support.v7.widget.SnapHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
@@ -32,6 +33,9 @@ public class StartFragment extends Fragment {
 
     @BindView(R.id.rvRecentEvents)
     RecyclerView rvRecentEvents;
+
+    @BindView(R.id.tvNoRecentEvents)
+    TextView tvNoRecentEvents;
 
     @BindView(R.id.pager_indicator)
     IndefinitePagerIndicator pagerIndicator;
@@ -77,9 +81,14 @@ public class StartFragment extends Fragment {
         query.findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
-                events.clear();
-                events.addAll(objects);
-                recentEventAdapter.notifyDataSetChanged();
+                if(objects.size() > 0) {
+                    tvNoRecentEvents.setVisibility(View.INVISIBLE);
+                    events.clear();
+                    events.addAll(objects);
+                    recentEventAdapter.notifyDataSetChanged();
+                } else {
+                    tvNoRecentEvents.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

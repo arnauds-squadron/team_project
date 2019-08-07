@@ -164,7 +164,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         final String eventTitle = etEventTitle.getText().toString().trim();
 
         if (TextUtils.isEmpty(eventTitle)) {
-            Toast.makeText(getActivity(), "Give your recentEvent a name!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Give your event a name!", Toast.LENGTH_SHORT).show();
             return;
         }
 

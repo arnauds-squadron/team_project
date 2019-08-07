@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -43,6 +44,9 @@ public class ChatDashboardFragment extends Fragment {
 
     @BindView(R.id.rvChats)
     RecyclerView rvChats;
+
+    @BindView(R.id.tvNoChats)
+    TextView tvNoChats;
 
     @BindView(R.id.ivProfile)
     ImageView ivProfile;
@@ -160,11 +164,14 @@ public class ChatDashboardFragment extends Fragment {
                         chatList.addAll(objects);
                         chatAdapter.notifyDataSetChanged();
                         lastUpdated = objects.get(0).getUpdatedAt();
+                        tvNoChats.setVisibility(View.INVISIBLE);
                     }
                 } else if (e != null) {
                     Toast.makeText(getActivity(), "Could not load chats",
                             Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
+                } else {
+                    tvNoChats.setVisibility(View.VISIBLE);
                 }
                 swipeContainer.setRefreshing(false);
             }
