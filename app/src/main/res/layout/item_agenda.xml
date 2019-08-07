@@ -60,8 +60,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:text="Day"
             android:textColor="@color/toast_red"
             android:textSize="36sp"
@@ -99,8 +99,8 @@
 
         <com.parse.ParseImageView
             android:id="@+id/ivProfileImage"
-            android:layout_width="83dp"
-            android:layout_height="83dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginTop="8dp"
             card_view:layout_constraintEnd_toStartOf="@+id/tvEventTitle"
             card_view:layout_constraintHorizontal_bias="0.5"
