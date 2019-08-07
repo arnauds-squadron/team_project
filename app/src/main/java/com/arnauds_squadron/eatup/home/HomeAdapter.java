@@ -9,6 +9,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -175,7 +176,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
      */
 
     private void getPendingRequests(Event event) {
-        // TODO always be continually refreshing for events??? how often does home fragment refresh?
         List<ParseUser> pending = event.getPendingRequests();
         String eventTitle = event.getTitle();
         if (pending != null && pending.size() > requests.size()) {
@@ -194,8 +194,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 int notificationId = i;
                 String contentText = String.format(Locale.getDefault(), "You have a new request to join %s!", eventTitle);
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                        // TODO replace with Toast's logo
-                        .setSmallIcon(R.drawable.ic_home)
+                        .setSmallIcon(R.drawable.ic_toast_logo)
                         .setContentTitle("New request to join event")
                         .setContentText(contentText)
                         .setContentIntent(pendingIntent)
@@ -241,13 +240,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         @BindView(R.id.btnCancel)
         Button btnCancel;
 
-
         @BindView(R.id.rvRequests)
         RecyclerView rvRequests;
 
         ViewHolder(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
