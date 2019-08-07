@@ -58,6 +58,6 @@ public class Business {
 
     @SerializedName("categories")
     @Expose
-    public List<Categories> categories;
+    public List<Category> categories;
 
 }

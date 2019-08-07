@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
-import com.arnauds_squadron.eatup.models.Categories;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
@@ -25,10 +23,7 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.List;
 
 import butterknife.BindView;

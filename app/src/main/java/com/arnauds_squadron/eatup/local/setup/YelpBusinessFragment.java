@@ -1,35 +1,20 @@
 package com.arnauds_squadron.eatup.local.setup;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SnapHelper;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.util.Printer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.YelpBusinessAdapter;
-import com.arnauds_squadron.eatup.home.HomeAdapter;
 import com.arnauds_squadron.eatup.models.Business;
-import com.arnauds_squadron.eatup.models.Categories;
+import com.arnauds_squadron.eatup.models.Category;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
@@ -39,7 +24,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -106,10 +90,10 @@ public class YelpBusinessFragment extends Fragment {
 //    @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         String businessId = mBusiness.get(yelpBusinessAdapter.getPosition()).id;
-        List<Categories> categories = mBusiness.get(yelpBusinessAdapter.getPosition()).categories;
+        List<Category> categories = mBusiness.get(yelpBusinessAdapter.getPosition()).categories;
         List<String> tags = new ArrayList<>();
         for(int i = 0; i < categories.size(); i++){
-            tags.add(categories.get(i).alias);
+            tags.add(categories.get(i).title);
         }
         tags.size();
         mListener.updateCategories(tags);
