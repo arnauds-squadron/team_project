@@ -8,13 +8,12 @@ import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
-import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 
 /**
  * Pager Adapter to handle all the setup fragments we need to create an event
  */
 public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
-    private final int PAGE_COUNT = 5;
+    private final int PAGE_COUNT = 4;
 
     SetupFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -27,15 +26,13 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if(position == 0)
+        if (position == 0)
             return new StartFragment();
-        if(position == 1)
+        if (position == 1)
             return new AddressFragment();
         if (position == 2)
-            return new TagsFragment();
-        if (position == 3)
             return new YelpBusinessFragment();
-        if (position == 4)
+        if (position == 3)
             return new DateFragment();
         return new StartFragment();
     }

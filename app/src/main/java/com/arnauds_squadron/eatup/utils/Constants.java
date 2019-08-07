@@ -3,14 +3,21 @@ package com.arnauds_squadron.eatup.utils;
 import com.parse.ParseUser;
 
 public final class Constants {
+
+    // Package name of the application
+    public static String PACKAGE_NAME;
+
+    // The logged in user, only changed in the login activity
+    public static ParseUser CURRENT_USER;
+
     public static final int SUCCESS_RESULT = 0;
     public static final int FAILURE_RESULT = 1;
-    public static final String PACKAGE_NAME =
+    public static final String GOOGLE_PACKAGE_NAME =
             "com.google.android.gms.location.sample.locationaddress";
-    public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
-    public static final String RESULT_DATA_KEY = PACKAGE_NAME +
+    public static final String RECEIVER = GOOGLE_PACKAGE_NAME + ".RECEIVER";
+    public static final String RESULT_DATA_KEY = GOOGLE_PACKAGE_NAME +
             ".RESULT_DATA_KEY";
-    public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME +
+    public static final String LOCATION_DATA_EXTRA = GOOGLE_PACKAGE_NAME +
             ".LOCATION_DATA_EXTRA";
     public static final String KEY_PROFILE_PICTURE = "profilePicture";
     public static final String BIO = "bio";
@@ -49,9 +56,6 @@ public final class Constants {
     public static final int ADDRESS_FRAGMENT_INDEX = 2;
 //    public static final int YELP_BUSINESS_FRAGMENT = 3;
     public static final int DATE_FRAGMENT_INDEX = 4;
-
-    // The logged in user, only changed in the login activity
-    public static ParseUser CURRENT_USER;
 
     public static final String PREFS_NAME = "preferences";
     public static final String FIRST_LOAD = "first_load";

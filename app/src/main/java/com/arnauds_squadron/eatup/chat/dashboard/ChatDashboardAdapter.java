@@ -90,11 +90,20 @@ public class ChatDashboardAdapter extends RecyclerView.Adapter<ChatDashboardAdap
                 @Override
                 public void done(ParseObject object, ParseException e) {
                     ParseFile image = object.getParseFile("profilePicture");
-                    Glide.with(context)
-                            .load(image.getUrl())
-                            .transform(new CircleCrop())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(viewHolder.ivImage);
+
+                    if (image != null) {
+                        Glide.with(context)
+                                .load(image.getUrl())
+                                .transform(new CircleCrop())
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .into(viewHolder.ivImage);
+                    } else {
+                        Glide.with(context)
+                                .load(FormatHelper.getProfilePlaceholder(context))
+                                .transform(new CircleCrop())
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .into(viewHolder.ivImage);
+                    }
                 }
             });
         }

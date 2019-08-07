@@ -14,7 +14,6 @@ import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
-import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
@@ -36,7 +35,6 @@ public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
         YelpBusinessFragment.OnFragmentInteractionListener,
-        TagsFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.flNoEventsScheduled)
@@ -85,17 +83,6 @@ public class LocalFragment extends Fragment implements
     public void startEventCreation(Event newEvent) {
         currentEvent = null;
         recentEvent = newEvent;
-        advanceViewPager();
-    }
-
-    /**
-     * Overrides the TagsFragment interface
-     * <p>
-     * Updates some of the initial fields of the newly created event (tags, 21+, restaurant, etc)
-     */
-    @Override
-    public void updateTags(List<String> tagList) {
-        currentEvent.setTags(tagList);
         advanceViewPager();
     }
 

@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements
             gotoLoginActivity();
         }
 
+        Constants.PACKAGE_NAME = getPackageName();
         pagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(), this);
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
