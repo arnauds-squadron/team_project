@@ -56,4 +56,8 @@ public class Business {
     @Expose
     public Location location;
 
+    @SerializedName("categories")
+    @Expose
+    public List<Categories> categories;
+
 }

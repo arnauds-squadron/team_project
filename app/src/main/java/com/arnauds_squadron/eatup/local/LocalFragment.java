@@ -249,6 +249,9 @@ public class LocalFragment extends Fragment implements
         advanceViewPager();
     }
 
+    public void updateCategories(List<String> categories) {
+        currentEvent.setTags(categories);
+    }
     /**
      * Interface to communicate with the parent activity so the HomeFragment is navigated to
      * after an event is created
