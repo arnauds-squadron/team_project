@@ -16,6 +16,7 @@ import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
+import com.arnauds_squadron.eatup.models.Categories;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
@@ -24,6 +25,8 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.List;
@@ -264,6 +267,9 @@ public class LocalFragment extends Fragment implements
         advanceViewPager();
     }
 
+    public void updateCategories(List<String> categories) {
+        currentEvent.setTags(categories);
+    }
     /**
      * Interface to communicate with the parent activity so the HomeFragment is navigated to
      * after an event is created

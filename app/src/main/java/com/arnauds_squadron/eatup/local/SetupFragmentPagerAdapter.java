@@ -37,8 +37,6 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
             return new YelpBusinessFragment();
         if (position == 4)
             return new DateFragment();
-        if (position == 5)
-            return new DateFragment();
         return new StartFragment();
     }
 }

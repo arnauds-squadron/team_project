@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.util.Printer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.YelpBusinessAdapter;
 import com.arnauds_squadron.eatup.home.HomeAdapter;
 import com.arnauds_squadron.eatup.models.Business;
+import com.arnauds_squadron.eatup.models.Categories;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
@@ -106,6 +108,13 @@ public class YelpBusinessFragment extends Fragment {
     @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         String businessId = mBusiness.get(yelpBusinessAdapter.getPosition()).id;
+        List<Categories> categories = mBusiness.get(yelpBusinessAdapter.getPosition()).categories;
+        List<String> tags = new ArrayList<>();
+        for(int i = 0; i < categories.size(); i++){
+            tags.add(categories.get(i).alias);
+        }
+        tags.size();
+        mListener.updateCategories(tags);
         mListener.updateBusinessId(businessId);
     }
 
@@ -125,7 +134,6 @@ public class YelpBusinessFragment extends Fragment {
         Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),
                 "food", 50);
-
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @SuppressLint("SetTextI18n")
@@ -157,6 +165,8 @@ public class YelpBusinessFragment extends Fragment {
          * clicks on
          */
         void updateBusinessId(String id);
+
+        void updateCategories(List<String> categories);
 
         Event getCurrentEvent();
     }
