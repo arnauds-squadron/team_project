@@ -12,7 +12,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.Printer;
@@ -56,10 +58,6 @@ public class YelpBusinessFragment extends Fragment {
     @BindView(R.id.rvYelpBusinesses)
     RecyclerView rvYelpBusinesses;
 
-    @BindView(R.id.btnNext)
-    Button btnNext;
-
-    FragmentActivity listener;
     YelpBusinessAdapter yelpBusinessAdapter;
 
     Event event;
@@ -105,7 +103,7 @@ public class YelpBusinessFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.btnNext)
+//    @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         String businessId = mBusiness.get(yelpBusinessAdapter.getPosition()).id;
         List<Categories> categories = mBusiness.get(yelpBusinessAdapter.getPosition()).categories;
@@ -121,15 +119,11 @@ public class YelpBusinessFragment extends Fragment {
     private void initializeViews() {
         mBusiness = new ArrayList<>();
         // construct adapter from data source
-        yelpBusinessAdapter = new YelpBusinessAdapter(getContext(), mBusiness);
+        yelpBusinessAdapter = new YelpBusinessAdapter(getContext(), mBusiness, this);
         // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setReverseLayout(true);
         rvYelpBusinesses.setLayoutManager(layoutManager);
         rvYelpBusinesses.setAdapter(yelpBusinessAdapter);
-        RecyclerView.ItemDecoration itemDecoration = new
-                DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        rvYelpBusinesses.addItemDecoration(itemDecoration);
 
         Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),

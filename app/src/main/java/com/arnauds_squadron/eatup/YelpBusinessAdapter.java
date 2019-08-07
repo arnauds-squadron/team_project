@@ -35,11 +35,13 @@ public class YelpBusinessAdapter extends RecyclerView.Adapter<YelpBusinessAdapte
 
     private  Context context;
     private List<Business> mBusiness;
+    private YelpBusinessFragment yelpBusinessFragment;
 
     int position;
-    public YelpBusinessAdapter(Context context, List<Business> mBusiness) {
+    public YelpBusinessAdapter(Context context, List<Business> mBusiness, YelpBusinessFragment fragment) {
         this.context = context;
         this.mBusiness = mBusiness;
+        this.yelpBusinessFragment = fragment;
     }
 
     @NonNull
@@ -88,6 +90,7 @@ public class YelpBusinessAdapter extends RecyclerView.Adapter<YelpBusinessAdapte
                     int position = getAdapterPosition();
                     setPosition(position);
                     notifyItemChanged(position);
+                    yelpBusinessFragment.goToNextFragment();
                 }
             });
         }
