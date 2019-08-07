@@ -24,13 +24,27 @@
     </style>
 
     <style name="SpinnerTextViewItem" parent="@android:style/Widget.TextView">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingEnd">36dp</item>
+        <item name="android:paddingRight">36dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">left</item>
     </style>
 
     <style name="spinner_dropdown_style1" parent="Widget.AppCompat.DropDownItem.Spinner">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">#507B91</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingEnd">36dp</item>
+        <item name="android:paddingRight">36dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
     </style>
 
     <style name="button_action">

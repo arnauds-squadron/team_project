@@ -15,7 +15,6 @@ import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 
 import java.util.List;
@@ -66,7 +65,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         ImageView ivEventImage;
         @BindView(R.id.tvEventName)
         TextView tvEventName;
-        @BindView(R.id.tvDate)
+        @BindView(R.id.tvDay)
         TextView tvDate;
         @BindView(R.id.tvTags)
         TextView tvCuisine;

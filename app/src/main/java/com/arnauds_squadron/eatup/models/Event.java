@@ -343,5 +343,12 @@ public class Event extends ParseObject {
             setSkip(skipAmount);
             return this;
         }
+
+        // filters past events with no attendees
+        public Query ratingFilter(Date currentDate) {
+            whereLessThan(KEY_DATE, currentDate);
+            whereEqualTo(KEY_ACCEPTED_GUESTS, new JSONArray());
+            return this;
+        }
     }
 }

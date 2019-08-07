@@ -49,10 +49,10 @@ public class HomeDetailsActivity extends AppCompatActivity {
     @BindView(R.id.cbLegal)
     CheckBox cbLegal;
 
-    @BindView(R.id.tvTitle)
+    @BindView(R.id.tvEventTitle)
     TextView tvTitle;
 
-    @BindView(R.id.tvPlace)
+    @BindView(R.id.tvAddress)
     TextView tvPlace;
 
     @BindView(R.id.tvPerson)
@@ -94,11 +94,11 @@ public class HomeDetailsActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<Business> call,
                                    @NonNull retrofit2.Response<Business> response) {
                 if (response.isSuccessful()) {
-
                     Business business = response.body();
                     if (business != null) {
                         Location location = business.location;
                         //tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
+
                         tvPlace.setText(event.getAddressString());
                         tvYelp.setText(business.name);
                         final String url = business.url;

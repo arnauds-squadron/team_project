@@ -9,8 +9,7 @@
         android:id="@+id/ivImage"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         android:contentDescription="@string/message_other_profile_image"
         android:src="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,42 +24,40 @@
         android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivImage"
-        app:layout_constraintEnd_toStartOf="@+id/btnAccept"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImage"
         app:layout_constraintTop_toTopOf="@+id/ivImage" />
 
-
     <Button
         android:id="@+id/btnAccept"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:layout_marginRight="12dp"
-        android:background="@xml/rounded_button_light"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
-        android:paddingLeft="12dp"
-        android:paddingTop="8dp"
-        android:paddingRight="12dp"
-        android:paddingBottom="8dp"
-        android:text="confirm"
-        android:textColor="@color/toast_red_diluted"
-        android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvRequestText"
+        android:layout_width="72dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/accept_button_tint"
+        android:text="@string/accept"
+        android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@+id/btnDeny"
-        app:layout_constraintTop_toTopOf="@+id/tvRequestText"
-        app:layout_constraintVertical_bias="0.545" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ivImage"
+        app:layout_constraintTop_toBottomOf="@+id/tvRequestText"
+        tools:targetApi="lollipop" />
 
-    <ImageView
+
+    <Button
         android:id="@+id/btnDeny"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/btnAccept"
+        android:layout_width="72dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginRight="32dp"
+        android:backgroundTint="@color/deny_button_tint"
+        android:text="@string/deny"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnAccept"
         app:layout_constraintTop_toTopOf="@+id/btnAccept"
-        app:srcCompat="@drawable/ic_delete_light" />
+        tools:targetApi="lollipop" />
 
 </android.support.constraint.ConstraintLayout>

@@ -25,6 +25,14 @@ public class FormatHelper {
         return DateFormat.format("MMMM dd, yyyy", date).toString();
     }
 
+    public static String formatDateMonth(Date date) {
+        return DateFormat.format("MMM", date).toString();
+    }
+
+    public static String formatDateDay(Date date) {
+        return DateFormat.format("dd", date).toString();
+    }
+
     /**
      * Function to obtain the time information in the given Date object and correctly formats the
      * time depending on if the user uses 24 hour time or 12 hour time
