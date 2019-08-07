@@ -89,4 +89,9 @@ public class FormatHelper {
 
         return returnString.substring(2);
     }
+
+    public static int getProfilePlaceholder(Context context) {
+        return context.getResources()
+                .getIdentifier("profile_placeholder", "drawable", Constants.PACKAGE_NAME);
+    }
 }

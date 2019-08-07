@@ -11,16 +11,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -43,6 +47,9 @@ public class ChatDashboardFragment extends Fragment {
 
     @BindView(R.id.rvChats)
     RecyclerView rvChats;
+
+    @BindView(R.id.tvNoChats)
+    TextView tvNoChats;
 
     @BindView(R.id.ivProfile)
     ImageView ivProfile;
@@ -81,10 +88,18 @@ public class ChatDashboardFragment extends Fragment {
         Constants.CURRENT_USER.fetchInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                if(object.getParseFile(KEY_PROFILE_PICTURE) != null) {
+                ParseFile image = object.getParseFile(KEY_PROFILE_PICTURE);
+                if (image != null) {
                     Glide.with(ChatDashboardFragment.this)
                             .load(object.getParseFile(KEY_PROFILE_PICTURE).getUrl())
                             .transform(new CircleCrop())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(ivProfile);
+                } else {
+                    Glide.with(ChatDashboardFragment.this)
+                            .load(FormatHelper.getProfilePlaceholder(getContext()))
+                            .transform(new CircleCrop())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .into(ivProfile);
                 }
             }
@@ -154,17 +169,20 @@ public class ChatDashboardFragment extends Fragment {
         query.newestFirst().matchesUser(user).findInBackground(new FindCallback<Chat>() {
             @Override
             public void done(List<Chat> objects, ParseException e) {
-                if (e == null && objects != null && objects.size() > 0 ) {
+                if (e == null && objects != null && objects.size() > 0) {
                     if (!objects.get(0).getUpdatedAt().equals(lastUpdated)) {
                         chatList.clear();
                         chatList.addAll(objects);
                         chatAdapter.notifyDataSetChanged();
                         lastUpdated = objects.get(0).getUpdatedAt();
+                        tvNoChats.setVisibility(View.INVISIBLE);
                     }
                 } else if (e != null) {
                     Toast.makeText(getActivity(), "Could not load chats",
                             Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
+                } else {
+                    tvNoChats.setVisibility(View.VISIBLE);
                 }
                 swipeContainer.setRefreshing(false);
             }

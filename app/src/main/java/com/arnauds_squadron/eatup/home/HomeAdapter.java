@@ -42,7 +42,6 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.http.HEAD;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CHANNEL_ID;
 import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
@@ -83,33 +82,29 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         if (event.getDate() != null) {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
             Date date = localCalendar.getTime();
-                // event has not passed
-                if (date.after(event.getDate())) {
-                    // check if current user is the host
-                    if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                        if(event.getAcceptedGuestsList() != null) {
-                            if(event.getAcceptedGuestsList().size() != 0) {
-                                viewHolder.btnCancel.setText("Rate guests");
-                                viewHolder.btnCancel.setTag(GUEST);
-                            }
-                        }
-                        else {
-                            viewHolder.btnCancel.setVisibility(View.INVISIBLE);
+            // event has not passed
+            if (date.after(event.getDate())) {
+                // check if current user is the host
+                if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                    if(event.getAcceptedGuestsList() != null) {
+                        if(event.getAcceptedGuestsList().size() != 0) {
+                            viewHolder.btnCancel.setText("Rate guests");
+                            viewHolder.btnCancel.setTag(GUEST);
                         }
                     }
                     else {
-                        viewHolder.btnCancel.setText("Rate host");
-                        viewHolder.btnCancel.setTag(HOST);
+                        viewHolder.btnCancel.setVisibility(View.INVISIBLE);
                     }
                 }
-                viewHolder.tvDay.setText(formatDateDay(event.getDate()));
-                viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
-                viewHolder.tvTime.setText(formatTime(event.getDate(), context));
+                else {
+                    viewHolder.btnCancel.setText("Rate host");
+                    viewHolder.btnCancel.setTag(HOST);
+                }
+            }
+            viewHolder.tvDay.setText(formatDateDay(event.getDate()));
+            viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
+            viewHolder.tvTime.setText(formatTime(event.getDate(), context));
         }
-        if (event.getTitle() != null) {
-            viewHolder.tvTitle.setText(event.getTitle());
-        }
-
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
         }

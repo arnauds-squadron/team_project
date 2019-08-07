@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.DateFragment;
 import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
-import com.arnauds_squadron.eatup.local.setup.tags.TagsFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
@@ -25,7 +23,6 @@ import com.parse.ParseGeoPoint;
 import com.parse.SaveCallback;
 
 import java.util.Date;
-import java.util.List;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,7 +35,6 @@ public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
         YelpBusinessFragment.OnFragmentInteractionListener,
-        TagsFragment.OnFragmentInteractionListener,
         DateFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.flNoEventsScheduled)
@@ -87,17 +83,6 @@ public class LocalFragment extends Fragment implements
     public void startEventCreation(Event newEvent) {
         currentEvent = null;
         recentEvent = newEvent;
-        advanceViewPager();
-    }
-
-    /**
-     * Overrides the TagsFragment interface
-     * <p>
-     * Updates some of the initial fields of the newly created event (tags, 21+, restaurant, etc)
-     */
-    @Override
-    public void updateTags(List<String> tagList) {
-        currentEvent.setTags(tagList);
         advanceViewPager();
     }
 
@@ -264,6 +249,9 @@ public class LocalFragment extends Fragment implements
         advanceViewPager();
     }
 
+    public void updateCategories(List<String> categories) {
+        currentEvent.setTags(categories);
+    }
     /**
      * Interface to communicate with the parent activity so the HomeFragment is navigated to
      * after an event is created
