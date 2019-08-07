@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.profile.VisitorProfileActivity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -97,7 +96,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
         Button btnAccept;
 
         @BindView(R.id.btnDeny)
-        Button btnDeny;
+        ImageView btnDeny;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -76,16 +76,19 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
+
+        viewHolder.divider.setVisibility(View.INVISIBLE);
+
         if (event.getDate() != null) {
             Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
             Date date = localCalendar.getTime();
                 // event has not passed
                 if (date.after(event.getDate())) {
                     // check if current user is the host
-                    if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
+                    if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                         if(event.getAcceptedGuestsList() != null) {
                             if(event.getAcceptedGuestsList().size() != 0) {
-                                viewHolder.btnCancel.setText("    Rate guests    ");
+                                viewHolder.btnCancel.setText("Rate guests");
                                 viewHolder.btnCancel.setTag(GUEST);
                             }
                         }
@@ -94,40 +97,24 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         }
                     }
                     else {
-                        viewHolder.btnCancel.setText("    Rate host    ");
+                        viewHolder.btnCancel.setText("Rate host");
                         viewHolder.btnCancel.setTag(HOST);
                     }
                 }
-
                 viewHolder.tvDay.setText(formatDateDay(event.getDate()));
                 viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
                 viewHolder.tvTime.setText(formatTime(event.getDate(), context));
-
-//                String[] split = event.getDate().toString().split(" ");
-//
-//                viewHolder.tvDay.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
         }
         if (event.getTitle() != null) {
             viewHolder.tvTitle.setText(event.getTitle());
         }
-
-        try {
-            viewHolder.tvAddress.setText(event.getHost().fetchIfNeeded().getUsername());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-//        if (event.getEventImage() != null) {
-//            viewHolder.ivImage.setParseFile(event.getEventImage());
-//            viewHolder.ivImage.loadInBackground();
-//        }
 
         if(event.getAddressString() != null) {
             viewHolder.tvAddress.setText(event.getAddressString());
         }
 
         // Display requests if the current user is the host of this event
-        if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
+        if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
             requests = new ArrayList<>();
             requestAdapter = new RequestAdapter(event, requests);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context);
@@ -136,7 +123,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             viewHolder.rvRequests.setLayoutManager(layoutManager);
             viewHolder.rvRequests.setAdapter(requestAdapter);
 
-            getPendingRequests(event);
+            getPendingRequests(event, viewHolder);
         }
         ParseUser parseUser = event.getHost();
         File parseFile = null;
@@ -175,12 +162,19 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
      * Queries the Parse Server to get the list of pending request for this particular event
      */
 
-    private void getPendingRequests(Event event) {
+    private void getPendingRequests(Event event, ViewHolder viewHolder) {
         List<ParseUser> pending = event.getPendingRequests();
         String eventTitle = event.getTitle();
         if (pending != null && pending.size() > requests.size()) {
             requests.clear();
             requests.addAll(pending);
+
+            if(requests.size() != 0) {
+                viewHolder.divider.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.divider.setVisibility(View.INVISIBLE);
+            }
+
             requestAdapter.notifyItemRangeInserted(0, pending.size());
 
             // create notifications for each of the pending requests
@@ -206,9 +200,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-//        @BindView(R.id.ivImage)
-//        ParseImageView ivImage;
-
 
         @BindView(R.id.tvDay)
         TextView tvDay;
@@ -242,6 +233,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         @BindView(R.id.rvRequests)
         RecyclerView rvRequests;
+
+        @BindView(R.id.divider)
+        View divider;
 
         ViewHolder(@NonNull final View itemView) {
             super(itemView);

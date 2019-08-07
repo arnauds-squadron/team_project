@@ -30,7 +30,9 @@ import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import org.json.JSONArray;
 
@@ -156,16 +158,16 @@ public class HomeFragment extends Fragment implements
         // when this list is different from the current timeline.
         final List<Event> tempEvents = new ArrayList<>();
 
-        final String userId = Constants.CURRENT_USER.getObjectId();
+        final String userId = ParseUser.getCurrentUser().getObjectId();
         final Event.Query query = new Event.Query();
 
         Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
         Date currentDate = localCalendar.getTime();
 
         if (filterType == 1) {
-            query.withHost().ownEvent(Constants.CURRENT_USER);
+            query.withHost().ownEvent(ParseUser.getCurrentUser());
         } else if (filterType == 2) {
-            query.withHost().notOwnEvent(Constants.CURRENT_USER);
+            query.withHost().notOwnEvent(ParseUser.getCurrentUser());
         }
 
         // TODO add filter for events that don't have any guests and are already past, so we don't show them for rating
