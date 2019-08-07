@@ -17,11 +17,14 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Rating;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -47,29 +50,40 @@ public class ProfileFragment extends Fragment {
 
     @BindView(R.id.etBio)
     EditText etBio;
+
     @BindView(R.id.etUsername)
     EditText etUsername;
+
     @BindView(R.id.tvUsername)
     TextView tvUsername;
+
     @BindView(R.id.tvBio)
     TextView tvBio;
+
     @BindView(R.id.tvRatings)
     TextView tvRatings;
+
     @BindView(R.id.ratingBar)
     RatingBar ratingBar;
+
     @BindView(R.id.btnNewProfileImage)
     FloatingActionButton btnNewProfileImage;
+
     @BindView(R.id.ivSave)
     ImageView ivSave;
+
     @BindView(R.id.ivCancel)
     ImageView ivCancel;
+
     @BindView(R.id.btLogout)
     Button btLogout;
-    @Nullable
+
     @BindView(R.id.ivImage)
     ImageView ivProfile;
+
     @BindView(R.id.btEditUsername)
     Button btEditUsername;
+
     @BindView(R.id.tvEditTitle)
     TextView tvEditTitle;
 
@@ -89,8 +103,27 @@ public class ProfileFragment extends Fragment {
         tvEditTitle.setVisibility(View.INVISIBLE);
         ivCancel.setVisibility(View.INVISIBLE);
         ivSave.setVisibility(View.INVISIBLE);
+
+        // load user profileImage
+        ParseFile profileImage = Constants.CURRENT_USER.getParseFile(KEY_PROFILE_PICTURE);
+
+        if (profileImage != null) {
+            Glide.with(this)
+                    .load(profileImage.getUrl())
+                    .transform(new CircleCrop())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(ivProfile);
+        } else {
+            Glide.with(this)
+                    .load(FormatHelper.getProfilePlaceholder(getContext()))
+                    .transform(new CircleCrop())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(ivProfile);
+        }
+
         return view;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ParseUser user = Constants.CURRENT_USER;
@@ -104,32 +137,23 @@ public class ProfileFragment extends Fragment {
         query.findInBackground(new FindCallback<Rating>() {
             public void done(List<Rating> ratings, ParseException e) {
                 if (e == null) {
-                    if(ratings.size() != 0) {
+                    if (ratings.size() != 0) {
                         Rating rating = ratings.get(0);
                         float averageRating = rating.getAvgRatingHost().floatValue();
                         int numRatings = rating.getNumRatingsHost().intValue();
                         ratingBar.setRating(averageRating);
-                        tvRatings.setText(String.format(Locale.getDefault(),"(%s)", numRatings));
-                    }
-                    else {
+                        tvRatings.setText(String.format(Locale.getDefault(), "(%s)", numRatings));
+                    } else {
                         ratingBar.setRating(NO_RATING);
                     }
                 } else {
-                    Toast.makeText(getContext(),"Query for rating not successful",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Query for rating not successful", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
-        // load user profileImage
-        ParseFile profileImage = user.getParseFile(KEY_PROFILE_PICTURE);
-        if (profileImage != null) {
-            Glide.with(this)
-                    .load(profileImage.getUrl())
-                    .transform(new CircleCrop())
-                    .into(ivProfile);
-        }
         String username = user.getUsername();
-        if(user.getUsername() != null) {
+        if (user.getUsername() != null) {
             tvUsername.setText(username);
             etUsername.setText(username);
         }
@@ -139,8 +163,7 @@ public class ProfileFragment extends Fragment {
         if (bio != null) {
             tvBio.setText(bio);
             etBio.setText(bio);
-        }
-        else {
+        } else {
             tvBio.setText(R.string.no_bio);
         }
     }
@@ -171,7 +194,7 @@ public class ProfileFragment extends Fragment {
 //        startActivity(cInt);
 //    }
     @OnClick(R.id.btEditUsername)
-    public void editUsername () {
+    public void editUsername() {
         tvBio.setVisibility(View.INVISIBLE);
         tvUsername.setVisibility(View.INVISIBLE);
         etUsername.setVisibility(View.VISIBLE);
@@ -180,8 +203,9 @@ public class ProfileFragment extends Fragment {
         ivCancel.setVisibility(View.VISIBLE);
         ivSave.setVisibility(View.VISIBLE);
     }
+
     @OnClick(R.id.ivSave)
-    public void saveChanges () {
+    public void saveChanges() {
         //todo make changes update to ParseDashboard
         ParseUser user = Constants.CURRENT_USER;
         if (!user.getUsername().equals(etUsername.toString())) {
@@ -208,8 +232,9 @@ public class ProfileFragment extends Fragment {
         ivSave.setVisibility(View.INVISIBLE);
         ivCancel.setVisibility(View.INVISIBLE);
     }
+
     @OnClick(R.id.ivCancel)
-    public void cancelChanges () {
+    public void cancelChanges() {
         tvBio.setVisibility(View.VISIBLE);
         tvEditTitle.setVisibility(View.INVISIBLE);
         tvUsername.setVisibility(View.VISIBLE);
@@ -222,7 +247,7 @@ public class ProfileFragment extends Fragment {
     }
 
     @OnClick(R.id.btLogout)
-    public void logout () {
+    public void logout() {
         ParseUser.logOut();
         mListener.stopUpdatingEvents();
         Constants.CURRENT_USER = null;
@@ -232,7 +257,10 @@ public class ProfileFragment extends Fragment {
     private void gotoLoginActivity() {
         Intent i = new Intent(getActivity(), LoginActivity.class);
         startActivity(i);
-        getActivity().finish();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            mainActivity.finish();
+        }
     }
 
     public interface OnFragmentInteractionListener {

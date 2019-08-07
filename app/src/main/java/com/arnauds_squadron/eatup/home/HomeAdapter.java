@@ -21,23 +21,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.RateUserActivity;
+import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardFragment;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.utils.Constants;
+import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
@@ -59,6 +65,7 @@ import static com.arnauds_squadron.eatup.utils.Constants.CHANNEL_ID;
 import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
 import static com.arnauds_squadron.eatup.utils.Constants.HOST;
+import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 import static com.parse.Parse.getApplicationContext;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
@@ -88,50 +95,31 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
         if (event.getDate() != null) {
-            Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
-            Date date = localCalendar.getTime();
-            if (event.getDate() != null) {
-                // event has not passed
-                if (date.before(event.getDate())) {
-                    viewHolder.tvDate.setTextColor(Color.BLACK);
-                    // check if current user is the host
-                    if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                        if(event.getAcceptedGuestsList() != null) {
-                            if(event.getAcceptedGuestsList().size() != 0) {
-                                viewHolder.btnCancel.setText("    Rate guests    ");
-                                viewHolder.btnCancel.setTag(GUEST);
-                            }
+            Date date = new Date();
+            // event has not passed
+            if (date.before(event.getDate())) {
+                viewHolder.tvDate.setTextColor(Color.BLACK);
+                // check if current user is the host
+                if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                    if (event.getAcceptedGuestsList() != null) {
+                        if (event.getAcceptedGuestsList().size() != 0) {
+                            viewHolder.btnCancel.setText("    Rate guests    ");
+                            viewHolder.btnCancel.setTag(GUEST);
                         }
-                        else {
-                            viewHolder.btnCancel.setVisibility(View.INVISIBLE);
-                        }
+                    } else {
+                        viewHolder.btnCancel.setVisibility(View.INVISIBLE);
                     }
-                    else {
-                        viewHolder.btnCancel.setText("    Rate host    ");
-                        viewHolder.btnCancel.setTag(HOST);
-                    }
+                } else {
+                    viewHolder.btnCancel.setText("    Rate host    ");
+                    viewHolder.btnCancel.setTag(HOST);
                 }
-                String[] split = event.getDate().toString().split(" ");
-                viewHolder.tvDate.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
             }
+            String[] split = event.getDate().toString().split(" ");
+            viewHolder.tvDate.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
         }
-        if (event.getTitle() != null) {
-            viewHolder.tvTitle.setText(event.getTitle());
-        }
+        viewHolder.tvTitle.setText(event.getTitle());
+        viewHolder.tvPlace.setText(event.getAddressString());
 
-        try {
-            viewHolder.tvPlace.setText(event.getHost().fetchIfNeeded().getUsername());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if (event.getTitle() != null) {
-            viewHolder.tvTitle.setText(event.getTitle());
-        }
-
-        if(event.getAddressString() != null) {
-            viewHolder.tvPlace.setText(event.getAddressString());
-        }
         // Display requests if the current user is the host of this event
         if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
             requests = new ArrayList<>();
@@ -144,32 +132,27 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             getPendingRequests(event);
         }
-        ParseUser parseUser = event.getHost();
-        File parseFile = null;
-        if (parseUser.equals(ParseUser.getCurrentUser()) && ParseUser.getCurrentUser().getParseFile("profilePicture") != null) {
-            try {
-                parseFile = ParseUser.getCurrentUser().getParseFile("profilePicture").getFile();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                if (parseUser.fetchIfNeeded().getParseFile("profilePicture") != null){
-                    try {
-                        parseFile = parseUser.getParseFile("profilePicture").getFile();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+
+        event.getHost().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                ParseFile image = object.getParseFile("profilePicture");
+
+                if (image != null) {
+                    Glide.with(context)
+                            .load(object.getParseFile(KEY_PROFILE_PICTURE).getUrl())
+                            .transform(new CircleCrop())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(viewHolder.ivProfileImage);
+                } else {
+                    Glide.with(context)
+                            .load(FormatHelper.getProfilePlaceholder(context))
+                            .transform(new CircleCrop())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(viewHolder.ivProfileImage);
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
-        }
-        viewHolder.ivProfileImage.loadInBackground();
-        Glide.with(context)
-                .load(parseFile)
-                .transform(new CircleCrop())
-                .into(viewHolder.ivProfileImage);
+        });
     }
 
     @Override
@@ -219,7 +202,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         ImageButton ibOpenChat;
 
         @BindView(R.id.ivProfileImage)
-        ParseImageView ivProfileImage;
+        ImageView ivProfileImage;
 
         @BindView(R.id.btnCancel)
         Button btnCancel;
