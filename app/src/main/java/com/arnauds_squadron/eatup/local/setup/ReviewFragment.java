@@ -53,7 +53,7 @@ import retrofit2.Callback;
  * Fragment that asks the user to input the date and time of their recentEvent through a series of
  * input dialogs.
  */
-public class DateFragment extends Fragment implements OnMapReadyCallback {
+public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
     @BindView(R.id.tvTags)
     TextView tvTags;
@@ -101,7 +101,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_event_date, container, false);
+        View view = inflater.inflate(R.layout.fragment_event_review, container, false);
         ButterKnife.bind(this, view);
         return view;
     }

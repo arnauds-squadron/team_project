@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
-import com.arnauds_squadron.eatup.local.setup.DateFragment;
+import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -35,7 +35,7 @@ public class LocalFragment extends Fragment implements
         StartFragment.OnFragmentInteractionListener,
         AddressFragment.OnFragmentInteractionListener,
         YelpBusinessFragment.OnFragmentInteractionListener,
-        DateFragment.OnFragmentInteractionListener {
+        ReviewFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.flNoEventsScheduled)
     NoSwipingViewPager viewPager;
@@ -120,7 +120,7 @@ public class LocalFragment extends Fragment implements
     }
 
     /**
-     * Overrides the DateFragment interface
+     * Overrides the ReviewFragment interface
      *
      * @return the current event so the map doesn't reset its position
      */

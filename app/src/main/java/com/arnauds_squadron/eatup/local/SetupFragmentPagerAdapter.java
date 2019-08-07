@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
-import com.arnauds_squadron.eatup.local.setup.DateFragment;
+import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
 import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 
@@ -33,7 +33,7 @@ public class SetupFragmentPagerAdapter extends FragmentPagerAdapter {
         if (position == 2)
             return new YelpBusinessFragment();
         if (position == 3)
-            return new DateFragment();
+            return new ReviewFragment();
         return new StartFragment();
     }
 }
