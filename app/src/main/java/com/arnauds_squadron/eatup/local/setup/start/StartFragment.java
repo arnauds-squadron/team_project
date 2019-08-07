@@ -114,7 +114,7 @@ public class StartFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.btnStartNewEvent)
+    //@OnClick(R.id.btnStartNewEvent)
     public void startEventCreation() {
         mListener.startEventCreation(null);
     }
