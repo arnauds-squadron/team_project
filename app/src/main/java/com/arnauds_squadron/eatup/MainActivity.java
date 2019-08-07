@@ -14,6 +14,7 @@ import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
+import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
 import com.arnauds_squadron.eatup.profile.ProfileFragment;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseUser;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements
         ProfileFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.flNoEventsScheduled)
-    ViewPager viewPager;
+    NoSwipingViewPager viewPager;
 
     @BindView(R.id.tab_bar)
     TabLayout tabLayout;

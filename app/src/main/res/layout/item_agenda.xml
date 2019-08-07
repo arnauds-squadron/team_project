@@ -5,12 +5,12 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
     card_view:cardBackgroundColor="#FAFAFA"
     card_view:cardCornerRadius="8dp"
-    card_view:cardElevation="4dp"
-    android:clickable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    >
+    card_view:cardElevation="4dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,19 +18,12 @@
 
         <Button
             android:id="@+id/btnCancel"
+            style="@style/button_action"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:background="@xml/rounded_button_light"
-            android:minHeight="0dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:minWidth="0dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
             android:text="@string/cancel"
-            android:textColor="@color/toast_red_diluted"
             android:textSize="12sp"
             card_view:layout_constraintStart_toEndOf="@+id/btnChat"
             card_view:layout_constraintTop_toTopOf="@+id/btnChat" />
@@ -101,12 +94,12 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="8dp"
+            android:contentDescription="@string/message_profile_image"
             card_view:layout_constraintEnd_toStartOf="@+id/tvEventTitle"
             card_view:layout_constraintHorizontal_bias="0.5"
             card_view:layout_constraintStart_toEndOf="@+id/tvDay"
             card_view:layout_constraintTop_toTopOf="parent"
-            card_view:srcCompat="@android:color/background_light"
-            android:contentDescription="@string/message_profile_image" />
+            card_view:srcCompat="@android:color/background_light" />
 
         <TextView
             android:id="@+id/tvRestaurant"
@@ -184,20 +177,13 @@
             card_view:layout_constraintTop_toBottomOf="@+id/tvMonth" />
 
         <Button
+            style="@style/button_action"
             android:id="@+id/btnChat"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
-            android:background="@xml/rounded_button_light"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingLeft="12dp"
-            android:paddingTop="8dp"
-            android:paddingRight="12dp"
-            android:paddingBottom="8dp"
             android:text="@string/chat_button"
-            android:textColor="@color/toast_red_diluted"
             android:textSize="12sp"
             card_view:layout_constraintBottom_toTopOf="@id/divider"
             card_view:layout_constraintStart_toStartOf="@+id/tvEventTitle"

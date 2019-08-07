@@ -52,7 +52,7 @@
     </style>
 
     <style name="button_action">
-        <item name="android:background">@xml/rounded_button</item>
+        <item name="android:background">@drawable/rounded_button</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
