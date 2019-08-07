@@ -14,8 +14,6 @@ import com.arnauds_squadron.eatup.event_details.EventDetailsActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
 import com.bumptech.glide.Glide;
-import com.parse.Parse;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 
 import java.util.List;
@@ -66,7 +64,7 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
         ImageView ivEventImage;
         @BindView(R.id.tvEventTitle)
         TextView tvEventTitle;
-        @BindView(R.id.tvDate)
+        @BindView(R.id.tvDay)
         TextView tvDate;
 
         // constructor takes in inflated layout

@@ -14,9 +14,9 @@ import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.profile.VisitorProfileActivity;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -55,8 +55,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
         user.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject object, ParseException e) {
-                String requestText = object.getString("username") + " would like to join the " +
-                        event.getTitle() + " event";
+                String requestText = object.getString("username") + " would like to join";
 
                 //TODO: spannable to make name and event name bold
                 viewHolder.tvRequestText.setText(requestText);
@@ -70,6 +69,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
                 if (profilePicture != null) {
                     Glide.with(context)
                             .load(profilePicture.getUrl())
+                            .transform(new CircleCrop())
                             .into(viewHolder.ivProfile);
                 }
             }
@@ -96,7 +96,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
         Button btnAccept;
 
         @BindView(R.id.btnDeny)
-        Button btnDeny;
+        ImageView btnDeny;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

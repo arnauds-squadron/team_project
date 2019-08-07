@@ -28,7 +28,7 @@
             app:srcCompat="@android:color/background_light" />
 
         <TextView
-            android:id="@+id/tvTitle"
+            android:id="@+id/tvEventTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -41,7 +41,7 @@
             app:layout_constraintTop_toBottomOf="@+id/ivEventImage" />
 
         <TextView
-            android:id="@+id/tvPlace"
+            android:id="@+id/tvAddress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -50,7 +50,7 @@
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/tvEventTitle" />
 
     </android.support.constraint.ConstraintLayout>
 

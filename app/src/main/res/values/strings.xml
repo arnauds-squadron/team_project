@@ -78,6 +78,8 @@
     <string name="password">password</string>
     <string name="username">username</string>
     <string name="set">Set</string>
+    <string name="chat_button">Chat</string>
+    <string name="cancel">Cancel</string>
     <string name="no_recent_events">No recent events</string>
     <string name="no_chats">No chats</string>
     <!--latitude/longitude tags-->

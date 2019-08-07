@@ -1,49 +1,33 @@
 package com.arnauds_squadron.eatup.home;
 
-import android.annotation.SuppressLint;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.RateUserActivity;
-import com.arnauds_squadron.eatup.chat.dashboard.ChatDashboardFragment;
 import com.arnauds_squadron.eatup.home.requests.RequestAdapter;
-import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.utils.FormatHelper;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
-import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseImageView;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
@@ -58,15 +42,13 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
 
 import static com.arnauds_squadron.eatup.utils.Constants.CHANNEL_ID;
-import static com.arnauds_squadron.eatup.utils.Constants.DISPLAY_NAME;
 import static com.arnauds_squadron.eatup.utils.Constants.GUEST;
 import static com.arnauds_squadron.eatup.utils.Constants.HOST;
-import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
-import static com.parse.Parse.getApplicationContext;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateDay;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateMonth;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
@@ -94,34 +76,45 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
+
+        viewHolder.divider.setVisibility(View.INVISIBLE);
+
         if (event.getDate() != null) {
-            Date date = new Date();
+            Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
+            Date date = localCalendar.getTime();
             // event has not passed
-            if (date.before(event.getDate())) {
-                viewHolder.tvDate.setTextColor(Color.BLACK);
+            if (date.after(event.getDate())) {
                 // check if current user is the host
                 if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                    if (event.getAcceptedGuestsList() != null) {
-                        if (event.getAcceptedGuestsList().size() != 0) {
-                            viewHolder.btnCancel.setText("    Rate guests    ");
+                    if(event.getAcceptedGuestsList() != null) {
+                        if(event.getAcceptedGuestsList().size() != 0) {
+                            viewHolder.btnCancel.setText("Rate guests");
                             viewHolder.btnCancel.setTag(GUEST);
                         }
-                    } else {
+                    }
+                    else {
                         viewHolder.btnCancel.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    viewHolder.btnCancel.setText("    Rate host    ");
+                }
+                else {
+                    viewHolder.btnCancel.setText("Rate host");
                     viewHolder.btnCancel.setTag(HOST);
                 }
             }
-            String[] split = event.getDate().toString().split(" ");
-            viewHolder.tvDate.setText(split[1] + "\n" + split[2] + "\n" + split[3]);
+            viewHolder.tvDay.setText(formatDateDay(event.getDate()));
+            viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
+            viewHolder.tvTime.setText(formatTime(event.getDate(), context));
         }
-        viewHolder.tvTitle.setText(event.getTitle());
-        viewHolder.tvPlace.setText(event.getAddressString());
+        if (event.getTitle() != null) {
+            viewHolder.tvTitle.setText(event.getTitle());
+        }
+
+        if(event.getAddressString() != null) {
+            viewHolder.tvAddress.setText(event.getAddressString());
+        }
 
         // Display requests if the current user is the host of this event
-        if (event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
+        if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
             requests = new ArrayList<>();
             requestAdapter = new RequestAdapter(event, requests);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context);
@@ -130,29 +123,34 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             viewHolder.rvRequests.setLayoutManager(layoutManager);
             viewHolder.rvRequests.setAdapter(requestAdapter);
 
-            getPendingRequests(event);
+            getPendingRequests(event, viewHolder);
         }
-
-        event.getHost().fetchIfNeededInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                ParseFile image = object.getParseFile("profilePicture");
-
-                if (image != null) {
-                    Glide.with(context)
-                            .load(object.getParseFile(KEY_PROFILE_PICTURE).getUrl())
-                            .transform(new CircleCrop())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(viewHolder.ivProfileImage);
-                } else {
-                    Glide.with(context)
-                            .load(FormatHelper.getProfilePlaceholder(context))
-                            .transform(new CircleCrop())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(viewHolder.ivProfileImage);
-                }
+        ParseUser parseUser = event.getHost();
+        File parseFile = null;
+        if (parseUser.equals(ParseUser.getCurrentUser()) && ParseUser.getCurrentUser().getParseFile("profilePicture") != null) {
+            try {
+                parseFile = ParseUser.getCurrentUser().getParseFile("profilePicture").getFile();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-        });
+        } else {
+            try {
+                if (parseUser.fetchIfNeeded().getParseFile("profilePicture") != null){
+                    try {
+                        parseFile = parseUser.getParseFile("profilePicture").getFile();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        viewHolder.ivProfileImage.loadInBackground();
+        Glide.with(context)
+                .load(parseFile)
+                .transform(new CircleCrop())
+                .into(viewHolder.ivProfileImage);
     }
 
     @Override
@@ -164,13 +162,19 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
      * Queries the Parse Server to get the list of pending request for this particular event
      */
 
-    private void getPendingRequests(Event event) {
-        // TODO always be continually refreshing for events??? how often does home fragment refresh?
+    private void getPendingRequests(Event event, ViewHolder viewHolder) {
         List<ParseUser> pending = event.getPendingRequests();
         String eventTitle = event.getTitle();
         if (pending != null && pending.size() > requests.size()) {
             requests.clear();
             requests.addAll(pending);
+
+            if(requests.size() != 0) {
+                viewHolder.divider.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.divider.setVisibility(View.INVISIBLE);
+            }
+
             requestAdapter.notifyItemRangeInserted(0, pending.size());
 
             // create notifications for each of the pending requests
@@ -184,8 +188,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 int notificationId = i;
                 String contentText = String.format(Locale.getDefault(), "You have a new request to join %s!", eventTitle);
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                        // TODO replace with Toast's logo
-                        .setSmallIcon(R.drawable.ic_home)
+                        .setSmallIcon(R.drawable.ic_toast_logo)
                         .setContentTitle("New request to join event")
                         .setContentText(contentText)
                         .setContentIntent(pendingIntent)
@@ -198,30 +201,46 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.ibOpenChat)
-        ImageButton ibOpenChat;
+        @BindView(R.id.tvDay)
+        TextView tvDay;
+
+        @BindView(R.id.tvMonth)
+        TextView tvMonth;
+
+        @BindView(R.id.tvTime)
+        TextView tvTime;
 
         @BindView(R.id.ivProfileImage)
-        ImageView ivProfileImage;
+        ParseImageView ivProfileImage;
+
+        @BindView(R.id.tvEventTitle)
+        TextView tvTitle;
+
+        @BindView(R.id.tvRestaurant)
+        TextView tvRestaurant;
+
+        @BindView(R.id.constraintLayoutAddress)
+        ConstraintLayout constraintLayoutAddress;
+
+        @BindView(R.id.tvAddress)
+        TextView tvAddress;
+
+        @BindView(R.id.btnChat)
+        Button btnChat;
 
         @BindView(R.id.btnCancel)
         Button btnCancel;
 
-        @BindView(R.id.tvDate)
-        TextView tvDate;
-
-        @BindView(R.id.tvTitle)
-        TextView tvTitle;
-
-        @BindView(R.id.tvPlace)
-        TextView tvPlace;
-
         @BindView(R.id.rvRequests)
         RecyclerView rvRequests;
+
+        @BindView(R.id.divider)
+        View divider;
 
         ViewHolder(@NonNull final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -255,7 +274,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 }
             });
 
-            ibOpenChat.setOnClickListener(new View.OnClickListener() {
+            btnChat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Event event = mAgenda.get(getAdapterPosition());
