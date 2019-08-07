@@ -42,6 +42,7 @@ public class VisitorProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visitor_profile);
         ButterKnife.bind(this);

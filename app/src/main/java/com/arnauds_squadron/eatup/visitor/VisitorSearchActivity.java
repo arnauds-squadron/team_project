@@ -143,6 +143,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visitor_search);
         ButterKnife.bind(this);
