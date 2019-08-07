@@ -16,7 +16,7 @@
         <item>Home-cooked</item>
     </array>
     <string-array name="host">
-        <item>All</item>
+        <item>All events</item>
         <item>Hosting</item>
         <item>Visiting</item>
     </string-array>
