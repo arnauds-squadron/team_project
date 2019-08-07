@@ -32,8 +32,9 @@
             android:paddingRight="12dp"
             android:text="@string/cancel"
             android:textColor="@color/toast_red_diluted"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlace" />
+            android:textSize="12sp"
+            card_view:layout_constraintStart_toEndOf="@+id/btnChat"
+            card_view:layout_constraintTop_toTopOf="@+id/btnChat" />
 
         <TextView
             android:id="@+id/tvEventTitle"
@@ -44,7 +45,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:textSize="18sp"
+            android:text="@string/detailview_event_title"
+            android:textSize="22sp"
             android:textStyle="bold"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintHorizontal_bias="0.5"
@@ -52,20 +54,7 @@
             card_view:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvPlace"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:autoLink = "map"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
-
-        <TextView
-            android:id="@+id/tvDate"
+            android:id="@+id/tvDay"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
@@ -74,7 +63,6 @@
             android:layout_marginEnd="12dp"
             android:layout_marginRight="12dp"
             android:text="Day"
-            android:layout_marginBottom="8dp"
             android:textColor="@color/toast_red"
             android:textSize="36sp"
             android:textStyle="normal|bold"
@@ -91,15 +79,10 @@
             android:layout_marginLeft="10dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@null"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@+id/btnCancel"
-            app:layout_constraintEnd_toStartOf="@+id/btnCancel"
-            app:layout_constraintTop_toTopOf="@+id/btnCancel"
-            app:srcCompat="@drawable/chat_icon"
-            android:contentDescription="@string/chat" />
-
+            android:background="@color/bottom_gray_light"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="@+id/ivProfileImage"
+            card_view:layout_constraintTop_toTopOf="@+id/rvRequests" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvRequests"
@@ -114,7 +97,7 @@
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="@+id/ivProfileImage" />
 
-        <ImageView
+        <com.parse.ParseImageView
             android:id="@+id/ivProfileImage"
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -123,8 +106,7 @@
             card_view:layout_constraintHorizontal_bias="0.5"
             card_view:layout_constraintStart_toEndOf="@+id/tvDay"
             card_view:layout_constraintTop_toTopOf="parent"
-            card_view:srcCompat="@android:color/background_light"
-            android:contentDescription="@string/message_profile_image" />
+            card_view:srcCompat="@android:color/background_light" />
 
         <TextView
             android:id="@+id/tvRestaurant"
