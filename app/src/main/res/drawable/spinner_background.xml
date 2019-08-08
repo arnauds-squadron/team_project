@@ -16,7 +16,7 @@
                     android:top="-12dp" />
                 <stroke
                     android:width="2dp"
-                    android:color="@color/toast_red_diluted"/>
+                    android:color="@color/toast_red"/>
             </shape>
         </item>
         <item>

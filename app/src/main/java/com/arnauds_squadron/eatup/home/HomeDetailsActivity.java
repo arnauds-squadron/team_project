@@ -28,8 +28,6 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
-import java.io.File;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -64,7 +62,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
     TextView tvPerson;
 
     @BindView(R.id.tvRestaurant)
-    TextView tvYelp;
+    TextView tvRestaurant;
 
     @BindView(R.id.rbYelp)
     RatingBar rbYelp;
@@ -115,7 +113,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                         //tvAddress.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
 
                         tvAddress.setText(event.getAddressString());
-                        tvYelp.setText(business.name);
+                        tvRestaurant.setText(business.name);
                         final String url = business.url;
 
 //                        ivLink.setOnClickListener(new View.OnClickListener() {
