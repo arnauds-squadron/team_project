@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
+import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.profile.VisitorProfileActivity;
 import com.bumptech.glide.Glide;
@@ -23,6 +24,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import org.json.JSONException;
 
 import java.util.List;
 
@@ -108,6 +111,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
                     int position = getAdapterPosition();
                     ParseUser user = requests.get(position);
                     handleRequest(user, position, true);
+                    event.getChat().addMember(user);
                 }
             });
 
@@ -120,6 +124,13 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
                 }
             });
 
+//            for(int i = 0; i < event.getAcceptedGuests().length(); i++) {
+//                try {
+//                    event.getChat().addMember((ParseUser) event.getAcceptedGuests().get(i));
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

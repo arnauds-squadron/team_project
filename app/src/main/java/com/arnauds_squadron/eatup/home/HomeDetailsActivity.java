@@ -158,9 +158,6 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 .transform(new CircleCrop())
                 .into(ivProfile);
 
-        if (event.getCuisine() != null) {
-            tvFood.setText(event.getCuisine());
-        }
         //Todo get the username to appear
         if (event.getHost() != null) {
             try {
