@@ -249,6 +249,10 @@ public class LocalFragment extends Fragment implements
         advanceViewPager();
     }
 
+    public void updateBusinessName(String name) {
+        currentEvent.setYelpRestaurant(name);
+    }
+
     public void updateCategories(List<String> categories) {
         currentEvent.setTags(categories);
     }

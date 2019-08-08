@@ -25,14 +25,11 @@ import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 
 @ParseClassName("Event")
 public class Event extends ParseObject {
-    private static final String KEY_EVENT_IMAGE = "eventImage";
     private static final String KEY_DATE = "date";
     private static final String KEY_TITLE = "title";
     private static final String KEY_HOST = "host";
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_ADDRESS_STRING = "addressString";
-    private static final String KEY_DESCRIPTION = "description";
-    private static final String KEY_FOOD_TYPE = "foodType";
     private static final String KEY_TAGS = "tags";
     private static final String KEY_MAX_GUESTS = "maxGuests";
     private static final String KEY_21 = "over21";
@@ -46,12 +43,10 @@ public class Event extends ParseObject {
     private static final String KEY_IS_FILLED = "isFilled";
     private static final String KEY_NO_RATING = "noRatingSubmitted";
     private static final String KEY_YELP_IMAGE = "yelpImage";
+    private static final String KEY_YELP_RESTAURANT = "yelpRestaurant";
 
     public static Event copyEvent(Event oldEvent) {
         Event newEvent = new Event();
-
-        if(oldEvent.getEventImage() != null)
-            newEvent.setEventImage(oldEvent.getEventImage());
 
         newEvent.setDate(oldEvent.getDate());
         newEvent.setTitle(oldEvent.getTitle());
@@ -74,13 +69,6 @@ public class Event extends ParseObject {
     }
 
     // ParseFile - class in SDK that allows accessing files stored with Parse
-    public ParseFile getEventImage() {
-        return getParseFile(KEY_EVENT_IMAGE);
-    }
-
-    public void setEventImage(ParseFile image) {
-        put(KEY_EVENT_IMAGE, image);
-    }
 
     public Date getDate() {
         return getDate(KEY_DATE);
@@ -140,15 +128,6 @@ public class Event extends ParseObject {
         put(KEY_TAGS, new JSONArray(tags));
     }
 
-    // TODO: replace with the tag system
-    public String getCuisine() {
-        return getString(KEY_FOOD_TYPE);
-    }
-
-    public void setCuisine(String foodType) {
-        put(KEY_FOOD_TYPE, foodType);
-    }
-
     public JSONArray getAcceptedGuests() {
         return getJSONArray(KEY_ACCEPTED_GUESTS);
     }
@@ -201,10 +180,6 @@ public class Event extends ParseObject {
         put(YELP_ID, yelpId);
     }
 
-    public boolean getIsFilled() {
-        return getBoolean(KEY_IS_FILLED);
-    }
-
     public void setIsFilled() {
         put(KEY_IS_FILLED, true);
     }
@@ -215,6 +190,14 @@ public class Event extends ParseObject {
 
     public String getYelpImage() {
         return getString(KEY_YELP_IMAGE);
+    }
+
+    public void setYelpRestaurant(String name) {
+        put(KEY_YELP_RESTAURANT, name);
+    }
+
+    public String getYelpRestaurant() {
+        return getString(KEY_YELP_RESTAURANT);
     }
     /**
      * Adds the user to this event's pending guests lists, and they must be accepted or denied
@@ -331,11 +314,6 @@ public class Event extends ParseObject {
 
         public Query notFilled() {
             whereEqualTo(KEY_IS_FILLED, false);
-            return this;
-        }
-
-        public Query notRated(ParseUser user) {
-            whereEqualTo(KEY_NO_RATING, user);
             return this;
         }
 

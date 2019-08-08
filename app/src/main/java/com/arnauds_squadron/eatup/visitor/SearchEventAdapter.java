@@ -71,7 +71,7 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
         TextView tvCuisine;
         @BindView(R.id.tvDistance)
         TextView tvDistance;
-        @BindView(R.id.layoutOver21)
+        @BindView(R.id.clLegal)
         ConstraintLayout layoutOver21;
 
         // constructor takes in inflated layout
