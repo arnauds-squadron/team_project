@@ -1,7 +1,6 @@
 package com.arnauds_squadron.eatup.local.setup;
 
 import android.annotation.TargetApi;
-import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -87,13 +85,13 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
                 LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
                 String address = recentEvent.getAddressString();
 
-                animateCamera(latLng, recentEvent.getTitle());
+                moveCamera(latLng, Constants.DEFAULT_MAP_ZOOM, recentEvent.getTitle());
                 autocompleteFragment.a.setText(address); // EditText view
                 selectedPlace = Place.builder().setLatLng(latLng).setAddress(address).build();
             } else if (currentEvent == null) {
                 if (map != null) {
                     map.clear();
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 1));
+                    moveCamera(new LatLng(0, 0), 1, null);
                 }
                 autocompleteFragment.a.setText("");
                 selectedPlace = null;
@@ -144,19 +142,47 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Moves the Google Map to the specified latitude and longitude, and makes a marker with the
-     * given title
+     * Animates the Google Map to the specified latitude and longitude, and makes a marker with the
+     * given title if it is not null
      *
      * @param latLng Object holding the latitude and longitude of the point the camera is moving to
-     * @param title  title of the marker
+     * @param title  title of the marker, if set to null no marker is drawn.
      */
     private void animateCamera(LatLng latLng, String title) {
         try {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM));
-            map.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title(title)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            map.animateCamera(CameraUpdateFactory
+                    .newLatLngZoom(latLng, Constants.DEFAULT_MAP_ZOOM));
+            if (title != null) {
+                map.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Moves the Google Map to the specified latitude and longitude, and makes a marker with the
+     * given title if it is not null
+     *
+     * @param latLng Object holding the latitude and longitude of the point the camera is moving to
+     * @param title  title of the marker, if set to null no marker is drawn.
+     */
+    private void moveCamera(LatLng latLng, float zoomLevel, String title) {
+        try {
+            map.moveCamera(CameraUpdateFactory
+                    .newLatLngZoom(latLng, zoomLevel));
+
+            if (title != null) {
+                map.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
