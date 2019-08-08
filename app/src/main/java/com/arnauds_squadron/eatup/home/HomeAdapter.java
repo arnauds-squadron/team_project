@@ -93,23 +93,21 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                     if(event.getAcceptedGuestsList() != null) {
                         if(event.getAcceptedGuestsList().size() != 0) {
-                            viewHolder.btnCancel.setText("Rate guests");
-                            viewHolder.btnCancel.setTag(GUEST);
+                            viewHolder.btnChat.setText("Rate guests");
+                            viewHolder.btnChat.setTag(GUEST);
                         }
-                    }
-                    else {
-                        viewHolder.btnCancel.setVisibility(View.INVISIBLE);
                     }
                 }
                 else {
-                    viewHolder.btnCancel.setText("Rate host");
-                    viewHolder.btnCancel.setTag(HOST);
+                    viewHolder.btnChat.setText("Rate host");
+                    viewHolder.btnChat.setTag(HOST);
                 }
             }
             viewHolder.tvDay.setText(formatDateDay(event.getDate()));
             viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
             viewHolder.tvTime.setText(formatTime(event.getDate(), context));
         }
+
         viewHolder.tvEventTitle.setText(event.getTitle());
         viewHolder.tvRestaurant.setText(event.getYelpRestaurant());
         viewHolder.tvAddress.setText(event.getAddressString());
@@ -234,7 +232,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            btnCancel.setOnClickListener(new View.OnClickListener() {
+            btnChat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final int eventPosition = getAdapterPosition();
@@ -246,7 +244,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         if (event.getDate().after(localCalendar.getTime())) {
                             Intent i = new Intent(context, RateUserActivity.class);
                             i.putExtra("event", event);
-                            i.putExtra("ratingType", (String) btnCancel.getTag());
+                            i.putExtra("ratingType", (String) btnChat.getTag());
                             context.startActivity(i);
                         }
                         // TODO add some sort of check to remove the user from the event in the Parse database
