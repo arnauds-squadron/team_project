@@ -27,7 +27,7 @@
         android:layout_marginRight="8dp"
         android:text="Username"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@android:color/text_color_secondary"
+        android:textColor="@color/_default_gray"
         android:textSize="32sp"
         android:textStyle="bold"
         android:transitionName="hostName"

@@ -9,6 +9,7 @@
     <color name="bottom_gray">#666666</color>
     <color name="bottom_gray_diluted">#80838383</color>
     <color name="bottom_gray_light">#80ADADAD</color>
+    <color name="_default_gray">#8A000000</color>
 
     <!--Eat up custom colors-->
     <color name="toast_red">#D81B34</color>
