@@ -113,7 +113,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                         //tvAddress.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
 
                         tvAddress.setText(event.getAddressString());
-                        tvRestaurant.setText(business.name);
+                        tvRestaurant.setText(event.getYelpRestaurant());
                         final String url = business.url;
 
 //                        ivLink.setOnClickListener(new View.OnClickListener() {
@@ -205,8 +205,9 @@ public class HomeDetailsActivity extends AppCompatActivity {
             if (event.getOver21()) {
                 clLegal.setVisibility(View.VISIBLE);
             }
-        } else {
-            clLegal.setVisibility(View.INVISIBLE);
+            else {
+                clLegal.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }

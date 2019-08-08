@@ -111,6 +111,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             viewHolder.tvTime.setText(formatTime(event.getDate(), context));
         }
         viewHolder.tvEventTitle.setText(event.getTitle());
+        viewHolder.tvRestaurant.setText(event.getYelpRestaurant());
         viewHolder.tvAddress.setText(event.getAddressString());
 
         // Display requests if the current user is the host of this event
@@ -255,7 +256,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         mAgenda.remove(eventPosition);
                         notifyItemRemoved(eventPosition);
                         notifyItemRangeChanged(eventPosition, mAgenda.size());
-                        Snackbar snackbar = Snackbar.make(itemView, "DELETED!", Snackbar.LENGTH_LONG)
+                        Snackbar snackbar = Snackbar.make(itemView, "Event deleted.", Snackbar.LENGTH_LONG)
                                 .setAction("UNDO", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
