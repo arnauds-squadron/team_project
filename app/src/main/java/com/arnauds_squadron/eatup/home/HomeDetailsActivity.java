@@ -18,7 +18,6 @@ import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.profile.HostProfileActivity;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -55,13 +54,13 @@ public class HomeDetailsActivity extends AppCompatActivity {
     @BindView(R.id.tvAddress)
     TextView tvPlace;
 
-    @BindView(R.id.tvPerson)
+    @BindView(R.id.tvHost)
     TextView tvPerson;
 
     @BindView(R.id.tvFood)
     TextView tvFood;
 
-    @BindView(R.id.tvYelp)
+    @BindView(R.id.tvRestaurant)
     TextView tvYelp;
 
     @BindView(R.id.ivLink)
