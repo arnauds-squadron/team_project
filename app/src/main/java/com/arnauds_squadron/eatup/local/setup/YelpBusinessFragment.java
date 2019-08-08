@@ -113,7 +113,7 @@ public class YelpBusinessFragment extends Fragment {
 
         Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),
-                "food", 50);
+                "food", "distance");
 
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @SuppressLint("SetTextI18n")
