@@ -99,7 +99,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
         Button btnAccept;
 
         @BindView(R.id.btnDeny)
-        ImageView btnDeny;
+        Button btnDeny;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -27,7 +27,7 @@
         android:layout_marginRight="8dp"
         android:text="detailview_location_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/_default_gray"
+        android:textColor="@color/default_gray"
         android:textSize="28sp"
         android:textStyle="bold"
         android:transitionName="restaurantName"
