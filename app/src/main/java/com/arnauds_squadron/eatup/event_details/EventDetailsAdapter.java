@@ -110,9 +110,11 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Business business = (Business) v.getTag();
+                    final Event event = (Event) v.getTag(R.id.event);
+                    final Business business = (Business) v.getTag(R.id.business);
                     Intent i = new Intent(context, EventDetailsRestaurantActivity.class);
-                    i.putExtra("restaurant", Parcels.wrap(business));
+                    i.putExtra("event", Parcels.wrap(event));
+                    i.putExtra("business", Parcels.wrap(business));
                     Pair<View, String> imagePair = Pair.create((View) ivEventImage, "eventImage");
                     Pair<View, String> namePair = Pair.create((View) tvRestaurantName, "restaurantName");
                     Pair<View, String> ratingPair = Pair.create((View) restaurantRating, "restaurantRating");
@@ -124,8 +126,11 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             });
         }
 
+        void setEventRootViewTag(Event event) {
+            rootView.setTag(R.id.event, event);
+        }
         void setBusinessRootViewTag(Business business) {
-            rootView.setTag(business);
+            rootView.setTag(R.id.business, business);
         }
 
     }
@@ -202,6 +207,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
             case 1:
                 final RestaurantViewHolder restaurantViewHolder = (RestaurantViewHolder) holder;
+                restaurantViewHolder.setEventRootViewTag(event);
 
                 Call<Business> restaurantDetails = YelpData.retrofit(context).getDetails(event.getYelpId());
                 restaurantDetails.enqueue(new Callback<Business>() {

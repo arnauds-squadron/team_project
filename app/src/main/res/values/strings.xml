@@ -85,6 +85,9 @@
     <!--latitude/longitude tags-->
     <item name="latitude" type="id" />
     <item name="longitude" type="id" />
+    <!--business/event tags for visitor event detail view-->
+    <item name="business" type="id"/>
+    <item name="event" type="id"/>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
