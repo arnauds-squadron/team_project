@@ -224,9 +224,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         @BindView(R.id.btnChat)
         Button btnChat;
 
-        @BindView(R.id.btnCancel)
-        Button btnCancel;
-
         @BindView(R.id.rvRequests)
         RecyclerView rvRequests;
 

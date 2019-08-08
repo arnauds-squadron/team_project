@@ -227,5 +227,20 @@
             app:srcCompat="@drawable/ic_21" />
     </android.support.constraint.ConstraintLayout>
 
+    <Button
+        android:id="@+id/btnCancel"
+        style="@style/rounded_button_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Button"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>
