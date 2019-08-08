@@ -170,7 +170,7 @@
             card_view:layout_constraintStart_toStartOf="@+id/ivProfileImage" />
 
         <Button
-            style="@style/button_action"
+            style="@style/rounded_button"
             android:id="@+id/btnChat"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
@@ -184,7 +184,7 @@
 
         <Button
             android:id="@+id/btnCancel"
-            style="@style/button_action"
+            style="@style/rounded_button"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_marginStart="8dp"
