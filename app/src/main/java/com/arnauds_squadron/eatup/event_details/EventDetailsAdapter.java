@@ -47,8 +47,6 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private RecyclerView recyclerView;
     private final static int CARD_COUNT = 2;
 
-    // TODO implement restaurant detail view when parse database set up
-
     EventDetailsAdapter(Activity context, Event event, RecyclerView recyclerView) {
         this.context = context;
         this.event = event;
@@ -209,6 +207,12 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 final RestaurantViewHolder restaurantViewHolder = (RestaurantViewHolder) holder;
                 restaurantViewHolder.setEventRootViewTag(event);
 
+                restaurantViewHolder.tvRestaurantName.setText(event.getYelpRestaurant());
+                Glide.with(context.getApplicationContext())
+                        .load(event.getYelpImage())
+                        .centerCrop()
+                        .into(restaurantViewHolder.ivEventImage);
+
                 Call<Business> restaurantDetails = YelpData.retrofit(context).getDetails(event.getYelpId());
                 restaurantDetails.enqueue(new Callback<Business>() {
                     @Override
@@ -218,11 +222,6 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             Business restaurant = response.body();
                             restaurantViewHolder.setBusinessRootViewTag(restaurant);
                             if (restaurant != null) {
-                                restaurantViewHolder.tvRestaurantName.setText(restaurant.name);
-                                Glide.with(context.getApplicationContext())
-                                        .load(restaurant.imageUrl)
-                                        .centerCrop()
-                                        .into(restaurantViewHolder.ivEventImage);
                                 restaurantViewHolder.restaurantRating.setRating(restaurant.rating);
                             }
                         }

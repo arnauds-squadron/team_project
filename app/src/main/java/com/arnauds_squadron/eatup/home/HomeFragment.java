@@ -104,9 +104,7 @@ public class HomeFragment extends Fragment implements
 //        RecyclerView.ItemDecoration itemDecoration = new
 //                DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
 //        rvAgenda.addItemDecoration(itemDecoration);
-        //swipe to delete
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(rvAgenda);
+
         ArrayAdapter adapter = ArrayAdapter.createFromResource(getContext(), R.array.host, R.layout.spinner_item1);
         spinner.setAdapter(adapter);
         String value = spinner.getSelectedItem().toString();
@@ -204,76 +202,6 @@ public class HomeFragment extends Fragment implements
             }
         });
     }
-    //swipe to delete
-
-
-    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-
-        ColorDrawable background = new ColorDrawable(Color.RED);
-
-        //        private Drawable icon = ContextCompat.getDrawable(homeAdapter.getContext(),
-//                R.drawable.ic_home_light);
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView,
-                              @NonNull RecyclerView.ViewHolder viewHolder,
-                              @NonNull RecyclerView.ViewHolder target) {
-            Toast.makeText(getContext(), "on Move", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        @Override
-        public void onSwiped(RecyclerView.ViewHolder target, int swipeDir) {
-//            Toast.makeText(getContext(), "on Swiped ", Toast.LENGTH_SHORT).show();
-            //Remove swiped item from list and notify the RecyclerView
-            final int position = target.getAdapterPosition();
-            final Event item = agenda.get(position);
-            agenda.remove(position);
-            homeAdapter.notifyDataSetChanged();
-            Snackbar snackbar = Snackbar.make(rvAgenda, "DELETED!", Snackbar.LENGTH_LONG)
-                    .setAction("UNDO", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            agenda.add(position, item);
-                            homeAdapter.notifyDataSetChanged();
-                        }
-                    });
-            snackbar.setActionTextColor(Color.YELLOW);
-            snackbar.show();
-        }
-
-        @Override
-        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
-                                @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                int actionState, boolean isCurrentlyActive) {
-            super.onChildDraw(c, recyclerView, viewHolder, dX,
-                    dY, actionState, isCurrentlyActive);
-            View itemView = viewHolder.itemView;
-//            int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-//            int iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-//            int iconBottom = iconTop + icon.getIntrinsicHeight();
-            int backgroundCornerOffset = 20;
-            if (dX > 0) { // Swiping to the right
-//                int iconLeft = itemView.getLeft() + iconMargin + icon.getIntrinsicWidth();
-//                int iconRight = itemView.getLeft() + iconMargin;
-//                icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-                background.setBounds(itemView.getLeft(), itemView.getTop(),
-                        itemView.getLeft() + ((int) dX) + backgroundCornerOffset,
-                        itemView.getBottom());
-
-            } else if (dX < 0) { // Swiping to the left
-//                int iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
-//                int iconRight = itemView.getRight() - iconMargin;
-//                icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-                background.setBounds(itemView.getRight() + ((int) dX) - backgroundCornerOffset,
-                        itemView.getTop(), itemView.getRight(), itemView.getBottom());
-            } else { // view is unSwiped
-//                icon.setBounds(0, 0, 0, 0);
-                background.setBounds(0, 0, 0, 0);
-            }
-            background.draw(c);
-//            icon.draw(c);
-        }
-    };
 
     /**
      * Called by the HomeAdapter to open an event's chat

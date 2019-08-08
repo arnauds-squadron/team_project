@@ -57,14 +57,15 @@ public class EventDetailsRestaurantActivity extends AppCompatActivity {
         Business restaurant = Parcels.unwrap(getIntent().getParcelableExtra("business"));
 
         tvAddress.setText(event.getAddressString());
+        Glide.with(EventDetailsRestaurantActivity.this)
+                .load(event.getYelpImage())
+                .into(ivEventImage);
 
         tvRestaurantName.setText(restaurant.name);
         restaurantRating.setRating(restaurant.rating);
         tvNumberRatings.setText(String.format(Locale.getDefault(), "(%s)", Integer.toString(restaurant.reviewCount)));
         tvPhone.setText(restaurant.displayPhone);
-        Glide.with(EventDetailsRestaurantActivity.this)
-                .load(restaurant.imageUrl)
-                .into(ivEventImage);
+
 
         final String url = restaurant.url;
         btYelp.setOnClickListener(new View.OnClickListener() {

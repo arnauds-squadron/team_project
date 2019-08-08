@@ -89,6 +89,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home_details);
         ButterKnife.bind(this);
         event = Parcels.unwrap(getIntent().getParcelableExtra(Event.class.getSimpleName()));
+
         // Using retrofit to call the YelpApiRepsonse on  the events Cuisine and geopoint location
         // then checking for a response if we have a response, then get the specific information
         // defined in the Business Class
@@ -111,9 +112,6 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     if (business != null) {
                         Location location = business.location;
                         //tvAddress.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
-
-                        tvAddress.setText(event.getAddressString());
-                        tvRestaurant.setText(event.getYelpRestaurant());
                         final String url = business.url;
 
 //                        ivLink.setOnClickListener(new View.OnClickListener() {
@@ -125,9 +123,6 @@ public class HomeDetailsActivity extends AppCompatActivity {
 //                                finish();
 //                            }
 //                        });
-                        Glide.with(HomeDetailsActivity.this)
-                                .load(business.imageUrl)
-                                .into(ivImage);
                         rbYelp.setRating(business.rating);
                     }
                 }
@@ -146,6 +141,12 @@ public class HomeDetailsActivity extends AppCompatActivity {
         if (event.getTitle() != null) {
             tvTitle.setText(event.getTitle());
         }
+
+        tvAddress.setText(event.getAddressString());
+        tvRestaurant.setText(event.getYelpRestaurant());
+        Glide.with(HomeDetailsActivity.this)
+                .load(event.getYelpImage())
+                .into(ivImage);
 
         //load the profile image
         ParseUser parseUser = event.getHost();
@@ -175,11 +176,6 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(ivHost);
         }
-
-        //we removed getCuisine and replaced it with get Tags
-//        if (event.getCuisine() != null) {
-//            tvCuisine.setText(event.getCuisine());
-//        }
 
         if (event.getTags() != null) {
             tvCuisine.setText(event.getTags().get(0));
