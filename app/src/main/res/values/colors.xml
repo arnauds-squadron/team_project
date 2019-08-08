@@ -18,14 +18,13 @@
     <color name="toast_red_dark">#ad172a</color>
     <color name="view_background">#FAFAFA</color>
     <color name="message_gray">#EAEAEA</color>
-    <color name="accept_button_tint">#86db9a</color>
-    <color name="deny_button_tint">#db8686</color>
 
     <!--Helpful colors-->
     <color name="red">#FF0000</color>
     <color name="white">#FFF</color>
     <color name="white_transparent">#33FFFFFF</color>
     <color name="black">#000</color>
-    <color name="ripple_gray">#CDCDCD</color>
+    <color name="ripple_default">#DCCDCD</color>
+    <color name="ripple_filled">#73101d</color>
 
 </resources>
