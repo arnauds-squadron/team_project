@@ -94,8 +94,8 @@
                 android:id="@+id/tvCuisine"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
                 android:text="Mexican, pizza, etc."
@@ -107,8 +107,8 @@
 
             <ImageView
                 android:id="@+id/ivSearch"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
@@ -140,8 +140,8 @@
                 android:id="@+id/tvCurrentLocation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
                 android:text="@string/current_location_title"
@@ -153,8 +153,8 @@
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
