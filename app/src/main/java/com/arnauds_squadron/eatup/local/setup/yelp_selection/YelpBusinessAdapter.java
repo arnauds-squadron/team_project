@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup;
+package com.arnauds_squadron.eatup.local.setup.yelp_selection;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,8 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-//import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
-import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
+import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Location;
 import com.bumptech.glide.Glide;
@@ -23,12 +22,11 @@ import butterknife.ButterKnife;
 
 public class YelpBusinessAdapter extends RecyclerView.Adapter<YelpBusinessAdapter.ViewHolder> {
 
-    private  Context context;
+    private Context context;
     private List<Business> mBusiness;
     private YelpBusinessFragment yelpBusinessFragment;
 
-    int position;
-    public YelpBusinessAdapter(Context context, List<Business> mBusiness, YelpBusinessFragment fragment) {
+    YelpBusinessAdapter(Context context, List<Business> mBusiness, YelpBusinessFragment fragment) {
         this.context = context;
         this.mBusiness = mBusiness;
         this.yelpBusinessFragment = fragment;
@@ -49,7 +47,11 @@ public class YelpBusinessAdapter extends RecyclerView.Adapter<YelpBusinessAdapte
         Business business = mBusiness.get(i);
         Location location = business.location;
         viewHolder.tvPlace.setText(business.name);
-        viewHolder.tvAddress.setText(location.getAddress1() + " " + location.getCity() + ", " + location.getState());
+        String address = location.getAddress1() + " "
+                + location.getCity() + ", "
+                + location.getState();
+
+        viewHolder.tvAddress.setText(address);
         Glide.with(context)
                 .load(business.imageUrl)
                 .into(viewHolder.ivYelpImage);
@@ -78,17 +80,10 @@ public class YelpBusinessAdapter extends RecyclerView.Adapter<YelpBusinessAdapte
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
-                    setPosition(position);
                     notifyItemChanged(position);
-                    yelpBusinessFragment.goToNextFragment();
+                    yelpBusinessFragment.goToNextFragment(position);
                 }
             });
         }
-    }
-    public void setPosition(int i) {
-        this.position = i;
-    }
-    public int getPosition(){
-        return position;
     }
 }

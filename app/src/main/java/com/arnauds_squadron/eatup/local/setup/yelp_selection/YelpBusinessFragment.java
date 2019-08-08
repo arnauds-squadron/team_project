@@ -1,4 +1,4 @@
-package com.arnauds_squadron.eatup.local.setup;
+package com.arnauds_squadron.eatup.local.setup.yelp_selection;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -10,9 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.YelpBusinessAdapter;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Category;
 import com.arnauds_squadron.eatup.models.Event;
@@ -28,23 +29,23 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link YelpBusinessFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * create an instance of this fragment.
+ * Fragment that takes the user inputted address and finds the nearby restaurants by querying the
+ * Yelp API, and displays them in a list that the user selects from
  */
 public class YelpBusinessFragment extends Fragment {
-
-    private OnFragmentInteractionListener mListener;
-    private List<Business> mBusiness;
 
     @BindView(R.id.rvYelpBusinesses)
     RecyclerView rvYelpBusinesses;
 
-    YelpBusinessAdapter yelpBusinessAdapter;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
 
-    Event event;
+    @BindView(R.id.tvErrorLoadingRestaurants)
+    TextView tvErrorLoading;
+
+    private OnFragmentInteractionListener mListener;
+    private List<Business> mBusiness;
+    private YelpBusinessAdapter yelpBusinessAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,66 +56,58 @@ public class YelpBusinessFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_yelp_business, container, false);
         ButterKnife.bind(this, view);
-        return  view;
+
+        mBusiness = new ArrayList<>();
+        yelpBusinessAdapter = new YelpBusinessAdapter(getContext(), mBusiness, this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvYelpBusinesses.setLayoutManager(layoutManager);
+        rvYelpBusinesses.setAdapter(yelpBusinessAdapter);
+
+        return view;
     }
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisibleToUser) {
-            event = mListener.getCurrentEvent();
-            initializeViews();
-        }
-    }
-
-
 
     /**
      * Called in onCreate to bind the this child fragment to its parent, so the listener
      * can be used
+     *
      * @param fragment The parent fragment
      */
-    public void onAttachToParentFragment(Fragment fragment)
-    {
+    public void onAttachToParentFragment(Fragment fragment) {
         try {
             mListener = (OnFragmentInteractionListener) fragment;
-        }
-        catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(fragment.toString() + " must implement the interface");
         }
     }
 
-//    @OnClick(R.id.btnNext)
-    public void goToNextFragment() {
-        String businessId = mBusiness.get(yelpBusinessAdapter.getPosition()).id;
-        String businessName = mBusiness.get(yelpBusinessAdapter.getPosition()).name;
-        List<Category> categories = mBusiness.get(yelpBusinessAdapter.getPosition()).categories;
+    /**
+     * Notifies the parent adapter to go to the next fragment when the user selects a yelp
+     * restaurant
+     *
+     * @param position The index of the restaurant selected by the user
+     */
+    public void goToNextFragment(int position) {
+        String businessId = mBusiness.get(position).id;
+        String businessName = mBusiness.get(position).name;
+        List<Category> categories = mBusiness.get(position).categories;
         List<String> tags = new ArrayList<>();
-        for(int i = 0; i < categories.size(); i++){
+        for (int i = 0; i < categories.size(); i++) {
             tags.add(categories.get(i).title);
         }
-        tags.size();
-        mListener.updateBusinessName(businessName);
-        mListener.updateCategories(tags);
-        mListener.updateBusinessId(businessId);
+        mListener.updateYelpBusiness(businessId, businessName, tags);
     }
 
-    private void initializeViews() {
-        mBusiness = new ArrayList<>();
-        // construct adapter from data source
-        yelpBusinessAdapter = new YelpBusinessAdapter(getContext(), mBusiness, this);
-        // RecyclerView setup
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        rvYelpBusinesses.setLayoutManager(layoutManager);
-        rvYelpBusinesses.setAdapter(yelpBusinessAdapter);
+    public void findNearbyRestaurants(Event event) {
+        mBusiness.clear();
+        yelpBusinessAdapter.notifyDataSetChanged();
 
         Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),
                 "food", "distance");
 
+        progressBar.setVisibility(View.VISIBLE);
         meetUp.enqueue(new Callback<YelpApiResponse>() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -130,7 +123,11 @@ public class YelpBusinessFragment extends Fragment {
                         yelpBusinessAdapter.notifyItemInserted(mBusiness.size() - 1);
                         i++;
                     }
+                    tvErrorLoading.setVisibility(View.INVISIBLE);
+                } else {
+                    tvErrorLoading.setVisibility(View.VISIBLE);
                 }
+                progressBar.setVisibility(View.INVISIBLE);
             }
 
             @Override
@@ -141,15 +138,10 @@ public class YelpBusinessFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        /** updates the Id for the Business the user
+        /**
+         * updates the Id for the Business the user
          * clicks on
          */
-        void updateBusinessId(String id);
-
-        void updateBusinessName(String name);
-
-        void updateCategories(List<String> categories);
-
-        Event getCurrentEvent();
+        void updateYelpBusiness(String id, String name, List<String> tags);
     }
 }
