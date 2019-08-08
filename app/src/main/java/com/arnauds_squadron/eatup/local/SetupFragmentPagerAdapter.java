@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
-import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
+import com.arnauds_squadron.eatup.local.setup.yelp_selection.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 
 /**

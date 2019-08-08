@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
-import com.arnauds_squadron.eatup.local.setup.YelpBusinessFragment;
+import com.arnauds_squadron.eatup.local.setup.yelp_selection.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
@@ -97,6 +97,11 @@ public class LocalFragment extends Fragment implements
         currentEvent.setHost(Constants.CURRENT_USER);
         currentEvent.setAddress(address);
         currentEvent.setAddressString(addressString);
+
+        YelpBusinessFragment fragment = (YelpBusinessFragment)
+                getTypedFragment(YelpBusinessFragment.class);
+        // Start searching for nearby restaurants before the fragment is visible
+        fragment.findNearbyRestaurants(currentEvent);
         advanceViewPager();
     }
 
@@ -244,18 +249,20 @@ public class LocalFragment extends Fragment implements
         viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
     }
 
-    public void updateBusinessId(String id) {
+    /**
+     * Updates the details of the current event's restaurant with the given parameters
+     * @param id The yelpId of the restaurant
+     * @param name The name of the restaurant
+     * @param tags The different food tags (Mexican, burritos, etc) that the restaurant is
+     *            associated with
+     */
+    public void updateYelpBusiness(String id, String name, List<String> tags) {
         currentEvent.setYelpId(id);
+        currentEvent.setYelpRestaurant(name);
+        currentEvent.setTags(tags);
         advanceViewPager();
     }
 
-    public void updateBusinessName(String name) {
-        currentEvent.setYelpRestaurant(name);
-    }
-
-    public void updateCategories(List<String> categories) {
-        currentEvent.setTags(categories);
-    }
     /**
      * Interface to communicate with the parent activity so the HomeFragment is navigated to
      * after an event is created
