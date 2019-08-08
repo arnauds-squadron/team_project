@@ -86,6 +86,7 @@
 
     <Button
         android:id="@+id/btYelp"
+        style="@style/button_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -93,9 +94,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="32dp"
-        android:background="@xml/rounded_button"
         android:text="details"
-        android:textColor="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
