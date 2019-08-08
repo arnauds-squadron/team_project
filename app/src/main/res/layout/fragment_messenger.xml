@@ -86,7 +86,7 @@
         android:id="@+id/etMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/textview_message"
+        style="@style/text_view_message"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="8dp"

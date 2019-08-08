@@ -28,19 +28,29 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
-import java.io.File;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 
 import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateDay;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateMonth;
+import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 
 public class HomeDetailsActivity extends AppCompatActivity {
 
     @BindView(R.id.ivImage)
     ImageView ivImage;
+
+    @BindView(R.id.tvDay)
+    TextView tvDay;
+
+    @BindView(R.id.tvMonth)
+    TextView tvMonth;
+
+    @BindView(R.id.tvTime)
+    TextView tvTime;
 
     @BindView(R.id.tvEventTitle)
     TextView tvTitle;
@@ -52,7 +62,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
     TextView tvPerson;
 
     @BindView(R.id.tvRestaurant)
-    TextView tvYelp;
+    TextView tvRestaurant;
 
     @BindView(R.id.rbYelp)
     RatingBar rbYelp;
@@ -103,7 +113,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                         //tvAddress.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
 
                         tvAddress.setText(event.getAddressString());
-                        tvYelp.setText(business.name);
+                        tvRestaurant.setText(event.getYelpRestaurant());
                         final String url = business.url;
 
 //                        ivLink.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +138,11 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
+
+        tvDay.setText(formatDateDay(event.getDate()));
+        tvMonth.setText(formatDateMonth(event.getDate()));
+        tvTime.setText(formatTime(event.getDate(), context));
+
         if (event.getTitle() != null) {
             tvTitle.setText(event.getTitle());
         }
@@ -190,8 +205,9 @@ public class HomeDetailsActivity extends AppCompatActivity {
             if (event.getOver21()) {
                 clLegal.setVisibility(View.VISIBLE);
             }
-        } else {
-            clLegal.setVisibility(View.INVISIBLE);
+            else {
+                clLegal.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }

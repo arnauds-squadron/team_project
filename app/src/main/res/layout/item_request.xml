@@ -33,7 +33,7 @@
 
     <Button
         android:id="@+id/btnAccept"
-        style="@style/button_action"
+        style="@style/rounded_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"

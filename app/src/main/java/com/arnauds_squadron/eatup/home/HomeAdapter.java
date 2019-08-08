@@ -1,5 +1,6 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -7,8 +8,10 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -107,7 +110,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
             viewHolder.tvTime.setText(formatTime(event.getDate(), context));
         }
-        viewHolder.tvTitle.setText(event.getTitle());
+        viewHolder.tvEventTitle.setText(event.getTitle());
+        viewHolder.tvRestaurant.setText(event.getYelpRestaurant());
         viewHolder.tvAddress.setText(event.getAddressString());
 
         // Display requests if the current user is the host of this event
@@ -206,7 +210,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         ImageView ivProfileImage;
 
         @BindView(R.id.tvEventTitle)
-        TextView tvTitle;
+        TextView tvEventTitle;
 
         @BindView(R.id.tvRestaurant)
         TextView tvRestaurant;
@@ -252,7 +256,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         mAgenda.remove(eventPosition);
                         notifyItemRemoved(eventPosition);
                         notifyItemRangeChanged(eventPosition, mAgenda.size());
-                        Snackbar snackbar = Snackbar.make(itemView, "DELETED!", Snackbar.LENGTH_LONG)
+                        Snackbar snackbar = Snackbar.make(itemView, "Event deleted.", Snackbar.LENGTH_LONG)
                                 .setAction("UNDO", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -282,7 +286,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         Event event = mAgenda.get(position);
                         Intent intent = new Intent(context, HomeDetailsActivity.class);
                         intent.putExtra(Event.class.getSimpleName(), Parcels.wrap(event));
-                        context.startActivity(intent);
+                        Pair<View, String> dayPair = Pair.create((View) tvDay, "day");
+                        Pair<View, String> monthPair = Pair.create((View) tvMonth, "month");
+                        Pair<View, String> timePair = Pair.create((View) tvTime, "time");
+                        Pair<View, String> profilePair = Pair.create((View) ivProfileImage, "hostImage");
+                        Pair<View, String> eventTitlePair = Pair.create((View) tvEventTitle, "eventTitle");
+                        Pair<View, String> restaurantPair = Pair.create((View) tvRestaurant, "restaurantName");
+                        Pair<View, String> addressPair = Pair.create((View) constraintLayoutAddress, "clAddress");
+                        ActivityOptionsCompat options = ActivityOptionsCompat.
+                                makeSceneTransitionAnimation((Activity) context, dayPair, monthPair, timePair, profilePair, eventTitlePair, restaurantPair, addressPair);
+                        context.startActivity(intent, options.toBundle());
                     }
                 }
             });
