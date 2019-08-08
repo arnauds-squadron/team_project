@@ -20,12 +20,13 @@
             android:id="@+id/tvDay"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             android:layout_marginRight="12dp"
             android:text="Day"
+            android:transitionName="day"
             android:textColor="@color/toast_red"
             android:textSize="36sp"
             android:textStyle="normal|bold"
@@ -38,27 +39,30 @@
             android:id="@+id/tvMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:text="Month"
+            android:transitionName="month"
+            android:textSize="20sp"
+            android:textStyle="bold"
             card_view:layout_constraintEnd_toEndOf="@+id/tvDay"
-            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintStart_toStartOf="@+id/tvDay"
             card_view:layout_constraintTop_toBottomOf="@+id/tvDay" />
 
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="Mealtime"
+            android:transitionName="time"
+            android:textSize="16sp"
+            android:textStyle="bold"
             card_view:layout_constraintEnd_toEndOf="@+id/tvDay"
-            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintStart_toStartOf="@+id/tvDay"
             card_view:layout_constraintTop_toBottomOf="@+id/tvMonth" />
 
         <ImageView
             android:id="@+id/ivProfileImage"
+            android:transitionName="hostImage"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="8dp"
@@ -71,6 +75,7 @@
 
         <TextView
             android:id="@+id/tvEventTitle"
+            android:transitionName="eventTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -95,6 +100,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:text="Restaurant name"
+            android:transitionName="restaurantName"
             android:textSize="18sp"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
@@ -102,6 +108,7 @@
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayoutAddress"
+            android:transitionName="clAddress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
