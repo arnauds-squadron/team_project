@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -12,14 +12,17 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -29,7 +32,6 @@ import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,6 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -55,32 +58,44 @@ import retrofit2.Callback;
  */
 public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
+    @BindView(R.id.scrollView)
+    ScrollView scrollView;
+
     @BindView(R.id.tvTags)
     TextView tvTags;
 
-    @BindView(R.id.tvSelectedDate)
-    TextView tvSelectedDate;
+    @BindView(R.id.ivEventTitle)
+    ImageView ivEventTitle;
 
-    @BindView(R.id.tvSelectedTime)
-    TextView tvSelectedTime;
+    @BindView(R.id.etEventTitle)
+    EditText etEventTitle;
+
+    @BindView(R.id.tvEventTitle)
+    TextView tvEventTitle;
 
     @BindView(R.id.ivCalendar)
     ImageView ivCalendar;
 
+    @BindView(R.id.tvSelectedDate)
+    TextView tvSelectedDate;
+
     @BindView(R.id.ivClock)
     ImageView ivClock;
 
-    @BindView(R.id.tvMaxGuests)
-    TextView tvMaxGuests;
+    @BindView(R.id.tvSelectedTime)
+    TextView tvSelectedTime;
 
     @BindView(R.id.ivMaxGuests)
     ImageView ivMaxGuests;
 
+    @BindView(R.id.tvMaxGuests)
+    TextView tvMaxGuests;
+
     @BindView(R.id.cbOver21)
     CheckBox cbOver21;
 
-    @BindView(R.id.etEventTitle)
-    EditText etEventTitle;
+    @BindView(R.id.tvOver21)
+    TextView tvOver21;
 
     @BindView(R.id.tvRestaurantName)
     TextView tvRestaurantName;
@@ -92,8 +107,6 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
     // Calendar object that holds the date and time that the user selects
     private Calendar selectedTime;
     // Booleans to make sure the user selects a time before moving on
-    private boolean dateSet;
-    private boolean timeSet;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,11 +114,34 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         onAttachToParentFragment(getParentFragment());
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_review, container, false);
         ButterKnife.bind(this, view);
+
+        scrollView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+        scrollView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.clearFocus();
+                return false;
+            }
+
+        });
+
+        etEventTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean focused) {
+                if (!focused) {
+                    tvEventTitle.setText(etEventTitle.getText());
+                    tvEventTitle.setVisibility(View.VISIBLE);
+                    etEventTitle.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
         return view;
     }
 
@@ -119,6 +155,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
         if (isVisibleToUser) {
             selectedTime = Calendar.getInstance();
+            selectedTime.add(Calendar.DAY_OF_YEAR, 7);
 
             currentEvent = mListener.getCurrentEvent();
             recentEvent = mListener.getRecentEvent();
@@ -126,15 +163,12 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
 
             if (recentEvent != null) { // recent event, fill in all the fields
                 selectedTime.setTime(recentEvent.getDate());
-                dateSet = true;
-                timeSet = true;
                 setRecentEventFields();
             } else { // reset recent event fields in case the user undoes changes and returns
-                dateSet = false;
-                timeSet = false;
-                resetRecentEventFields();
-                showDatePickerDialog(true);
+                setCurrentEventFields();
             }
+            tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(selectedTime.getTime()));
+            tvSelectedTime.setText(FormatHelper.formatTime(selectedTime.getTime(), getActivity()));
         }
     }
 
@@ -197,68 +231,38 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    /**
-     * Calls the parent fragment to update the new recentEvent with the new fields
-     */
-    private void updateEventFields() {
-        String title = etEventTitle.getText().toString().trim();
-        Date date = selectedTime.getTime();
-        int maxGuests = Integer.parseInt(tvMaxGuests.getText().toString());
-        boolean over21 = cbOver21.isChecked();
-
-        mListener.updateFinalFields(title, date, maxGuests, over21);
+    @OnClick({R.id.tvEventTitle, R.id.ivEventTitle})
+    public void editTitle() {
+        tvEventTitle.setVisibility(View.INVISIBLE);
+        etEventTitle.setVisibility(View.VISIBLE);
+        etEventTitle.requestFocus();
+        etEventTitle.setSelection(etEventTitle.getText().length());
+        showKeyboard();
     }
 
     /**
-     * Updates the date parameter and updates only the date TextView when a new date is set
+     * Shows the user a popup to select the date of the recentEvent. Default date is one week from
+     * the current date
      */
-    @OnClick(R.id.tvSelectedDate)
-    public void updateDate() {
-        showDatePickerDialog(false);
-    }
-
-    /**
-     * Updates the time parameter and updates only the time TextView when a new time is set
-     */
-    @OnClick(R.id.tvSelectedTime)
-    public void updateTime() {
-        showTimePickerDialog(false);
-    }
-
-    /**
-     * Shows the user a popup to select the date of the recentEvent. Default date is the current date
-     *
-     * @param shouldShowNextDialog Shows the TimePickerDialog if true, just updates the date
-     *                             TextView if false
-     */
-    private void showDatePickerDialog(final boolean shouldShowNextDialog) {
+    @OnClick({R.id.tvSelectedDate, R.id.ivCalendar})
+    public void showDatePickerDialog() {
         int currentYear = selectedTime.get(Calendar.YEAR);
         int currentMonth = selectedTime.get(Calendar.MONTH);
         int currentDay = selectedTime.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePicker = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-                selectedTime.set(Calendar.YEAR, year);
-                selectedTime.set(Calendar.MONTH, month);
-                selectedTime.set(Calendar.DAY_OF_MONTH, day);
-                dateSet = true;
-                if (shouldShowNextDialog)
-                    showTimePickerDialog(true);
-                else
-                    updateNewFieldTextViews();
-            }
-        }, currentYear, currentMonth, currentDay);
+        DatePickerDialog datePicker = new DatePickerDialog(getActivity(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int day) {
+                        selectedTime.set(Calendar.YEAR, year);
+                        selectedTime.set(Calendar.MONTH, month);
+                        selectedTime.set(Calendar.DAY_OF_MONTH, day);
+                        tvSelectedDate.setText(
+                                FormatHelper.formatDateWithMonthNames(selectedTime.getTime()));
+                    }
+                }, currentYear, currentMonth, currentDay);
 
         datePicker.setCanceledOnTouchOutside(false);
-        datePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int buttonId) {
-                dateSet = false;
-                if (!shouldShowNextDialog)
-                    updateNewFieldTextViews();
-            }
-        });
         datePicker.show();
     }
 
@@ -266,7 +270,8 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
      * Creates the TimePickerDialog programmatically after the DatePickerDialog has finished,
      * and initializes it with the current time
      */
-    private void showTimePickerDialog(final boolean shouldShowNextDialog) {
+    @OnClick({R.id.tvSelectedTime, R.id.ivClock})
+    public void showTimePickerDialog() {
         int currentHour = selectedTime.get(Calendar.HOUR_OF_DAY);
         int currentMinute = selectedTime.get(Calendar.MINUTE);
 
@@ -276,26 +281,12 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                     public void onTimeSet(TimePicker view, int hour, int minute) {
                         selectedTime.set(Calendar.HOUR_OF_DAY, hour);
                         selectedTime.set(Calendar.MINUTE, minute);
-                        timeSet = true;
-                        if (shouldShowNextDialog) {
-                            showMaxGuestsDialog();
-                        } else {
-                            updateNewFieldTextViews();
-                        }
+                        tvSelectedTime.setText(
+                                FormatHelper.formatTime(selectedTime.getTime(), getActivity()));
                     }
                 }, currentHour, currentMinute, true);
 
         timePicker.setCanceledOnTouchOutside(false);
-        timePicker.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int buttonId) {
-                        timeSet = false;
-                        if (!shouldShowNextDialog) {
-                            updateNewFieldTextViews();
-                        }
-                    }
-                });
         timePicker.show();
     }
 
@@ -324,77 +315,9 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                 String text = npMaxGuests.getValue() + "";
                 tvMaxGuests.setText(text);
                 d.dismiss();
-                updateNewFieldTextViews();
             }
         });
         d.show();
-    }
-
-    /**
-     * Update the date and time text views and handle if the time wasn't set
-     */
-    private void updateNewFieldTextViews() {
-        toggleImageViews(true);
-
-        if (!dateSet)
-            tvSelectedDate.setText(getString(R.string.event_creation_date_not_selected));
-        else
-            tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(selectedTime.getTime()));
-
-        if (!timeSet)
-            tvSelectedTime.setText(getString(R.string.event_creation_time_not_selected));
-        else
-            tvSelectedTime.setText(FormatHelper.formatTime(selectedTime.getTime(), getActivity()));
-    }
-
-    /**
-     * Sets the values that have been set by the user through the wizard (address and tags)
-     */
-    private void setCurrentEventFields() {
-        SupportMapFragment mapFragment = (SupportMapFragment)
-                getChildFragmentManager().findFragmentById(R.id.mapFragment);
-        mapFragment.getMapAsync(this); // update the map
-
-        tvTags.setText(FormatHelper.listToString(currentEvent.getTags()));
-        tvRestaurantName.setText(currentEvent.getYelpRestaurant());
-    }
-
-    /**
-     * Resets the recent event fields if the user goes back and starts a new event and returns to
-     * this fragment. Reverts everything done by setRecentEventFields()
-     */
-    private void resetRecentEventFields() {
-        toggleImageViews(false);
-
-        etEventTitle.setText("");
-        tvMaxGuests.setText("");
-        cbOver21.setChecked(false);
-        tvSelectedDate.setText("");
-        tvSelectedTime.setText("");
-    }
-
-    /**
-     * Initialize all the fields that already have values in the recent event the user selected.
-     * Also sets the images to visible.
-     */
-    private void setRecentEventFields() {
-        toggleImageViews(true);
-
-        etEventTitle.setText(recentEvent.getTitle());
-        tvMaxGuests.setText(String.format(Locale.ENGLISH, "%d", recentEvent.getMaxGuests()));
-        cbOver21.setChecked(recentEvent.getOver21());
-        tvSelectedDate.setText(FormatHelper.formatDateWithMonthNames(recentEvent.getDate()));
-        tvSelectedTime.setText(FormatHelper.formatTime(recentEvent.getDate(), getActivity()));
-    }
-
-    /**
-     * Show all the ImageViews that are hidden by default if the user hasn't set a date, time, etc.
-     */
-    private void toggleImageViews(boolean isVisible) {
-        ivCalendar.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
-        ivClock.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
-        ivMaxGuests.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
-        cbOver21.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
     }
 
     /**
@@ -416,6 +339,57 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
                 .title(currentEvent.getTitle())
                 .snippet("snippet")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+    }
+
+    /**
+     * Calls the parent fragment to update the new recentEvent with the new fields
+     */
+    private void updateEventFields() {
+        String title = etEventTitle.getText().toString().trim();
+        Date date = selectedTime.getTime();
+        int maxGuests = Integer.parseInt(tvMaxGuests.getText().toString());
+        boolean over21 = cbOver21.isChecked();
+
+        mListener.updateFinalFields(title, date, maxGuests, over21);
+    }
+
+    /**
+     * Sets the values that have been set by the user through the wizard (address and tags)
+     */
+    private void setCurrentEventFields() {
+        SupportMapFragment mapFragment = (SupportMapFragment)
+                getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(this); // update the map
+
+        List<String> tags = currentEvent.getTags();
+        String title = "Lunch at " + currentEvent.getYelpRestaurant();
+        tvEventTitle.setText(title);
+        etEventTitle.setText(title);
+        tvMaxGuests.setText("1");
+        cbOver21.setChecked(false);
+        tvTags.setText(FormatHelper.listToString(tags));
+        tvRestaurantName.setText(currentEvent.getYelpRestaurant());
+    }
+
+    /**
+     * Initialize all the fields that already have values in the recent event the user selected.
+     * Also sets the images to visible.
+     */
+    private void setRecentEventFields() {
+        tvEventTitle.setText(recentEvent.getTitle());
+        etEventTitle.setText(recentEvent.getTitle());
+        tvMaxGuests.setText(String.format(Locale.ENGLISH, "%d", recentEvent.getMaxGuests()));
+        cbOver21.setChecked(recentEvent.getOver21());
+    }
+
+    /**
+     * Helper method to force the soft keyboard to show when the user clicks on the EditText to edit
+     * the title
+     */
+    private void showKeyboard() {
+        InputMethodManager imm = (InputMethodManager)
+                getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     public interface OnFragmentInteractionListener {

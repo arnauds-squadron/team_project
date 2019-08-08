@@ -48,7 +48,7 @@
     <string name="message_profile_image">my profile image</string>
     <string name="message_other_profile_image">profile image</string>
     <string name="messenger_message_hint">Type a message</string>
-    <string name="event_creation_title_hint">Event title</string>
+    <string name="event_creation_title_hint">Title</string>
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
     <string name="max_guests_label">Max Guests</string>
@@ -93,4 +93,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="chat">Chat</string>
+    <string name="confirm">Confirm</string>
+    <string name="title">Title</string>
 </resources>

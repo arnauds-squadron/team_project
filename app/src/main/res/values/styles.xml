@@ -96,9 +96,8 @@
         <item name="android:ems">10</item>
     </style>
 
-    <style name="checkBoxStyle" parent="Base.Theme.AppCompat">
-        <item name="colorAccent">@color/toast_red</item>
-        <item name="android:textColorSecondary">@color/toast_red</item>
+    <style name="input_field_review">
+        <item name="android:textSize">24sp</item>
     </style>
 
 </resources>
