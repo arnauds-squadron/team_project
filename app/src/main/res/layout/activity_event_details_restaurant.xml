@@ -41,11 +41,12 @@
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="14dp"
         android:text="# of Ratings"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/restaurantRating"
         app:layout_constraintStart_toEndOf="@+id/restaurantRating"
-        app:layout_constraintTop_toBottomOf="@+id/tvRestaurantName" />
+        app:layout_constraintTop_toTopOf="@+id/restaurantRating" />
 
     <RatingBar
         android:id="@+id/restaurantRating"
@@ -69,9 +70,9 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="4dp"
         android:text="detailview_phone"
-        android:textSize="18sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPrice" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutAddress" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayoutAddress"
@@ -79,14 +80,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:transitionName="clAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPhone">
+        app:layout_constraintTop_toBottomOf="@+id/restaurantRating">
 
         <TextView
             android:id="@+id/tvAddress"
@@ -96,7 +97,7 @@
             android:layout_marginLeft="2dp"
             android:autoLink="map"
             android:text="@string/detailview_address"
-            android:textSize="18sp"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
             app:layout_constraintTop_toTopOf="@+id/imageView3" />
@@ -117,11 +118,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="4dp"
         android:text="detailview_price"
-        android:textSize="18sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/restaurantRating" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPhone" />
 
     <Button
         android:id="@+id/btYelp"
