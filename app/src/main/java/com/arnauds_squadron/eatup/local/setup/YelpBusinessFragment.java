@@ -90,12 +90,14 @@ public class YelpBusinessFragment extends Fragment {
 //    @OnClick(R.id.btnNext)
     public void goToNextFragment() {
         String businessId = mBusiness.get(yelpBusinessAdapter.getPosition()).id;
+        String businessName = mBusiness.get(yelpBusinessAdapter.getPosition()).name;
         List<Category> categories = mBusiness.get(yelpBusinessAdapter.getPosition()).categories;
         List<String> tags = new ArrayList<>();
         for(int i = 0; i < categories.size(); i++){
             tags.add(categories.get(i).title);
         }
         tags.size();
+        mListener.updateBusinessName(businessName);
         mListener.updateCategories(tags);
         mListener.updateBusinessId(businessId);
     }
@@ -143,6 +145,8 @@ public class YelpBusinessFragment extends Fragment {
          * clicks on
          */
         void updateBusinessId(String id);
+
+        void updateBusinessName(String name);
 
         void updateCategories(List<String> categories);
 

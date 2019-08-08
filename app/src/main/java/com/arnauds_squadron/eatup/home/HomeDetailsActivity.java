@@ -178,8 +178,13 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     .into(ivHost);
         }
 
-        if (event.getCuisine() != null) {
-            tvCuisine.setText(event.getCuisine());
+        //we removed getCuisine and replaced it with get Tags
+//        if (event.getCuisine() != null) {
+//            tvCuisine.setText(event.getCuisine());
+//        }
+
+        if (event.getTags() != null) {
+            tvCuisine.setText(event.getTags().get(0));
         }
         //Todo get the username to appear
         if (event.getHost() != null) {
