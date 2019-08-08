@@ -1,11 +1,16 @@
 package com.arnauds_squadron.eatup.local.setup;
 
+import android.annotation.TargetApi;
+import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
@@ -48,6 +53,7 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         onAttachToParentFragment(getParentFragment());
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -85,8 +91,10 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
                 autocompleteFragment.a.setText(address); // EditText view
                 selectedPlace = Place.builder().setLatLng(latLng).setAddress(address).build();
             } else if (currentEvent == null) {
-                map.clear();
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 1));
+                if (map != null) {
+                    map.clear();
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 1));
+                }
                 autocompleteFragment.a.setText("");
                 selectedPlace = null;
             }
@@ -165,11 +173,13 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
      * Sets up the autocomplete fragment with the address hint, and sets the OnPlaceSelectedListener
      * that will update the selectedPlace object and the map fragment
      */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setupAutoCompleteFragment() {
         if (!Places.isInitialized()) {
             initializePlaces();
         }
 
+        setAutocompleteFragmentColors();
         autocompleteFragment.setHint("Address");
         autocompleteFragment.setPlaceFields(Arrays.asList(
                 Place.Field.ID,
@@ -190,6 +200,22 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
                         .show();
             }
         });
+    }
+
+    private void setAutocompleteFragmentColors() {
+        // Set search icon color to toast red
+        ((ImageButton) autocompleteFragment.getView()
+                .findViewById(R.id.places_autocomplete_search_button))
+                .setColorFilter(getResources().getColor(R.color.toast_red));
+
+//        ((ImageButton) autocompleteFragment.getView()
+//                .findViewById(R.id.places_autocomplete_back_button))
+//                .setColorFilter(getResources().getColor(R.color.toast_red));
+
+
+        ((ImageButton) autocompleteFragment.getView()
+                .findViewById(R.id.places_autocomplete_clear_button))
+                .setColorFilter(getResources().getColor(R.color.toast_red));
     }
 
     public interface OnFragmentInteractionListener {

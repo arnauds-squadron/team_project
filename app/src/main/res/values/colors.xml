@@ -14,6 +14,7 @@
     <color name="toast_red">#D81B34</color>
     <color name="toast_red_slight_diluted">#B3D81B34</color>
     <color name="toast_red_diluted">#80D81B34</color>
+    <color name="toast_red_dark">#ad172a</color>
     <color name="view_background">#FAFAFA</color>
     <color name="message_gray">#EAEAEA</color>
     <color name="accept_button_tint">#86db9a</color>

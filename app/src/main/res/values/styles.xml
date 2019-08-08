@@ -51,14 +51,22 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <style name="button_action">
-        <item name="android:background">@drawable/rounded_button</item>
+    <style name="rounded_button">
+        <item name="android:background">@xml/rounded_button</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="textview_message">
+    <style name="rounded_button_filled">
+        <item name="android:background">@xml/rounded_button_filled</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="text_view_message">
         <item name="android:background">@xml/rounded_text</item>
         <item name="android:breakStrategy" tools:targetApi="m">simple</item>
         <item name="android:gravity">center_vertical</item>

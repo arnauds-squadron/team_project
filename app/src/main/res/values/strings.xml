@@ -80,6 +80,7 @@
     <string name="set">Set</string>
     <string name="chat_button">Chat</string>
     <string name="cancel">Cancel</string>
+    <string name="search_nearby">Search nearby</string>
     <string name="no_recent_events">No recent events</string>
     <string name="no_chats">No chats</string>
     <!--latitude/longitude tags-->
