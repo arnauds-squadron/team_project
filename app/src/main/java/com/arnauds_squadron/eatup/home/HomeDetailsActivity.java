@@ -3,12 +3,11 @@ package com.arnauds_squadron.eatup.home;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -18,12 +17,13 @@ import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.profile.HostProfileActivity;
-import com.arnauds_squadron.eatup.yelp_api.YelpApiResponse;
+import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.ParseException;
-import com.parse.ParseImageView;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
@@ -35,37 +35,39 @@ import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 
+import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
+
 public class HomeDetailsActivity extends AppCompatActivity {
-
-    @BindView(R.id.rbYelp)
-    RatingBar rbYelp;
-
-    @BindView(R.id.ivProfile)
-    ParseImageView ivProfile;
 
     @BindView(R.id.ivImage)
     ImageView ivImage;
 
-    @BindView(R.id.cbLegal)
-    CheckBox cbLegal;
-
     @BindView(R.id.tvEventTitle)
     TextView tvTitle;
 
-    @BindView(R.id.tvAddress)
-    TextView tvPlace;
+    @BindView(R.id.ivHost)
+    ImageView ivHost;
 
-    @BindView(R.id.tvPerson)
+    @BindView(R.id.tvHost)
     TextView tvPerson;
 
-    @BindView(R.id.tvFood)
-    TextView tvFood;
-
-    @BindView(R.id.tvYelp)
+    @BindView(R.id.tvRestaurant)
     TextView tvYelp;
 
-    @BindView(R.id.ivLink)
-    ImageView ivLink;
+    @BindView(R.id.rbYelp)
+    RatingBar rbYelp;
+
+    @BindView(R.id.tvCuisine)
+    TextView tvCuisine;
+
+    @BindView(R.id.tvAddress)
+    TextView tvAddress;
+
+    @BindView(R.id.clLegal)
+    ConstraintLayout clLegal;
+
+//    @BindView(R.id.ivLink)
+//    ImageView ivLink;
 
     private Event event;
     private Context context;
@@ -98,21 +100,21 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     Business business = response.body();
                     if (business != null) {
                         Location location = business.location;
-                        //tvPlace.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
+                        //tvAddress.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
 
-                        tvPlace.setText(event.getAddressString());
+                        tvAddress.setText(event.getAddressString());
                         tvYelp.setText(business.name);
                         final String url = business.url;
 
-                        ivLink.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent i = new Intent(Intent.ACTION_VIEW);
-                                i.setData(Uri.parse(url));
-                                startActivity(i);
-                                finish();
-                            }
-                        });
+//                        ivLink.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                Intent i = new Intent(Intent.ACTION_VIEW);
+//                                i.setData(Uri.parse(url));
+//                                startActivity(i);
+//                                finish();
+//                            }
+//                        });
                         Glide.with(HomeDetailsActivity.this)
                                 .load(business.imageUrl)
                                 .into(ivImage);
@@ -132,32 +134,41 @@ public class HomeDetailsActivity extends AppCompatActivity {
 
         //load the profile image
         ParseUser parseUser = event.getHost();
-        File parseFile = null;
-        if (parseUser.equals(ParseUser.getCurrentUser()) && ParseUser.getCurrentUser().getParseFile("profilePicture") != null) {
-            try {
-                parseFile = ParseUser.getCurrentUser().getParseFile("profilePicture").getFile();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+        ParseFile profileImage = null;
+
+        // load user profileImage
+        if(parseUser.equals(ParseUser.getCurrentUser())) {
+            profileImage = ParseUser.getCurrentUser().getParseFile(KEY_PROFILE_PICTURE);
         } else {
             try {
-                if (parseUser.fetchIfNeeded().getParseFile("profilePicture") != null){
-                    try {
-                        parseFile = parseUser.getParseFile("profilePicture").getFile();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                }
+                profileImage = parseUser.fetchIfNeeded().getParseFile(KEY_PROFILE_PICTURE);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
-        ivProfile.loadInBackground();
-        Glide.with(context)
-                .load(parseFile)
-                .transform(new CircleCrop())
-                .into(ivProfile);
 
+        if (profileImage != null) {
+            Glide.with(this)
+                    .load(profileImage.getUrl())
+                    .transform(new CircleCrop())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(ivHost);
+        } else {
+            Glide.with(this)
+                    .load(FormatHelper.getProfilePlaceholder(this))
+                    .transform(new CircleCrop())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(ivHost);
+        }
+
+        //we removed getCuisine and replaced it with get Tags
+//        if (event.getCuisine() != null) {
+//            tvCuisine.setText(event.getCuisine());
+//        }
+
+        if (event.getTags() != null) {
+            tvCuisine.setText(event.getTags().get(0));
+        }
         //Todo get the username to appear
         if (event.getHost() != null) {
             try {
@@ -177,10 +188,10 @@ public class HomeDetailsActivity extends AppCompatActivity {
         }
         if (event.getOver21() != null) {
             if (event.getOver21()) {
-                cbLegal.setChecked(true);
+                clLegal.setVisibility(View.VISIBLE);
             }
         } else {
-            cbLegal.setChecked(false);
+            clLegal.setVisibility(View.INVISIBLE);
         }
     }
 }
