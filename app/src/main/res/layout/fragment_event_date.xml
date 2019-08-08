@@ -41,9 +41,9 @@
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="@+id/mapFragment"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/mapFragment"
-                app:layout_constraintTop_toBottomOf="@id/mapFragment" />
+                app:layout_constraintTop_toBottomOf="@+id/tvRestaurantName" />
 
             <View
                 android:id="@+id/separator"
@@ -56,8 +56,9 @@
                 android:layout_marginRight="24dp"
                 android:background="@color/bottom_gray_diluted"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvTags" />
+                app:layout_constraintTop_toBottomOf="@+id/tvTags" />
 
             <TextView
                 android:id="@+id/tvSelectedDate"
@@ -184,11 +185,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:text="@string/event_creation_create_event_text"
+                android:text="Confirm"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tilEventTitle"
                 tools:ignore="UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/tvRestaurantName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mapFragment" />
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

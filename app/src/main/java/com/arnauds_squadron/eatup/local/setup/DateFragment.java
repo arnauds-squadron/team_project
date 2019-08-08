@@ -82,6 +82,9 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.etEventTitle)
     EditText etEventTitle;
 
+    @BindView(R.id.tvRestaurantName)
+    TextView tvRestaurantName;
+
     private OnFragmentInteractionListener mListener;
 
     private Event currentEvent;
@@ -171,27 +174,24 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the
         // ApiResponse if we have a response, then get the specific information defined in the
         // Business Class
-        Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
-                currentEvent.getAddress().getLatitude(), currentEvent.getAddress().getLongitude(),
-                currentEvent.getTags().get(0), 50);
 
-        meetUp.enqueue(new Callback<YelpApiResponse>() {
+        Call<Business> meetUp = YelpData.retrofit(getContext()).getDetails(currentEvent.getYelpId());
+        meetUp.enqueue(new Callback<Business>() {
             @SuppressLint("SetTextI18n")
             @Override
-            public void onResponse(@NonNull Call<YelpApiResponse> call,
-                                   @NonNull retrofit2.Response<YelpApiResponse> response) {
+            public void onResponse(@NonNull Call<Business> call,
+                                   @NonNull retrofit2.Response<Business> response) {
                 if (response.isSuccessful()) {
-                    YelpApiResponse yelpApiResponse = response.body();
-                    if (yelpApiResponse != null && yelpApiResponse.businessList.size() > 0) {
-                        Business restaurant = yelpApiResponse.businessList.get(0);
-                        currentEvent.setYelpImage(restaurant.imageUrl);
+                    Business yelpApiResponse = response.body();
+                    if (yelpApiResponse != null) {
+                        currentEvent.setYelpImage(yelpApiResponse.imageUrl);
                     }
                 }
                 updateEventFields();
             }
 
             @Override
-            public void onFailure(@NonNull Call<YelpApiResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Business> call, @NonNull Throwable t) {
                 t.printStackTrace();
             }
         });
@@ -356,6 +356,7 @@ public class DateFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this); // update the map
 
         tvTags.setText(FormatHelper.listToString(currentEvent.getTags()));
+        tvRestaurantName.setText(currentEvent.getYelpRestaurant());
     }
 
     /**
