@@ -94,4 +94,10 @@
         <item name="android:textCursorDrawable">@drawable/colored_cursor</item>
         <item name="android:ems">10</item>
     </style>
+
+    <style name="checkBoxStyle" parent="Base.Theme.AppCompat">
+        <item name="colorAccent">@color/toast_red</item>
+        <item name="android:textColorSecondary">@color/toast_red</item>
+    </style>
+
 </resources>

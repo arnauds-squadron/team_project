@@ -59,6 +59,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvTags" />
 
+            <ImageView
+                android:id="@+id/ivCalendar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/calendar_icon_text"
+                android:tint="@color/toast_red"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separator"
+                app:srcCompat="@drawable/ic_calendar" />
+
             <TextView
                 android:id="@+id/tvSelectedDate"
                 android:layout_width="0dp"
@@ -67,12 +81,23 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginEnd="32dp"
                 android:layout_marginRight="32dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textStyle="bold"
+                android:textSize="30sp"
                 app:layout_constraintBottom_toBottomOf="@+id/ivCalendar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ivCalendar"
                 app:layout_constraintTop_toTopOf="@+id/ivCalendar" />
+
+            <ImageView
+                android:id="@+id/ivClock"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/clock_icon_text"
+                android:tint="@color/toast_red"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="@id/ivCalendar"
+                app:layout_constraintTop_toBottomOf="@+id/ivCalendar"
+                app:srcCompat="@drawable/ic_clock" />
 
             <TextView
                 android:id="@+id/tvSelectedTime"
@@ -82,79 +107,57 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginEnd="32dp"
                 android:layout_marginRight="32dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textStyle="bold"
+                android:textSize="30sp"
                 app:layout_constraintBottom_toBottomOf="@+id/ivClock"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ivClock"
                 app:layout_constraintTop_toTopOf="@+id/ivClock" />
 
             <ImageView
-                android:id="@+id/ivCalendar"
+                android:id="@+id/ivMaxGuests"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginLeft="32dp"
                 android:layout_marginTop="16dp"
-                android:contentDescription="@string/calendar_icon_text"
+                android:contentDescription="@string/message_profile_image"
+                android:scaleType="fitCenter"
                 android:visibility="invisible"
-                android:tint="@color/toast_red"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/separator"
-                app:srcCompat="@drawable/ic_calendar" />
-
-            <ImageView
-                android:id="@+id/ivClock"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginLeft="32dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="@string/clock_icon_text"
-                android:tint="@color/toast_red"
-                android:visibility="invisible"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ivCalendar"
-                app:srcCompat="@drawable/ic_clock" />
+                app:layout_constraintStart_toStartOf="@id/ivClock"
+                app:layout_constraintTop_toBottomOf="@+id/ivClock"
+                app:srcCompat="@drawable/ic_max_guests" />
 
             <TextView
                 android:id="@+id/tvMaxGuests"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_marginStart="32dp"
+                android:layout_marginLeft="32dp"
+                android:textSize="30sp"
                 app:layout_constraintBottom_toBottomOf="@+id/ivMaxGuests"
-                app:layout_constraintEnd_toStartOf="@+id/ivMaxGuests"
+                app:layout_constraintStart_toEndOf="@+id/ivMaxGuests"
                 app:layout_constraintTop_toTopOf="@+id/ivMaxGuests" />
-
-            <ImageView
-                android:id="@+id/ivMaxGuests"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="@string/message_profile_image"
-                android:scaleType="fitCenter"
-                android:visibility="invisible"
-                app:layout_constraintEnd_toStartOf="@+id/cbOver21"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/ivClock"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ivClock"
-                app:srcCompat="@drawable/ic_profile" />
 
             <CheckBox
                 android:id="@+id/cbOver21"
+                style="@style/checkBoxStyle"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/over_21_label"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:visibility="invisible"
+                android:layout_height="30dp"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@+id/ivMaxGuests"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/ivMaxGuests"
                 app:layout_constraintTop_toTopOf="@+id/ivMaxGuests" />
+
+            <TextView
+                android:id="@+id/tvOver21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
+                android:text="@string/over_21_label"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="@+id/cbOver21"
+                app:layout_constraintStart_toEndOf="@+id/cbOver21"
+                app:layout_constraintTop_toTopOf="@+id/cbOver21" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/tilEventTitle"
