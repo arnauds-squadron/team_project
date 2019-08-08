@@ -223,7 +223,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
         }
 
         // check if the current user is the host of the event
-        if(event.getHost().equals(ParseUser.getCurrentUser())) {
+        if(event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
             btnCancel.setText("Cancel event");
         } else {
             btnCancel.setText("Remove RSVP");
@@ -233,11 +233,15 @@ public class HomeDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // delete entire event if user is host
-                if(event.getHost().equals(ParseUser.getCurrentUser())) {
+                if(event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
                     event.deleteInBackground(new DeleteCallback() {
                         @Override
                         public void done(ParseException e) {
-                            Toast.makeText(getApplicationContext(), "Event deleted.", Toast.LENGTH_SHORT).show();;
+                            if(e == null) {
+                                Toast.makeText(getApplicationContext(), "Event deleted.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Error deleting event.", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                 }
@@ -249,7 +253,12 @@ public class HomeDetailsActivity extends AppCompatActivity {
                     event.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            Toast.makeText(getApplicationContext(), "RSVP removed from event.", Toast.LENGTH_SHORT).show();
+                            if(e == null) {
+                                Toast.makeText(getApplicationContext(), "RSVP removed from event.", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(), "Error removing RSVP from event.", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                 }
