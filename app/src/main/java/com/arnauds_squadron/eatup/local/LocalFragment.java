@@ -20,7 +20,10 @@ import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import org.json.JSONArray;
 
 import java.util.Date;
 import java.util.List;
@@ -106,12 +109,16 @@ public class LocalFragment extends Fragment implements
     }
 
     @Override
-    public void updateFinalFields(String title, Date date, int maxGuests, boolean over21) {
+    public void updateFinalFields(String title, Date date, int maxGuests, boolean over21, ParseUser host) {
         currentEvent.setTitle(title);
         currentEvent.setDate(date);
         currentEvent.setMaxGuests(maxGuests);
         currentEvent.setOver21(over21);
         currentEvent.setIsFilled(false);
+        currentEvent.addToNoRatingSubmitted(host);
+        currentEvent.setPendingRequests(new JSONArray());
+        currentEvent.setAllRequests(new JSONArray());
+        currentEvent.setAcceptedGuests(new JSONArray());
         saveEvent();
     }
 
