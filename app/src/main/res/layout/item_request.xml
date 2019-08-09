@@ -9,7 +9,6 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:contentDescription="@string/message_other_profile_image"
-        android:src="@android:color/black"
         app:layout_constraintBottom_toBottomOf="@+id/tvRequestText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvRequestText" />
@@ -28,7 +27,6 @@
         app:layout_constraintEnd_toStartOf="@+id/btnAccept"
         app:layout_constraintStart_toEndOf="@+id/ivImage"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <Button
         android:id="@+id/btnAccept"

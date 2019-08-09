@@ -25,6 +25,7 @@ import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.profile.HostProfileActivity;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
 import com.arnauds_squadron.eatup.yelp_api.YelpData;
 import com.bumptech.glide.Glide;
@@ -101,7 +102,6 @@ public class HomeDetailsActivity extends AppCompatActivity {
 
 
     private Event event;
-    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +114,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
         // Using retrofit to call the YelpApiRepsonse on  the events Cuisine and geopoint location
         // then checking for a response if we have a response, then get the specific information
         // defined in the Business Class
-        context = getApplicationContext();
+        Context context = getApplicationContext();
         //call the HomeDetailsActivity.apiAuth to get the Authorization and return a service for the ApiResponse
         // if we have a response, then get the specific information defined in the Business Class
         Call<Business> meetUp;
@@ -172,8 +172,8 @@ public class HomeDetailsActivity extends AppCompatActivity {
         ParseFile profileImage = null;
 
         // load user profileImage
-        if (parseUser.equals(ParseUser.getCurrentUser())) {
-            profileImage = ParseUser.getCurrentUser().getParseFile(KEY_PROFILE_PICTURE);
+        if (parseUser.equals(Constants.CURRENT_USER)) {
+            profileImage = Constants.CURRENT_USER.getParseFile(KEY_PROFILE_PICTURE);
         } else {
             try {
                 profileImage = parseUser.fetchIfNeeded().getParseFile(KEY_PROFILE_PICTURE);
