@@ -1,9 +1,13 @@
 package com.arnauds_squadron.eatup.home;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
+import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -12,9 +16,12 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.textclassifier.TextClassifier;
+import android.view.textclassifier.TextLinks;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -77,6 +84,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return new ViewHolder(postView);
     }
 
+    @TargetApi(Build.VERSION_CODES.P)
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         Event event = mAgenda.get(i);
@@ -90,14 +98,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             viewHolder.btnChat.setVisibility(View.GONE);
             // check if current user is the host
             if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                if(event.getAcceptedGuestsList() != null) {
-                    if(event.getAcceptedGuestsList().size() != 0) {
+                if (event.getAcceptedGuestsList() != null) {
+                    if (event.getAcceptedGuestsList().size() != 0) {
                         viewHolder.btnRate.setText("Rate guests");
                         viewHolder.btnRate.setTag(GUEST);
                     }
                 }
-            }
-            else {
+            } else {
                 viewHolder.btnRate.setText("Rate host");
                 viewHolder.btnRate.setTag(HOST);
             }
@@ -109,10 +116,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         viewHolder.tvDay.setText(formatDateDay(event.getDate()));
         viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
         viewHolder.tvTime.setText(formatTime(event.getDate(), context));
-
         viewHolder.tvEventTitle.setText(event.getTitle());
         viewHolder.tvRestaurant.setText(event.getYelpRestaurant());
         viewHolder.tvAddress.setText(event.getAddressString());
+        viewHolder.tvAddress.setPaintFlags(viewHolder.tvAddress.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         // Display requests if the current user is the host of this event
         if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
@@ -165,7 +172,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             requests.clear();
             requests.addAll(pending);
 
-            if(requests.size() != 0) {
+            if (requests.size() != 0) {
                 viewHolder.divider.setVisibility(View.VISIBLE);
             } else {
                 viewHolder.divider.setVisibility(View.INVISIBLE);
@@ -261,6 +268,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 public void onClick(View v) {
                     Event event = mAgenda.get(getAdapterPosition());
                     homeFragment.openChat(event.getChat());
+                }
+            });
+
+            tvAddress.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                            Uri.parse("http://maps.google.com/maps?daddr=" +
+                                    tvAddress.getText().toString()));
+                    context.startActivity(intent);
                 }
             });
 

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:targetApi="lollipop"
-    android:background="@null">
+    android:background="@null"
+    tools:targetApi="lollipop">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
@@ -149,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
                     android:layout_marginLeft="2dp"
-                    android:autoLink="all"
+                    android:textColor="@color/toast_red"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ivLocation"
                     app:layout_constraintTop_toTopOf="@+id/ivLocation" />
@@ -159,10 +159,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:contentDescription="@string/location"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/location_search_icon"
-                    android:contentDescription="@string/location" />
+                    app:srcCompat="@drawable/location_search_icon" />
             </android.support.constraint.ConstraintLayout>
 
             <Button
@@ -184,11 +184,11 @@
                 android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
                 android:layout_marginRight="12dp"
+                android:contentDescription="@string/chat"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/clAddress"
-                app:srcCompat="@drawable/ic_chat_red"
-                android:contentDescription="@string/chat" />
+                app:srcCompat="@drawable/ic_chat_red" />
 
             <View
                 android:id="@+id/divider"
