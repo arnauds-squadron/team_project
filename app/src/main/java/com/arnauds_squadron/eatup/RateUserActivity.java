@@ -112,6 +112,7 @@ public class RateUserActivity extends AppCompatActivity {
 
                 btSubmit.setText("    Rating submitted    ");
                 btSubmit.setOnClickListener(null);
+
                 finish();
             }
         });
@@ -148,6 +149,10 @@ public class RateUserActivity extends AppCompatActivity {
                             rating.put(AVG_RATING_HOST, calculateRating(averageRating, numRatings, newRating));
                             rating.increment(NUM_RATINGS_HOST);
                         } else {
+                            if (rating.getAvgRatingGuest() == null) {
+                                rating.setAvgRatingGuest(3);
+                                rating.setNumRatingsGuest(0);
+                            }
                             float averageRating = rating.getAvgRatingGuest().floatValue();
                             int numRatings = rating.getNumRatingsGuest().intValue();
 
