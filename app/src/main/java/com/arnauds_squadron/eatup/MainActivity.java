@@ -150,7 +150,10 @@ public class MainActivity extends AppCompatActivity implements
     public void onEventCreated() {
         navigateToFragment(Constants.HOME_FRAGMENT_INDEX);
 
+        HomeFragment homeFragment = (HomeFragment) getTypedFragment(HomeFragment.class);
         ChatFragment chatFragment = (ChatFragment) getTypedFragment(ChatFragment.class);
+
+        homeFragment.refreshEventsAsync(0);
 
         if (chatFragment != null)
             chatFragment.updateDashboardChats();

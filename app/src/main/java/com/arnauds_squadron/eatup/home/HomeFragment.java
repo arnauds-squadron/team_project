@@ -1,18 +1,13 @@
 package com.arnauds_squadron.eatup.home;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +18,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
@@ -36,10 +30,7 @@ import com.parse.ParseUser;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -101,11 +92,9 @@ public class HomeFragment extends Fragment implements
         layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
-//        RecyclerView.ItemDecoration itemDecoration = new
-//                DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-//        rvAgenda.addItemDecoration(itemDecoration);
 
-        ArrayAdapter adapter = ArrayAdapter.createFromResource(getContext(), R.array.host, R.layout.spinner_item1);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(getContext(), R.array.host,
+                R.layout.spinner_item1);
         spinner.setAdapter(adapter);
         String value = spinner.getSelectedItem().toString();
         setSpinnerToValue(spinner, value);
@@ -161,16 +150,14 @@ public class HomeFragment extends Fragment implements
         final String userId = ParseUser.getCurrentUser().getObjectId();
         final Event.Query query = new Event.Query();
 
-        Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
-        Date currentDate = localCalendar.getTime();
-
         if (filterType == 1) {
             query.withHost().ownEvent(ParseUser.getCurrentUser());
         } else if (filterType == 2) {
             query.withHost().notOwnEvent(ParseUser.getCurrentUser());
         }
 
-        // TODO add filter for events that don't have any guests and are already past, so we don't show them for rating
+        // TODO add filter for events that don't have any guests and are already past, so we don't
+        //  show them for rating
         query.orderByDescending("date");
         query.findInBackground(new FindCallback<Event>() {
             @Override
