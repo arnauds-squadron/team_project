@@ -37,7 +37,7 @@ public class Event extends ParseObject {
     private static final String KEY_ALL_REQUESTS = "allRequests";
     private static final String KEY_PENDING_GUESTS = "pendingGuests";
     private static final String KEY_ACCEPTED_GUESTS = "acceptedGuests";
-    private static final Double MAX_DISTANCE = 10.0;
+    private static final Double MAX_DISTANCE = 2.0;
     private static final String YELP_ID = "yelpRestaurantId";
     private static final String KEY_CREATED_AT = "createdAt";
     private static final String KEY_IS_FILLED = "isFilled";
