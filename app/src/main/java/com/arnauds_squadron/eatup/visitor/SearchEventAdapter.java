@@ -87,7 +87,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             double distanceInMiles = eventAddress.distanceInMilesTo(userLocation);
 
             tvDistance.setText(String.format(Locale.getDefault(), "%.2f mi", distanceInMiles));
-            tvDistance.setTag(distanceInMiles);
             tvEventName.setText(event.getTitle());
             tvDate.setText(event.getDateString(context));
 
@@ -117,9 +116,13 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                 Log.d("eventAdapter", "View event details");
                 Event event = events.get(position);
 
+                ParseGeoPoint eventAddress = event.getAddress();
+                double distanceInMiles = eventAddress.distanceInMilesTo(userLocation);
+                String distanceString = String.format(Locale.getDefault(), "%.2f mi", distanceInMiles);
+
                 Intent intent = new Intent(context, EventDetailsActivity.class);
                 intent.putExtra("event_id", event.getObjectId());
-                intent.putExtra("distance", (Double) v.getRootView().findViewById(R.id.tvDistance).getTag());
+                intent.putExtra("distance", distanceString);
                 context.startActivity(intent);
             }
         }

@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.parse.ParseGeoPoint;
 
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,7 +76,6 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
         }
 
         public void bind(Event event) {
-
             ParseGeoPoint eventAddress = event.getAddress();
             double distanceInMiles = eventAddress.distanceInMilesTo(currentUserLocation);
             // populate views according to data
@@ -98,9 +98,14 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
             // ensure position valid (exists in view)
             if (position != RecyclerView.NO_POSITION) {
                 Event event = events.get(position);
+
+                ParseGeoPoint eventAddress = event.getAddress();
+                double distanceInMiles = eventAddress.distanceInMilesTo(currentUserLocation);
+                String distanceString = String.format(Locale.getDefault(), "%.2f mi", distanceInMiles);
+
                 Intent intent = new Intent(context, EventDetailsActivity.class);
                 intent.putExtra("event_id", event.getObjectId());
-                intent.putExtra("distance", (Double) v.getRootView().findViewById(R.id.tvEventTitle).getTag());
+                intent.putExtra("distance", distanceString);
                 context.startActivity(intent);
             }
         }
