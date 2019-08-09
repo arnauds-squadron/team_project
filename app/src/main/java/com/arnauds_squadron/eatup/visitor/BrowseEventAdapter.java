@@ -24,7 +24,6 @@ import butterknife.ButterKnife;
 public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.ViewHolder> {
 
     private List<Event> events;
-    private final String KEY_PROFILE_IMAGE = "profileImage";
     // context defined as global variable so Glide in onBindViewHolder has access
     private Context context;
     private ParseGeoPoint currentUserLocation;
@@ -98,9 +97,7 @@ public class BrowseEventAdapter extends RecyclerView.Adapter<BrowseEventAdapter.
             int position = getAdapterPosition();
             // ensure position valid (exists in view)
             if (position != RecyclerView.NO_POSITION) {
-                Log.d("BrowseEventAdapter", "View Event Details");
                 Event event = events.get(position);
-
                 Intent intent = new Intent(context, EventDetailsActivity.class);
                 intent.putExtra("event_id", event.getObjectId());
                 intent.putExtra("distance", (Double) v.getRootView().findViewById(R.id.tvEventTitle).getTag());

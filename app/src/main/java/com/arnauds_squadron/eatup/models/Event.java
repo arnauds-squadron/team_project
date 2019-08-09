@@ -140,6 +140,8 @@ public class Event extends ParseObject {
         return getList(KEY_ACCEPTED_GUESTS);
     }
 
+    public void setAcceptedGuestsList(List<ParseUser> guestList) { put(KEY_ACCEPTED_GUESTS, guestList); }
+
     public JSONArray getNoRatingSubmitted() {
         return getJSONArray(KEY_NO_RATING);
     }

@@ -85,31 +85,33 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         viewHolder.divider.setVisibility(View.INVISIBLE);
 
-        if (event.getDate() != null) {
-            Date date = new Date();
-            // event has not passed
-            if (date.after(event.getDate())) {
-                // check if current user is the host
-                if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                    if(event.getAcceptedGuestsList() != null) {
-                        if(event.getAcceptedGuestsList().size() != 0) {
-                            viewHolder.btnCancel.setText("Rate guests");
-                            viewHolder.btnCancel.setTag(GUEST);
-                        }
+        Date date = new Date();
+        // event has passed
+        if (date.after(event.getDate())) {
+            viewHolder.btnRate.setVisibility(View.VISIBLE);
+            viewHolder.btnChat.setVisibility(View.GONE);
+            // check if current user is the host
+            if (event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                if(event.getAcceptedGuestsList() != null) {
+                    if(event.getAcceptedGuestsList().size() != 0) {
+                        viewHolder.btnRate.setText("Rate guests");
+                        viewHolder.btnRate.setTag(GUEST);
                     }
-                    else {
-                        viewHolder.btnCancel.setVisibility(View.INVISIBLE);
-                    }
-                }
-                else {
-                    viewHolder.btnCancel.setText("Rate host");
-                    viewHolder.btnCancel.setTag(HOST);
                 }
             }
-            viewHolder.tvDay.setText(formatDateDay(event.getDate()));
-            viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
-            viewHolder.tvTime.setText(formatTime(event.getDate(), context));
+            else {
+                viewHolder.btnRate.setText("Rate host");
+                viewHolder.btnRate.setTag(HOST);
+            }
+        } else {
+            viewHolder.btnRate.setVisibility(View.GONE);
+            viewHolder.btnChat.setVisibility(View.VISIBLE);
         }
+
+        viewHolder.tvDay.setText(formatDateDay(event.getDate()));
+        viewHolder.tvMonth.setText(formatDateMonth(event.getDate()));
+        viewHolder.tvTime.setText(formatTime(event.getDate(), context));
+
         viewHolder.tvEventTitle.setText(event.getTitle());
         viewHolder.tvRestaurant.setText(event.getYelpRestaurant());
         viewHolder.tvAddress.setText(event.getAddressString());
@@ -222,10 +224,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         TextView tvAddress;
 
         @BindView(R.id.btnChat)
-        Button btnChat;
+        ImageView btnChat;
 
-        @BindView(R.id.btnCancel)
-        Button btnCancel;
+        @BindView(R.id.btnRate)
+        Button btnRate;
 
         @BindView(R.id.rvRequests)
         RecyclerView rvRequests;
@@ -237,36 +239,15 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            btnCancel.setOnClickListener(new View.OnClickListener() {
+            btnRate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final int eventPosition = getAdapterPosition();
                     final Event event = mAgenda.get(eventPosition);
-
-                    // if past event date, rate the attending users. otherwise cancel the event
-                    Calendar localCalendar = Calendar.getInstance(TimeZone.getDefault());
-                    if (event.getDate() != null) {
-                        if (event.getDate().after(localCalendar.getTime())) {
-                            Intent i = new Intent(context, RateUserActivity.class);
-                            i.putExtra("event", event);
-                            i.putExtra("ratingType", (String) btnCancel.getTag());
-                            context.startActivity(i);
-                        }
-                        // TODO add some sort of check to remove the user from the event in the Parse database
-                        mAgenda.remove(eventPosition);
-                        notifyItemRemoved(eventPosition);
-                        notifyItemRangeChanged(eventPosition, mAgenda.size());
-                        Snackbar snackbar = Snackbar.make(itemView, "Event deleted.", Snackbar.LENGTH_LONG)
-                                .setAction("UNDO", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        mAgenda.add(eventPosition, event);
-                                        notifyDataSetChanged();
-                                    }
-                                });
-                        snackbar.setActionTextColor(Color.YELLOW);
-                        snackbar.show();
-                    }
+                        Intent i = new Intent(context, RateUserActivity.class);
+                        i.putExtra("event", event);
+                        i.putExtra("ratingType", (String) btnRate.getTag());
+                        context.startActivity(i);
                 }
             });
 
