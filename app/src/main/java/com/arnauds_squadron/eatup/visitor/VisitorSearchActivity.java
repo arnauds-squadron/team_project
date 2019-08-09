@@ -53,7 +53,6 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
@@ -215,7 +214,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         setLocationSuggestions(svLocation);
 
         // handle search intent
-        handleIntent(getIntent());
+        handleSearchActivityIntent(getIntent());
 
         // load data entries
         // retain instance so can call "resetStates" for fresh searches
@@ -248,204 +247,43 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     }
 
 
-    /* Current user location: functions to manage user permissions
-    Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
-     */
-
-    private ArrayList<String> permissionsToRequest(ArrayList<String> wantedPermissions) {
-        ArrayList<String> result = new ArrayList<>();
-
-        for (String perm : wantedPermissions) {
-            if (!hasPermission(perm)) {
-                result.add(perm);
-            }
-        }
-        return result;
-    }
-
-    private boolean hasPermission(String permission) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
-        }
-
-        return true;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (googleApiClient != null) {
-            googleApiClient.connect();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (!checkPlayServices()) {
-            Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // stop location updates
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-            googleApiClient.disconnect();
-        }
-    }
-
-    private boolean checkPlayServices() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
-            } else {
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        // Permissions ok, we get last location
-        currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-        // if user didn't specify a location, display event distance using current location
-        if (useCurrentLocation) {
-            if (currentLocation != null) {
-                currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
-                eventAdapter.updateCurrentLocation(currentGeoPoint);
-            }
-        }
-        startLocationUpdates();
-    }
-
-    private void startLocationUpdates() {
-        locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(FASTEST_INTERVAL);
-
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Permissions necessary for EatUp to use your location", Toast.LENGTH_SHORT).show();
-        }
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if (location != null) {
-            Log.d("VisitorSearch locChange", "Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude());
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case ALL_PERMISSIONS_RESULT:
-                for (String perm : permissionsToRequest) {
-                    if (!hasPermission(perm)) {
-                        permissionsRejected.add(perm);
-                    }
-                }
-
-                if (permissionsRejected.size() > 0) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (shouldShowRequestPermissionRationale(permissionsRejected.get(0))) {
-                            new AlertDialog.Builder(VisitorSearchActivity.this).
-                                    setMessage("Permission must be granted for EatUp to use your location.").
-                                    setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                requestPermissions(permissionsRejected.
-                                                        toArray(new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
-                                            }
-                                        }
-                                    }).setNegativeButton("Cancel", null).create().show();
-
-                            return;
-                        }
-                    }
-                } else {
-                    if (googleApiClient != null) {
-                        googleApiClient.connect();
-                    }
-                }
-
-                break;
-        }
-    }
-
-    // Get the intent, verify the action and get the query
+    // Search intent methods. Get the intent, verify the search action type and get the query
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        handleIntent(intent);
+        handleSearchActivityIntent(intent);
     }
 
-    private void handleIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
-            int newSearchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
-            Log.d("VisitorSearchActivity", "spinner position: " + newSearchCategory);
-            loadTopEvents(new Date(0));
-        }
-        // otherwise called by a click on something in VisitorFragment
-        else {
-            searchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
-            // either cuisine or location search
-            if(searchCategory == CUISINE_SEARCH) {
-                // set default location to current location from visitor fragment
-                Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
-                Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
-                queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
-                svLocation.setQuery("Current location", false);
-                svCuisine.onActionViewExpanded();
-            } else {
-                svCuisine.setQuery("All events", false);
-                svLocation.onActionViewExpanded();
-            }
+    // Handles the click on visitor fragment
+    private void handleSearchActivityIntent(Intent intent) {
+        searchCategory = intent.getIntExtra(SEARCH_CATEGORY, 0);
+        // either cuisine or location search
+        if(searchCategory == CUISINE_SEARCH) {
+            // set default location to current location from visitor fragment
+            Double latitude = intent.getDoubleExtra("latitude", DEFAULT_COORD);
+            Double longitude = intent.getDoubleExtra("longitude", DEFAULT_COORD);
+            queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
+            svLocation.setQuery(CURRENT_LOCATION_STRING, false);
+            svCuisine.onActionViewExpanded();
+        } else {
+            svCuisine.setQuery(ALL_EVENTS_STRING, false);
+            svLocation.onActionViewExpanded();
         }
     }
 
 
-    // Methods to query parse server
+    // Search by location only (all events)
     private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
         final Event.Query eventsQuery = new Event.Query();
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(ParseUser.getCurrentUser()).notFilled().getPrevious(mEvents.size());
+            eventsQuery.getAvailable(currentDate)
+                    .getClosest(geoPoint)
+                    .getTopAscending()
+                    .withHost()
+                    .notOwnEvent(ParseUser.getCurrentUser())
+                    .notFilled()
+                    .getPrevious(mEvents.size());
         } else {
             eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(ParseUser.getCurrentUser()).notFilled().getPrevious(mEvents.size());
         }
@@ -804,5 +642,162 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                 return true;
             }
         });
+    }
+
+
+    /* Current user location: functions to manage user permissions
+    Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
+     */
+
+    private ArrayList<String> permissionsToRequest(ArrayList<String> wantedPermissions) {
+        ArrayList<String> result = new ArrayList<>();
+
+        for (String perm : wantedPermissions) {
+            if (!hasPermission(perm)) {
+                result.add(perm);
+            }
+        }
+        return result;
+    }
+
+    private boolean hasPermission(String permission) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!checkPlayServices()) {
+            Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // stop location updates
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+            googleApiClient.disconnect();
+        }
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+            } else {
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // Permissions ok, we get last location
+        currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        // if user didn't specify a location, display event distance using current location
+        if (useCurrentLocation) {
+            if (currentLocation != null) {
+                currentGeoPoint = new ParseGeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
+                eventAdapter.updateCurrentLocation(currentGeoPoint);
+            }
+        }
+        startLocationUpdates();
+    }
+
+    private void startLocationUpdates() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Permissions necessary for EatUp to use your location", Toast.LENGTH_SHORT).show();
+        }
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            Log.d("VisitorSearch locChange", "Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case ALL_PERMISSIONS_RESULT:
+                for (String perm : permissionsToRequest) {
+                    if (!hasPermission(perm)) {
+                        permissionsRejected.add(perm);
+                    }
+                }
+                if (permissionsRejected.size() > 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (shouldShowRequestPermissionRationale(permissionsRejected.get(0))) {
+                            new AlertDialog.Builder(VisitorSearchActivity.this).
+                                    setMessage("Permission must be granted for EatUp to use your location.").
+                                    setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                requestPermissions(permissionsRejected.
+                                                        toArray(new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
+                                            }
+                                        }
+                                    }).setNegativeButton("Cancel", null).create().show();
+
+                            return;
+                        }
+                    }
+                } else {
+                    if (googleApiClient != null) {
+                        googleApiClient.connect();
+                    }
+                }
+                break;
+        }
     }
 }
