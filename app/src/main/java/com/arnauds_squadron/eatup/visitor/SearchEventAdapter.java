@@ -87,7 +87,6 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
             double distanceInMiles = eventAddress.distanceInMilesTo(userLocation);
 
             tvDistance.setText(String.format(Locale.getDefault(), "%.2f mi", distanceInMiles));
-            tvDistance.setTag(distanceInMiles);
             tvEventName.setText(event.getTitle());
             tvDate.setText(event.getDateString(context));
 
