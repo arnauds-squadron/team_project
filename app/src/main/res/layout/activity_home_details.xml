@@ -24,7 +24,7 @@
 
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/clEventTime"
+        android:id="@+id/clTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -90,8 +90,8 @@
         android:textStyle="bold"
         android:transitionName="eventTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/clEventTime"
-        app:layout_constraintTop_toTopOf="@+id/clEventTime" />
+        app:layout_constraintStart_toEndOf="@+id/clTime"
+        app:layout_constraintTop_toTopOf="@+id/clTime" />
 
     <TextView
         android:id="@+id/tvHost"
@@ -119,8 +119,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="20dp"
         android:transitionName="hostImage"
-        app:layout_constraintStart_toStartOf="@+id/clEventTime"
-        app:layout_constraintTop_toBottomOf="@+id/clEventTime"
+        app:layout_constraintStart_toStartOf="@+id/clTime"
+        app:layout_constraintTop_toBottomOf="@+id/clTime"
         app:srcCompat="@color/white_transparent" />
 
 
@@ -196,7 +196,7 @@
         app:layout_constraintTop_toBottomOf="@+id/rbYelp" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayoutAddress"
+        android:id="@+id/clAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -220,11 +220,11 @@
             android:text="@string/detailview_address"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="@+id/imageView3" />
+            app:layout_constraintStart_toEndOf="@+id/ivLocation"
+            app:layout_constraintTop_toTopOf="@+id/ivLocation" />
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/ivLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -242,7 +242,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutAddress"
+        app:layout_constraintTop_toBottomOf="@+id/clAddress"
         app:layout_constraintBottom_toTopOf="@+id/btnCancel">
 
         <TextView
@@ -284,7 +284,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/clAddress" />
 
 
 </android.support.constraint.ConstraintLayout>

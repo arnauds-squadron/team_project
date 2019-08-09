@@ -94,10 +94,10 @@
         android:text="detailview_phone"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/clAddress" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayoutAddress"
+        android:id="@+id/clAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -121,11 +121,11 @@
             android:text="@string/detailview_address"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="@+id/imageView3" />
+            app:layout_constraintStart_toEndOf="@+id/ivLocation"
+            app:layout_constraintTop_toTopOf="@+id/ivLocation" />
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/ivLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
