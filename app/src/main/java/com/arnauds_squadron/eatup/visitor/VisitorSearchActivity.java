@@ -82,19 +82,19 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     private SwipeRefreshLayout swipeContainer;
     private EndlessRecyclerViewScrollListener scrollListener;
 
-    private String CURRENT_LOCATION_ID = "currentLocation";
     private String ALL_EVENTS_TAG = "allEvents";
-    private String CURRENT_LOCATION_STRING = "Current location";
     private String ALL_EVENTS_STRING = "All events";
+    private String CURRENT_LOCATION_ID = "currentLocation";
+    private String CURRENT_LOCATION_STRING = "Current location";
 
-    // variables to keep track of current query
+
+    // variables to keep track of query from the visitor fragment
     private int searchCategory;
 
-    // queriedCuisineTag used to query database, queriedCuisineString displayed to the user
-    private String queriedCuisineTag = ALL_EVENTS_TAG;
+    // queriedCuisineString used to query database and displayed to the user
     private String queriedCuisineString = ALL_EVENTS_STRING;
-    private String queriedLocationString = CURRENT_LOCATION_STRING;
     private ParseGeoPoint queriedGeoPoint;
+    private String queriedLocationString = CURRENT_LOCATION_STRING;
 
     private final static Double DEFAULT_COORD = 0.0;
 
@@ -125,14 +125,10 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     // adapter for location search suggestions
     private PlacesClient placesClient;
 
-    /* Current user location using Google API Client: initialize variables
-     * Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
-     */
-    private Location currentLocation;
+    // GeoPoint to keep track of the user's current location
     private ParseGeoPoint currentGeoPoint;
     private GoogleApiClient googleApiClient;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private LocationRequest locationRequest;
     private static final long UPDATE_INTERVAL = 5000, FASTEST_INTERVAL = 5000; // = 5 seconds
     // lists to store location permissions
     private ArrayList<String> permissionsToRequest;
@@ -208,8 +204,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         final AutoCompleteTextView locationTextView = (AutoCompleteTextView) svLocation.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         locationTextView.setDropDownAnchor(R.id.svLocation);
 
-        useCurrentLocation = true;
-
         setCategorySuggestions(svCuisine);
         setLocationSuggestions(svLocation);
 
@@ -221,9 +215,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                Date maxEventId = getMaxDate();
-                Log.d("DATE", maxEventId.toString());
-                loadTopEvents(getMaxDate());
+                loadTopEvents();
             }
         };
         // add endless scroll listener to RecyclerView and load items
@@ -234,7 +226,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadTopEvents(new Date(0));
+                loadTopEvents();
             }
         });
         // configure refreshing colors
@@ -273,20 +265,15 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
 
 
     // Search by location only (all events)
-    private void locationSearch(ParseGeoPoint geoPoint, Date maxDate) {
+    private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
-        if (maxDate.equals(new Date(0))) {
-            eventAdapter.clear();
-            eventsQuery.getAvailable(currentDate)
-                    .getClosest(geoPoint)
-                    .getTopAscending()
-                    .withHost()
-                    .notOwnEvent(ParseUser.getCurrentUser())
-                    .notFilled()
-                    .getPrevious(mEvents.size());
-        } else {
-            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(ParseUser.getCurrentUser()).notFilled().getPrevious(mEvents.size());
-        }
+        eventsQuery.getAvailable(currentDate)
+                .getClosest(geoPoint)
+                .getTopAscending()
+                .withHost()
+                .notOwnEvent(ParseUser.getCurrentUser())
+                .notFilled()
+                .getPrevious(mEvents.size());
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override
@@ -312,22 +299,25 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         });
     }
 
-    protected void loadTopEvents(Date maxDate) {
+    protected void loadTopEvents() {
         // get all events in the area
-        if(queriedCuisineTag.equals(ALL_EVENTS_TAG)) {
-            locationSearch(queriedGeoPoint, new Date(0));
+        if(queriedCuisineString.equals(ALL_EVENTS_STRING)) {
+            locationSearch(queriedGeoPoint);
         }
         // get events according to tag
         else {
             final Event.Query eventsQuery = new Event.Query();
             // if opening app for the first time, get top 20 and clear old items
             // otherwise, query for events older than the oldest
-            if (maxDate.equals(new Date(0))) {
-                eventAdapter.clear();
-                eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineTag);
-            } else {
-                eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineTag);
-            }
+            eventAdapter.clear();
+            eventsQuery.getAvailable(currentDate)
+                    .getTopAscending()
+                    .withHost()
+                    .getClosest(queriedGeoPoint)
+                    .notOwnEvent(Constants.CURRENT_USER)
+                    .notFilled()
+                    .getPrevious(mEvents.size())
+                    .whereEqualTo("tags", queriedCuisineString);
             eventsQuery.findInBackground(new FindCallback<Event>() {
                 @Override
                 public void done(List<Event> objects, ParseException e) {
@@ -349,17 +339,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                     }
                 }
             });
-        }
-    }
-
-    // get date of oldest post
-    protected Date getMaxDate() {
-        int eventsSize = mEvents.size();
-        if (eventsSize == 0) {
-            return (new Date(0));
-        } else {
-            Event oldest = mEvents.get(mEvents.size() - 1);
-            return oldest.getCreatedAt();
         }
     }
 
@@ -394,14 +373,17 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                 String queryText;
                 if (locationQueryId.equals(CURRENT_LOCATION_ID)) {
                     useCurrentLocation = true;
-                    eventAdapter.updateCurrentLocation(currentGeoPoint);
+
                     queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
                     queriedLocationString = queryText;
                     queriedGeoPoint = currentGeoPoint;
-                    loadTopEvents(new Date(0));
+                    loadTopEvents();
+
+                    // update the UI and adapter
                     tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                     tvSearchQuery.setVisibility(View.VISIBLE);
                     tvResultsTitle.setVisibility(View.VISIBLE);
+                    eventAdapter.updateCurrentLocation(currentGeoPoint);
                 } else {
                     useCurrentLocation = false;
                     queryText = String.format(Locale.getDefault(),
@@ -418,9 +400,11 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                             Double latitude = place.getLatLng().latitude;
                             Double longitude = place.getLatLng().longitude;
                             Log.i("Fetch Place Request", "Successful call");
-                            eventAdapter.updateCurrentLocation(new ParseGeoPoint(latitude, longitude));
                             queriedGeoPoint = new ParseGeoPoint(latitude, longitude);
-                            loadTopEvents(new Date(0));
+                            loadTopEvents();
+
+                            // update the UI and adapter
+                            eventAdapter.updateCurrentLocation(queriedGeoPoint);
                             tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                             tvSearchQuery.setVisibility(View.VISIBLE);
                             tvResultsTitle.setVisibility(View.VISIBLE);
@@ -552,19 +536,15 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
 
             @Override
             public boolean onSuggestionClick(int position) {
-                // set default parameters for location: use current location
-                useCurrentLocation = true;
                 eventAdapter.updateCurrentLocation(currentGeoPoint);
                 queriedGeoPoint = currentGeoPoint;
 
                 Cursor cursor = (Cursor) categorySuggestionAdapter.getItem(position);
-                String categoryQueryId = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
                 String queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
                 searchView.setQuery(queryText, false);
 
                 queriedCuisineString = queryText;
-                queriedCuisineTag = categoryQueryId;
-                loadTopEvents(new Date(0));
+                loadTopEvents();
                 searchView.clearFocus();
                 tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
                 tvSearchQuery.setVisibility(View.VISIBLE);
@@ -722,7 +702,10 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         }
 
         // Permissions ok, we get last location
-        currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        /* Current user location using Google API Client: initialize variables
+         * Source: https://medium.com/@ssaurel/getting-gps-location-on-android-with-fused-location-provider-api-1001eb549089
+         */
+        Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
         // if user didn't specify a location, display event distance using current location
         if (useCurrentLocation) {
@@ -735,7 +718,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     }
 
     private void startLocationUpdates() {
-        locationRequest = new LocationRequest();
+        LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(UPDATE_INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
@@ -762,6 +745,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     public void onLocationChanged(Location location) {
         if (location != null) {
             Log.d("VisitorSearch locChange", "Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude());
+            currentGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         }
     }
 

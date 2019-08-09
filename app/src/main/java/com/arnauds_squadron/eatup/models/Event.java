@@ -182,8 +182,8 @@ public class Event extends ParseObject {
         put(YELP_ID, yelpId);
     }
 
-    public void setIsFilled() {
-        put(KEY_IS_FILLED, true);
+    public void setIsFilled(boolean isFilled) {
+        put(KEY_IS_FILLED, isFilled);
     }
 
     public void setYelpImage(String yelpImage) {
@@ -249,7 +249,7 @@ public class Event extends ParseObject {
                 { put (KEY_NO_RATING, new JSONArray()); }
             add(KEY_NO_RATING, user);
             if (getMaxGuests() == guestSize + 1) {
-                setIsFilled();
+                setIsFilled(true);
             }
         }
     }

@@ -111,6 +111,7 @@ public class LocalFragment extends Fragment implements
         currentEvent.setDate(date);
         currentEvent.setMaxGuests(maxGuests);
         currentEvent.setOver21(over21);
+        currentEvent.setIsFilled(false);
         saveEvent();
     }
 
