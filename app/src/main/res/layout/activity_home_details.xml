@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".home.HomeDetailsActivity">
+
+<android.support.constraint.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/ivImage"
@@ -16,45 +22,57 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@color/white_transparent" />
 
-    <TextView
-        android:id="@+id/tvDay"
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/clEventTime"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
-        android:text="Day"
-        android:textColor="@color/toast_red"
-        android:textSize="40sp"
-        android:textStyle="normal|bold"
-        android:transitionName="day"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivImage" />
+        app:layout_constraintTop_toBottomOf="@+id/ivImage">
 
-    <TextView
-        android:id="@+id/tvMonth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Month"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:transitionName="month"
-        app:layout_constraintEnd_toEndOf="@+id/tvDay"
-        app:layout_constraintStart_toStartOf="@+id/tvDay"
-        app:layout_constraintTop_toBottomOf="@+id/tvDay" />
+        <TextView
+            android:id="@+id/tvDay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day"
+            android:textColor="@color/toast_red"
+            android:textSize="36sp"
+            android:textStyle="normal|bold"
+            android:transitionName="day"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Mealtime"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:transitionName="time"
-        app:layout_constraintEnd_toEndOf="@+id/tvDay"
-        app:layout_constraintStart_toStartOf="@+id/tvDay"
-        app:layout_constraintTop_toBottomOf="@+id/tvMonth" />
+        <TextView
+            android:id="@+id/tvMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Month"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:transitionName="month"
+            app:layout_constraintEnd_toEndOf="@+id/tvDay"
+            app:layout_constraintStart_toStartOf="@+id/tvDay"
+            app:layout_constraintTop_toBottomOf="@+id/tvDay" />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Mealtime"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:transitionName="time"
+            app:layout_constraintEnd_toEndOf="@+id/tvDay"
+            app:layout_constraintStart_toStartOf="@+id/tvDay"
+            app:layout_constraintTop_toBottomOf="@+id/tvMonth" />
+    </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:id="@+id/tvEventTitle"
@@ -62,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:text="Event Title"
@@ -72,8 +90,8 @@
         android:textStyle="bold"
         android:transitionName="eventTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tvDay"
-        app:layout_constraintTop_toTopOf="@+id/tvDay" />
+        app:layout_constraintStart_toEndOf="@+id/clEventTime"
+        app:layout_constraintTop_toTopOf="@+id/clEventTime" />
 
     <TextView
         android:id="@+id/tvHost"
@@ -99,10 +117,10 @@
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:transitionName="hostImage"
-        app:layout_constraintStart_toStartOf="@+id/tvEventTitle"
-        app:layout_constraintTop_toBottomOf="@+id/tvEventTitle"
+        app:layout_constraintStart_toStartOf="@+id/clEventTime"
+        app:layout_constraintTop_toBottomOf="@+id/clEventTime"
         app:srcCompat="@color/white_transparent" />
 
     <TextView
@@ -116,7 +134,7 @@
         android:layout_marginRight="24dp"
         android:text="Restaurant name"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="22sp"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:transitionName="restaurantName"
         app:layout_constraintEnd_toEndOf="parent"
@@ -200,8 +218,10 @@
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="12dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutAddress">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutAddress"
+        app:layout_constraintBottom_toTopOf="@+id/btnCancel">
 
         <TextView
             android:id="@+id/tv21Title"
@@ -232,6 +252,7 @@
         style="@style/rounded_button_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="16dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
@@ -240,7 +261,9 @@
         android:text="@string/cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutAddress" />
 
 
 </android.support.constraint.ConstraintLayout>
+</ScrollView>

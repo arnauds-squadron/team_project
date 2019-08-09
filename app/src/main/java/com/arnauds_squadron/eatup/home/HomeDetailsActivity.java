@@ -220,7 +220,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
             if (event.getOver21()) {
                 clLegal.setVisibility(View.VISIBLE);
             } else {
-                clLegal.setVisibility(View.INVISIBLE);
+                clLegal.setVisibility(View.GONE);
             }
         }
 
