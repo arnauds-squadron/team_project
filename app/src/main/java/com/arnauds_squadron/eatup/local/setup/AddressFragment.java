@@ -233,15 +233,6 @@ public class AddressFragment extends Fragment implements OnMapReadyCallback {
         ((ImageButton) autocompleteFragment.getView()
                 .findViewById(R.id.places_autocomplete_search_button))
                 .setColorFilter(getResources().getColor(R.color.toast_red));
-
-//        ((ImageButton) autocompleteFragment.getView()
-//                .findViewById(R.id.places_autocomplete_back_button))
-//                .setColorFilter(getResources().getColor(R.color.toast_red));
-
-
-        ((ImageButton) autocompleteFragment.getView()
-                .findViewById(R.id.places_autocomplete_clear_button))
-                .setColorFilter(getResources().getColor(R.color.toast_red));
     }
 
     public interface OnFragmentInteractionListener {

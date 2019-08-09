@@ -95,4 +95,7 @@
     <string name="could_not_find_any_restaurants">Could not find any restaurants</string>
     <string name="log_in">Log In</string>
     <string name="agenda">Agenda</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="save">save</string>
+    <string name="log_out">Log Out</string>
 </resources>
