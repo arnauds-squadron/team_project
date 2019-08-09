@@ -14,10 +14,8 @@ import com.arnauds_squadron.eatup.local.LocalFragment;
 import com.arnauds_squadron.eatup.login.LoginActivity;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.navigation.MainFragmentPagerAdapter;
-import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
 import com.arnauds_squadron.eatup.profile.ProfileFragment;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements
         ProfileFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.flNoEventsScheduled)
-    NoSwipingViewPager viewPager;
+    ViewPager viewPager;
 
     @BindView(R.id.tab_bar)
     TabLayout tabLayout;
@@ -47,11 +45,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser == null) {
-            gotoLoginActivity();
-        }
 
         Constants.PACKAGE_NAME = getPackageName();
         pagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(), this);
@@ -228,11 +221,5 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         return null;
-    }
-
-    private void gotoLoginActivity() {
-        Intent i = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(i);
-        finish();
     }
 }

@@ -198,7 +198,7 @@ public class LocalFragment extends Fragment implements
      */
     private void createEventChat(String eventTitle) {
         final Chat chat = new Chat();
-        chat.setName(eventTitle + " Chat");
+        chat.setName(eventTitle);
         chat.addMember(Constants.CURRENT_USER);
         chat.saveInBackground(new SaveCallback() {
             @Override
