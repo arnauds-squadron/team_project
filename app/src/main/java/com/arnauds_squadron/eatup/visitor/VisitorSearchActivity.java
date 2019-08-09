@@ -25,7 +25,6 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,8 +53,10 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,12 +84,15 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
     private EndlessRecyclerViewScrollListener scrollListener;
 
     private String CURRENT_LOCATION_ID = "currentLocation";
-    private String ALL_EVENTS_ID = "allEvents";
+    private String ALL_EVENTS_TAG = "allEvents";
     private String CURRENT_LOCATION_STRING = "Current location";
     private String ALL_EVENTS_STRING = "All events";
 
     // variables to keep track of current query
     private int searchCategory;
+
+    // queriedCuisineTag used to query database, queriedCuisineString displayed to the user
+    private String queriedCuisineTag = ALL_EVENTS_TAG;
     private String queriedCuisineString = ALL_EVENTS_STRING;
     private String queriedLocationString = CURRENT_LOCATION_STRING;
     private ParseGeoPoint queriedGeoPoint;
@@ -441,9 +445,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         final Event.Query eventsQuery = new Event.Query();
         if (maxDate.equals(new Date(0))) {
             eventAdapter.clear();
-            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size());
+            eventsQuery.getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(ParseUser.getCurrentUser()).notFilled().getPrevious(mEvents.size());
         } else {
-            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size());
+            eventsQuery.getOlder(maxDate).getAvailable(currentDate).getClosest(geoPoint).getTopAscending().withHost().notOwnEvent(ParseUser.getCurrentUser()).notFilled().getPrevious(mEvents.size());
         }
 
         eventsQuery.findInBackground(new FindCallback<Event>() {
@@ -472,7 +476,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
 
     protected void loadTopEvents(Date maxDate) {
         // get all events in the area
-        if(queriedCuisineString.equals("All events")) {
+        if(queriedCuisineTag.equals(ALL_EVENTS_TAG)) {
             locationSearch(queriedGeoPoint, new Date(0));
         }
         // get events according to tag
@@ -482,9 +486,9 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
             // otherwise, query for events older than the oldest
             if (maxDate.equals(new Date(0))) {
                 eventAdapter.clear();
-                eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineString);
+                eventsQuery.getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineTag);
             } else {
-                eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineString);
+                eventsQuery.getOlder(maxDate).getAvailable(currentDate).getTopAscending().withHost().getClosest(queriedGeoPoint).notOwnEvent(Constants.CURRENT_USER).notFilled().getPrevious(mEvents.size()).whereEqualTo("tags", queriedCuisineTag);
             }
             eventsQuery.findInBackground(new FindCallback<Event>() {
                 @Override
@@ -720,8 +724,8 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                 String queryText = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
                 searchView.setQuery(queryText, false);
 
-                // TODO modify loadTopEvents to search by categoryQueryId
                 queriedCuisineString = queryText;
+                queriedCuisineTag = categoryQueryId;
                 loadTopEvents(new Date(0));
                 searchView.clearFocus();
                 tvSearchQuery.setText(String.format(Locale.getDefault(), "\'%s\' at \'%s\'", queriedCuisineString, queriedLocationString));
@@ -740,7 +744,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                     cursor.addRow(new String[]{
                             "1",
                             "All events",
-                            ALL_EVENTS_ID
+                            ALL_EVENTS_TAG
                     });
                     categorySuggestionAdapter.swapCursor(cursor);
                 } else {
@@ -748,7 +752,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                     cursor.addRow(new String[]{
                             "1",
                             "All events",
-                            ALL_EVENTS_ID
+                            ALL_EVENTS_TAG
                     });
                     int predictionCounter = 2;
                     for (int i = 0; (i < CATEGORY_TITLE.length); i++) {

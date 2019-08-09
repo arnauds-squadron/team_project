@@ -32,21 +32,20 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.BuildConfig;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 import com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -68,6 +67,12 @@ import static com.arnauds_squadron.eatup.utils.Constants.SUCCESS_RESULT;
  * for them
  */
 public class VisitorFragment extends Fragment {
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        isInForeground = isVisibleToUser;
+    }
 
     // TODO browsing nearby events - account for scenario in which user doesn't enable current location, use last remembered location or display a random array of events
 
@@ -145,17 +150,17 @@ public class VisitorFragment extends Fragment {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                    // Set current location for nearby events adapter and load only once
-                    if(!foundCurrentLocation) {
-                        adapterGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-                        locationSearch(adapterGeoPoint);
-                        eventAdapter.updateCurrentLocation(adapterGeoPoint);
-                        foundCurrentLocation = true;
-                    }
-
                     // if fragment is in the foreground, update the UI. don't do anything otherwise
                     if(isInForeground) {
+                        for (Location location : locationResult.getLocations()) {
+                            // Set current location for nearby events adapter and load only once
+                            if(!foundCurrentLocation) {
+                                adapterGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                                locationSearch(adapterGeoPoint);
+                                eventAdapter.updateCurrentLocation(adapterGeoPoint);
+                                foundCurrentLocation = true;
+                            }
+
                         // set tags on the constraint layout
                         constraintLayoutLocation.setTag(R.id.latitude, location.getLatitude());
                         constraintLayoutLocation.setTag(R.id.longitude, location.getLongitude());
@@ -171,7 +176,6 @@ public class VisitorFragment extends Fragment {
                             startGetAddressFromCoordinatesIntentService(location);
                         }
                     }
-
                 }
             }
         };
@@ -188,7 +192,6 @@ public class VisitorFragment extends Fragment {
         } else {
             startCurrentLocationUpdates();
         }
-        isInForeground = true;
     }
 
     @Override
@@ -196,7 +199,6 @@ public class VisitorFragment extends Fragment {
         // fragment is in the background
         // stop all location updates
         super.onPause();
-        isInForeground = false;
         stopCurrentLocationUpdates();
     }
 
@@ -315,10 +317,11 @@ public class VisitorFragment extends Fragment {
     private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
         eventsQuery.getClosest(geoPoint)
+                .getAvailable(new Date())
                 .getTopAscending()
                 .withHost()
                 .notFilled()
-                .notOwnEvent(Constants.CURRENT_USER);
+                .notOwnEvent(ParseUser.getCurrentUser());
         eventAdapter.clear();
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override

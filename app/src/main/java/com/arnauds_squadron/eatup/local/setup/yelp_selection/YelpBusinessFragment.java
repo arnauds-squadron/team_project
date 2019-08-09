@@ -94,7 +94,7 @@ public class YelpBusinessFragment extends Fragment {
         List<Category> categories = mBusiness.get(position).categories;
         List<String> tags = new ArrayList<>();
         for (int i = 0; i < categories.size(); i++) {
-            tags.add(categories.get(i).title);
+            tags.add(categories.get(i).alias);
         }
         mListener.updateYelpBusiness(businessId, businessName, tags);
     }
