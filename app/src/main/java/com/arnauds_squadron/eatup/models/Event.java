@@ -128,11 +128,19 @@ public class Event extends ParseObject {
         put(KEY_TAGS, new JSONArray(tags));
     }
 
+    public void setPendingRequests(JSONArray requestsArray) {
+        put(KEY_PENDING_GUESTS, requestsArray);
+    }
+
+    public void setAllRequests(JSONArray requestsArray) {
+        put(KEY_ALL_REQUESTS, requestsArray);
+    }
+
     public JSONArray getAcceptedGuests() {
         return getJSONArray(KEY_ACCEPTED_GUESTS);
     }
 
-    private void setAcceptedGuests(JSONArray guests) {
+    public void setAcceptedGuests(JSONArray guests) {
         put(KEY_ACCEPTED_GUESTS, guests);
     }
 
@@ -144,6 +152,11 @@ public class Event extends ParseObject {
 
     public JSONArray getNoRatingSubmitted() {
         return getJSONArray(KEY_NO_RATING);
+    }
+
+    public void addToNoRatingSubmitted(ParseUser user) {
+        put (KEY_NO_RATING, new JSONArray());
+        add(KEY_NO_RATING, user);
     }
 
     public int getMaxGuests() {
