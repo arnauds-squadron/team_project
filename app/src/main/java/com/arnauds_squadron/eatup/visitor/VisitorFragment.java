@@ -105,9 +105,7 @@ public class VisitorFragment extends Fragment {
     private AddressResultReceiver resultReceiver;
     private String addressOutput;
 
-    // public latitude and longitude of current location for victor to use
-    public Double currentLatitude;
-    public Double currentLongitude;
+    private boolean isInForeground;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -132,114 +130,74 @@ public class VisitorFragment extends Fragment {
 
         indefinitePagerIndicator.attachToRecyclerView(rvBrowse);
 
+        // Initialize a ResultReceiver
+        // Handle the address string returned from the IntentService (translates coordinates to address)
         resultReceiver = new AddressResultReceiver(new Handler());
 
-        // initialize current location services
+        // Initialize a request to get the current location
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         locationRequest = new LocationRequest();
         locationRequest.setInterval(UPDATE_INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-
+        // Location callback. Takes the current location and tries to convert it into a string address.
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-
                 for (Location location : locationResult.getLocations()) {
-                    // geocoder for translating coordinates to address
-                    if (!Geocoder.isPresent()) {
-                        Toast.makeText(getActivity(),
-                                R.string.no_geocoder_available,
-                                Toast.LENGTH_LONG).show();
-                        tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
-                    } else {
-                        // Start geocoder service and update UI to reflect the new address
-                        startIntentService(location);
-                    }
-                    constraintLayoutLocation.setTag(R.id.latitude, location.getLatitude());
-                    constraintLayoutLocation.setTag(R.id.longitude, location.getLongitude());
-
-                    currentLatitude = location.getLatitude();
-                    currentLongitude = location.getLongitude();
-
-                    // set current location for adapter and load only once
+                    // Set current location for nearby events adapter and load only once
                     if(!foundCurrentLocation) {
                         adapterGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
                         locationSearch(adapterGeoPoint);
                         eventAdapter.updateCurrentLocation(adapterGeoPoint);
                         foundCurrentLocation = true;
                     }
+
+                    // if fragment is in the foreground, update the UI. don't do anything otherwise
+                    if(isInForeground) {
+                        // set tags on the constraint layout
+                        constraintLayoutLocation.setTag(R.id.latitude, location.getLatitude());
+                        constraintLayoutLocation.setTag(R.id.longitude, location.getLongitude());
+
+                        // send the coordinates to the Geocoder to get the address string from the coordinates
+                        if (!Geocoder.isPresent()) {
+                            Toast.makeText(getActivity(),
+                                    R.string.no_geocoder_available,
+                                    Toast.LENGTH_LONG).show();
+                            tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", location.getLatitude(), location.getLongitude()));
+                        }
+                        else {
+                            startGetAddressFromCoordinatesIntentService(location);
+                        }
+                    }
+
                 }
             }
         };
     }
 
-    @OnClick(R.id.constraintLayoutCuisine)
-    public void startSearchCuisine() {
-        Intent i = new Intent(getContext(), VisitorSearchActivity.class);
-        i.putExtra(SEARCH_CATEGORY, CUISINE_SEARCH);
-        i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
-        i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
-        startActivity(i);
-    }
-
-    @OnClick(R.id.constraintLayoutLocation)
-    public void startSearchLocation() {
-        Intent i = new Intent(getContext(), VisitorSearchActivity.class);
-        i.putExtra(SEARCH_CATEGORY, LOCATION_SEARCH);
-        i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
-        i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
-        startActivity(i);
-    }
-
-    // methods to load posts into the RecyclerView based on location
-    private void locationSearch(ParseGeoPoint geoPoint) {
-        final Event.Query eventsQuery = new Event.Query();
-        eventsQuery.getClosest(geoPoint)
-                .getTopAscending()
-                .withHost()
-                .notFilled()
-                .notOwnEvent(Constants.CURRENT_USER);
-        eventAdapter.clear();
-        eventsQuery.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    if(objects.size() != 0) {
-                        for (int i = 0; i < objects.size(); ++i) {
-                            mEvents.add(objects.get(i));
-                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
-                        }
-                    }
-                    else {
-                        // only notify user if no events to show
-                        if(mEvents.size() == 0) {
-                            Toast.makeText(getContext(), "No events found nearby.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        // fragment is in the foreground
+        // check permissions first
+        // get last location and start location updates
+        super.onResume();
         if (!checkPermissions()) {
             requestPermissions();
         } else {
-            getLastLocation();
-            startLocationUpdates();
+            startCurrentLocationUpdates();
         }
+        isInForeground = true;
     }
 
     @Override
     public void onPause() {
-        stopLocationUpdates();
+        // fragment is in the background
+        // stop all location updates
         super.onPause();
+        isInForeground = false;
+        stopCurrentLocationUpdates();
     }
 
     /**
@@ -296,8 +254,7 @@ public class VisitorFragment extends Fragment {
                 Log.i("LocationFragment", "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted.
-                getLastLocation();
-                startLocationUpdates();
+                startCurrentLocationUpdates();
             } else {
                 // Permission denied.
                 // Notify the user that GPS is necessary to use the current location component of the app.
@@ -322,53 +279,71 @@ public class VisitorFragment extends Fragment {
         }
     }
 
-    /**
-     * Provides a simple way of getting a device's location and is well suited for
-     * applications that do not require a fine-grained location and that do not need location
-     * updates. Gets the best and most recent location currently available, which may be null
-     * in rare cases when a location is not available.
-     * <p>
-     * Note: this method should be called after location permission has been granted.
-     */
-    @SuppressLint("MissingPermission")
-    private void getLastLocation() {
-        mFusedLocationClient.getLastLocation()
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            lastLocation = task.getResult();
 
-                            // geocoder for translating coordinates to address
-                            if (!Geocoder.isPresent()) {
-                                Toast.makeText(getActivity(),
-                                        R.string.no_geocoder_available,
-                                        Toast.LENGTH_LONG).show();
-                                tvCurrentLocation.setText(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
-                            } else {
-                                // Start geocoder service and update UI to reflect the new address
-                                startIntentService(lastLocation);
-                            }
-//                            tvCurrentLocation.setTag(String.format(Locale.getDefault(), "%f, %f", lastLocation.getLatitude(), lastLocation.getLongitude()));
-                            tvCurrentLocation.setTag(R.id.latitude, lastLocation.getLatitude());
-                            tvCurrentLocation.setTag(R.id.longitude, lastLocation.getLongitude());
-                        } else {
-                            startLocationUpdates();
-                        }
-                    }
-                });
-    }
-
-    private void stopLocationUpdates() {
+    private void stopCurrentLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
     @SuppressLint("MissingPermission")
-    private void startLocationUpdates() {
+    private void startCurrentLocationUpdates() {
         mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
     }
 
-    // rewrite above method to avoid int errors
+
+    // Start search activity based on click on constraint layout
+    @OnClick(R.id.constraintLayoutCuisine)
+    public void startSearchCuisine() {
+        Intent i = new Intent(getContext(), VisitorSearchActivity.class);
+        i.putExtra(SEARCH_CATEGORY, CUISINE_SEARCH);
+        i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
+        i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
+        startActivity(i);
+    }
+
+
+    @OnClick(R.id.constraintLayoutLocation)
+    public void startSearchLocation() {
+        Intent i = new Intent(getContext(), VisitorSearchActivity.class);
+        i.putExtra(SEARCH_CATEGORY, LOCATION_SEARCH);
+        i.putExtra("latitude", (Double) constraintLayoutLocation.getTag(R.id.latitude));
+        i.putExtra("longitude", (Double) constraintLayoutLocation.getTag(R.id.longitude));
+        startActivity(i);
+    }
+
+
+    // Load nearby events into the RecyclerView based on location
+    private void locationSearch(ParseGeoPoint geoPoint) {
+        final Event.Query eventsQuery = new Event.Query();
+        eventsQuery.getClosest(geoPoint)
+                .getTopAscending()
+                .withHost()
+                .notFilled()
+                .notOwnEvent(Constants.CURRENT_USER);
+        eventAdapter.clear();
+        eventsQuery.findInBackground(new FindCallback<Event>() {
+            @Override
+            public void done(List<Event> objects, ParseException e) {
+                if (e == null) {
+                    if(objects.size() != 0) {
+                        for (int i = 0; i < objects.size(); ++i) {
+                            mEvents.add(objects.get(i));
+                            eventAdapter.notifyItemInserted(mEvents.size() - 1);
+                        }
+                    }
+                    else {
+                        // only notify user if no events to show
+                        if(mEvents.size() == 0) {
+                            Toast.makeText(getContext(), "No events found nearby.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    // Show a snackbar to tell the user that location is necessary
     private void showSnackbar(String mainString, String actionString,
                               View.OnClickListener listener) {
         Snackbar.make(getActivity().findViewById(android.R.id.content),
@@ -377,21 +352,23 @@ public class VisitorFragment extends Fragment {
                 .setAction(actionString, listener).show();
     }
 
+    // ButterKnife unbinder
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
 
-    // start Intent to get address from lat/long coordinates
-    protected void startIntentService(Location newLocation) {
+
+    // start IntentService to get address string from lat/long coordinates
+    protected void startGetAddressFromCoordinatesIntentService(Location newLocation) {
         Intent intent = new Intent(getContext(), FetchAddressIntentService.class);
         intent.putExtra(RECEIVER, resultReceiver);
         intent.putExtra(LOCATION_DATA_EXTRA, newLocation);
         getActivity().startService(intent);
     }
 
-    // ResultReceiver to set current location field based on address of lat/long
+    // ResultReceiver to set current location TextView text based on the address string received from IntentService
     class AddressResultReceiver extends ResultReceiver {
         AddressResultReceiver(Handler handler) {
             super(handler);
@@ -413,7 +390,6 @@ public class VisitorFragment extends Fragment {
             if (resultCode == SUCCESS_RESULT) {
                 tvCurrentLocation.setText(addressOutput);
             }
-
         }
     }
 }
