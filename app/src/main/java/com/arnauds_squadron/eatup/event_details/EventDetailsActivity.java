@@ -108,7 +108,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     }
                     tvNumGuests.setText(String.format(Locale.getDefault(), "%s/%s slots filled", numGuests, event.getMaxGuests()));
 
-                    if (currentEvent.checkRequest(Constants.CURRENT_USER)) {
+                    if (currentEvent.checkRequest(ParseUser.getCurrentUser())) {
                         btRequest.setVisibility(View.GONE);
                         btRequested.setVisibility(View.VISIBLE);
                     } else {
@@ -121,7 +121,6 @@ public class EventDetailsActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             // create request/add to "allRequests"
                             currentEvent.createRequest(Constants.CURRENT_USER, currentEvent);
-                            Toast.makeText(getApplicationContext(), "RSVP requested", Toast.LENGTH_SHORT).show();
                             btRequest.setVisibility(View.GONE);
                             btRequested.setVisibility(View.VISIBLE);
                         }
