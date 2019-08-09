@@ -239,7 +239,11 @@ public class Event extends ParseObject {
         List<ParseUser> tempList = new ArrayList<>();
         tempList.add(user);
         removeAll(KEY_PENDING_GUESTS, tempList);
-        int guestSize = getAcceptedGuestsList().size();
+        
+        int guestSize = 0;
+        if (getAcceptedGuests() != null) {
+            guestSize = getAcceptedGuestsList().size();
+        }
 
         if (isAccepted) {
             if (getAcceptedGuests() == null)
