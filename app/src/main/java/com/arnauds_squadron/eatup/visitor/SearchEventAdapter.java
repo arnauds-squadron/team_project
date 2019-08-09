@@ -117,9 +117,13 @@ public class SearchEventAdapter extends RecyclerView.Adapter<SearchEventAdapter.
                 Log.d("eventAdapter", "View event details");
                 Event event = events.get(position);
 
+                ParseGeoPoint eventAddress = event.getAddress();
+                double distanceInMiles = eventAddress.distanceInMilesTo(userLocation);
+                String distanceString = String.format(Locale.getDefault(), "%.2f mi", distanceInMiles);
+
                 Intent intent = new Intent(context, EventDetailsActivity.class);
                 intent.putExtra("event_id", event.getObjectId());
-                intent.putExtra("distance", (Double) v.getRootView().findViewById(R.id.tvDistance).getTag());
+                intent.putExtra("distance", distanceString);
                 context.startActivity(intent);
             }
         }

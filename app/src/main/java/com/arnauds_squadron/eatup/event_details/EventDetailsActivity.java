@@ -66,9 +66,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         }
 
         String eventId = getIntent().getStringExtra("event_id");
-        Double distanceInMiles = getIntent().getDoubleExtra("distance", 0f);
+        String distanceString = getIntent().getStringExtra("distance");
 
-        tvDistance.setText(String.format(Locale.getDefault(), "%.2f mi", distanceInMiles));
+        tvDistance.setText(distanceString);
 
         ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
         // try to find item from cache, otherwise go to network
