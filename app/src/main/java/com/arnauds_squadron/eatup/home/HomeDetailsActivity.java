@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -95,8 +96,9 @@ public class HomeDetailsActivity extends AppCompatActivity {
     @BindView(R.id.btnCancel)
     Button btnCancel;
 
-//    @BindView(R.id.ivLink)
-//    ImageView ivLink;
+    @BindView(R.id.btYelp)
+    ImageView btYelp;
+
 
     private Event event;
     private Context context;
@@ -129,19 +131,17 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Business business = response.body();
                     if (business != null) {
-                        Location location = business.location;
-                        //tvAddress.setText(location.getAddress1() + " " + location.getCity() + "," + location.getState() + " " + location.getZipCode());
                         final String url = business.url;
 
-//                        ivLink.setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-//                                Intent i = new Intent(Intent.ACTION_VIEW);
-//                                i.setData(Uri.parse(url));
-//                                startActivity(i);
-//                                finish();
-//                            }
-//                        });
+                        btYelp.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent(Intent.ACTION_VIEW);
+                                i.setData(Uri.parse(url));
+                                startActivity(i);
+                                finish();
+                            }
+                        });
                         rbYelp.setRating(business.rating);
                     }
                 }
