@@ -16,24 +16,46 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:color/black" />
 
-    <TextView
-        android:id="@+id/tvRestaurantName"
-        android:layout_width="0dp"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/clTitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:text="detailview_location_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/default_gray"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:transitionName="restaurantName"
+        android:layout_marginEnd="12dp"
+        android:layout_marginRight="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivEventImage" />
+        app:layout_constraintTop_toBottomOf="@+id/ivEventImage">
+
+        <TextView
+            android:id="@+id/tvRestaurantName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="detailview_location_name"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/default_gray"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:transitionName="restaurantName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/btYelp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvRestaurantName"
+            app:layout_constraintStart_toEndOf="@+id/tvRestaurantName"
+            app:layout_constraintTop_toTopOf="@+id/tvRestaurantName"
+            app:srcCompat="@drawable/yelp_link" />
+    </android.support.constraint.ConstraintLayout>
+
 
     <TextView
         android:id="@+id/tvNumberRatings"
@@ -60,7 +82,7 @@
         android:numStars="5"
         android:stepSize="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvRestaurantName" />
+        app:layout_constraintTop_toBottomOf="@+id/clTitle" />
 
     <TextView
         android:id="@+id/tvPhone"
@@ -124,19 +146,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPhone" />
 
-    <Button
-        android:id="@+id/btYelp"
-        style="@style/rounded_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="32dp"
-        android:text="details"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

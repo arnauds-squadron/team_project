@@ -44,7 +44,7 @@ public class EventDetailsRestaurantActivity extends AppCompatActivity {
     @BindView(R.id.tvAddress)
     TextView tvAddress;
     @BindView(R.id.btYelp)
-    Button btYelp;
+    ImageView btYelp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
