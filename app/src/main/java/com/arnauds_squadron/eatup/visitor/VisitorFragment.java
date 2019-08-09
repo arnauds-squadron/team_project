@@ -150,17 +150,17 @@ public class VisitorFragment extends Fragment {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                    // if fragment is in the foreground, update the UI. don't do anything otherwise
-                    if(isInForeground) {
-                        for (Location location : locationResult.getLocations()) {
-                            // Set current location for nearby events adapter and load only once
-                            if(!foundCurrentLocation) {
-                                adapterGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-                                locationSearch(adapterGeoPoint);
-                                eventAdapter.updateCurrentLocation(adapterGeoPoint);
-                                foundCurrentLocation = true;
-                            }
+            // if fragment is in the foreground, update the UI. don't do anything otherwise
+                for (Location location : locationResult.getLocations()) {
+                    // Set current location for nearby events adapter and load only once
+                    if(!foundCurrentLocation) {
+                        adapterGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                        locationSearch(adapterGeoPoint);
+                        eventAdapter.updateCurrentLocation(adapterGeoPoint);
+                        foundCurrentLocation = true;
+                    }
 
+                    if(isInForeground) {
                         // set tags on the constraint layout
                         constraintLayoutLocation.setTag(R.id.latitude, location.getLatitude());
                         constraintLayoutLocation.setTag(R.id.longitude, location.getLongitude());
