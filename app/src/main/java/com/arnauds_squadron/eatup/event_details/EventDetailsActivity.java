@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     RecyclerView rvEventDetails;
     @BindView(R.id.btRequest)
     Button btRequest;
+    @BindView(R.id.btRequested)
+    Button btRequested;
     @BindView(R.id.tvNumGuests)
     TextView tvNumGuests;
     @BindView(R.id.tvDay)
@@ -105,25 +108,37 @@ public class EventDetailsActivity extends AppCompatActivity {
                     }
                     tvNumGuests.setText(String.format(Locale.getDefault(), "%s/%s slots filled", numGuests, event.getMaxGuests()));
 
+                    if (currentEvent.checkRequest(Constants.CURRENT_USER)) {
+                        btRequest.setVisibility(View.GONE);
+                        btRequested.setVisibility(View.VISIBLE);
+                    } else {
+                        btRequested.setVisibility(View.GONE);
+                        btRequest.setVisibility(View.VISIBLE);
                     }
+
+                    btRequest.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // create request/add to "allRequests"
+                            currentEvent.createRequest(Constants.CURRENT_USER, currentEvent);
+                            Toast.makeText(getApplicationContext(), "RSVP requested", Toast.LENGTH_SHORT).show();
+                            btRequest.setVisibility(View.GONE);
+                            btRequested.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    btRequested.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "RSVP already requested", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
                 else {
                     e.printStackTrace();
                 }
             }
         });
-    }
-
-    @OnClick(R.id.btRequest)
-    public void eventRSVP() {
-        Toast.makeText(this, "Execute RSVP to the event", Toast.LENGTH_SHORT).show();
-        // if user has already requested in the past or is already RSVP'd to the event, prevent user from clicking button
-        // otherwise, create request/add to "allRequests" and send back to home screen
-        if (currentEvent.checkRequest(Constants.CURRENT_USER)) {
-            Toast.makeText(this, "RSVP already requested", Toast.LENGTH_SHORT).show();
-        } else {
-            currentEvent.createRequest(Constants.CURRENT_USER, currentEvent);
-            Toast.makeText(this, "RSVP requested", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void gotoLoginActivity() {
