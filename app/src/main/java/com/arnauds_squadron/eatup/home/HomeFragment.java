@@ -30,6 +30,7 @@ import com.parse.ParseUser;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -156,8 +157,6 @@ public class HomeFragment extends Fragment implements
             query.withHost().notOwnEvent(ParseUser.getCurrentUser());
         }
 
-        // TODO add filter for events that don't have any guests and are already past, so we don't
-        //  show them for rating
         query.orderByDescending("date");
         query.findInBackground(new FindCallback<Event>() {
             @Override
@@ -167,8 +166,13 @@ public class HomeFragment extends Fragment implements
                         final JSONArray guests = event.getAcceptedGuests();
                         String hostId = event.getHost().getObjectId();
                         if (userId.equals(hostId) || (guests != null &&
-                                guests.toString().contains(userId)))
-                            tempEvents.add(event);
+                                guests.toString().contains(userId))){
+                            // if the event is past, with no guests, don't add event to the agenda
+                            Date currentDate = new Date();
+                            if(!(currentDate.after(event.getDate()) && event.getAcceptedGuestsList().size() == 0)) {
+                                tempEvents.add(event);
+                            }
+                        }
                     }
                     if (tempEvents.size() != agenda.size()) { // Only update if events changed
                         agenda.clear();
