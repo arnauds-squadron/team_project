@@ -94,4 +94,5 @@
     <string name="title">Title</string>
     <string name="could_not_find_any_restaurants">Could not find any restaurants</string>
     <string name="log_in">Log In</string>
+    <string name="agenda">Agenda</string>
 </resources>

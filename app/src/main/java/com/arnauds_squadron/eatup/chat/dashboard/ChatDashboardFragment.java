@@ -10,22 +10,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.utils.Constants;
-import com.arnauds_squadron.eatup.utils.FormatHelper;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -34,8 +26,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 
 /**
  * Fragment that displays the list of active chats the user is part of
@@ -50,9 +40,6 @@ public class ChatDashboardFragment extends Fragment {
 
     @BindView(R.id.tvNoChats)
     TextView tvNoChats;
-
-    @BindView(R.id.ivProfile)
-    ImageView ivProfile;
 
     private OnFragmentInteractionListener mListener;
     private List<Chat> chatList;
@@ -85,26 +72,6 @@ public class ChatDashboardFragment extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_chat_dashboard, container, false);
         ButterKnife.bind(this, view);
 
-        Constants.CURRENT_USER.fetchInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                ParseFile image = object.getParseFile(KEY_PROFILE_PICTURE);
-                if (image != null) {
-                    Glide.with(ChatDashboardFragment.this)
-                            .load(object.getParseFile(KEY_PROFILE_PICTURE).getUrl())
-                            .transform(new CircleCrop())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(ivProfile);
-                } else {
-                    Glide.with(ChatDashboardFragment.this)
-                            .load(FormatHelper.getProfilePlaceholder(getContext()))
-                            .transform(new CircleCrop())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(ivProfile);
-                }
-            }
-        });
-
         swipeContainer.setColorSchemeResources(R.color.toast_red);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -112,12 +79,10 @@ public class ChatDashboardFragment extends Fragment {
                 getChatsAsync();
             }
         });
-
         chatList = new ArrayList<>();
         chatAdapter = new ChatDashboardAdapter(this, chatList);
         rvChats.setAdapter(chatAdapter);
         rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
-
         startChatRefresh();
 
         return view;

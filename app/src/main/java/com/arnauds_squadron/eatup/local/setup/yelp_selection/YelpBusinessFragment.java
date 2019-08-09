@@ -105,7 +105,7 @@ public class YelpBusinessFragment extends Fragment {
 
         Call<YelpApiResponse> meetUp = YelpData.retrofit(getContext()).getLocation(
                 event.getAddress().getLatitude(), event.getAddress().getLongitude(),
-                "food", "distance");
+                "restaurant", "distance");
 
         progressBar.setVisibility(View.VISIBLE);
         meetUp.enqueue(new Callback<YelpApiResponse>() {

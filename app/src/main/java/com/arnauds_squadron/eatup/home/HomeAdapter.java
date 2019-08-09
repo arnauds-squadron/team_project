@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.MainActivity;
 import com.arnauds_squadron.eatup.R;
@@ -55,6 +56,7 @@ import static com.arnauds_squadron.eatup.utils.Constants.KEY_PROFILE_PICTURE;
 import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateDay;
 import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateMonth;
 import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
+import static com.parse.Parse.getApplicationContext;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
@@ -244,10 +246,17 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 public void onClick(View v) {
                     final int eventPosition = getAdapterPosition();
                     final Event event = mAgenda.get(eventPosition);
+                    if (event.getAcceptedGuests() == null) {
+                        Toast.makeText(getApplicationContext(), "Sorry no Guest Attended", Toast.LENGTH_LONG).show();
+
+                    } else {
                         Intent i = new Intent(context, RateUserActivity.class);
                         i.putExtra("event", event);
                         i.putExtra("ratingType", (String) btnRate.getTag());
                         context.startActivity(i);
+                    }
+                    mAgenda.remove(eventPosition);
+                    notifyItemRemoved(eventPosition);
                 }
             });
 
