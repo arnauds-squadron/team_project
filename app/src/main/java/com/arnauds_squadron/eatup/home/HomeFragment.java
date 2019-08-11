@@ -69,7 +69,7 @@ public class HomeFragment extends Fragment implements
     private Runnable refreshEventsRunnable = new Runnable() {
         @Override
         public void run() {
-            //refreshEventsAsync(0);
+            refreshEventsAsync(0);
             updateHandler.postDelayed(this, Constants.EVENT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -90,7 +90,6 @@ public class HomeFragment extends Fragment implements
         homeAdapter = new HomeAdapter(getContext(), this, agenda);
         // RecyclerView setup
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setReverseLayout(true);
         rvAgenda.setLayoutManager(layoutManager);
         rvAgenda.setAdapter(homeAdapter);
 
@@ -148,17 +147,15 @@ public class HomeFragment extends Fragment implements
         // when this list is different from the current timeline.
         final List<Event> tempEvents = new ArrayList<>();
 
-        final String userId = ParseUser.getCurrentUser().getObjectId();
+        final String userId = Constants.CURRENT_USER.getObjectId();
         final Event.Query query = new Event.Query();
 
-        if (filterType == 1) {
-            query.withHost().ownEvent(ParseUser.getCurrentUser());
-        } else if (filterType == 2) {
-            query.withHost().notOwnEvent(ParseUser.getCurrentUser());
-        }
+        if (filterType == 1)
+            query.withHost().ownEvent(Constants.CURRENT_USER);
+        else if (filterType == 2)
+            query.withHost().notOwnEvent(Constants.CURRENT_USER);
 
-        query.orderByDescending("date");
-        query.findInBackground(new FindCallback<Event>() {
+        query.orderByAscending("date").findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null) {
@@ -166,10 +163,10 @@ public class HomeFragment extends Fragment implements
                         final JSONArray guests = event.getAcceptedGuests();
                         String hostId = event.getHost().getObjectId();
                         if (userId.equals(hostId) || (guests != null &&
-                                guests.toString().contains(userId))){
+                                guests.toString().contains(userId))) {
                             // if the event is past, with no guests, don't add event to the agenda
                             Date currentDate = new Date();
-                            if(!(currentDate.after(event.getDate()) && event.getAcceptedGuestsList().size() == 0)) {
+                            if (!(currentDate.after(event.getDate()))) { // && event.getAcceptedGuestsList().size() == 0)) {
                                 tempEvents.add(event);
                             }
                         }
@@ -213,8 +210,7 @@ public class HomeFragment extends Fragment implements
      * Method called to start the runnable so the events are constantly refreshing.
      */
     private void startUpdatingEvents() {
-        // TODO: change to progress bar in the middle?
-//        refreshEventsAsync(0);
+        refreshEventsAsync(0);
 
         if (!refreshRunnableNotStarted) { // only one runnable
             refreshEventsRunnable.run();

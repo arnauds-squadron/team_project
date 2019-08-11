@@ -43,9 +43,9 @@ public final class Constants {
     public static final int LOCATION_SEARCH = 2;
 
     // Update speed to refresh messages: 1 second
-    public static final int CHAT_UPDATE_SPEED_MILLIS = 2000;
+    public static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
     // Update speed to refresh events: 5 seconds
-    public static final int EVENT_UPDATE_SPEED_MILLIS = 5000;
+    public static final int EVENT_UPDATE_SPEED_MILLIS = 10000;
 
     // PagerAdapter constants
     public static final int LOCAL_FRAGMENT_INDEX = 1;
