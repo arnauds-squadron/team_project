@@ -214,8 +214,8 @@ public class MessengerFragment extends Fragment {
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        appendMessage(message);
-                        newestMessage = message;
+                        //appendMessage(message);
+                        //newestMessage = message;
                         etMessage.setText(null);
                     } else {
                         Toast.makeText(getContext(), "Could not send message",
