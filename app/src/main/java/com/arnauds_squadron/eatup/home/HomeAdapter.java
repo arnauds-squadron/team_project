@@ -16,12 +16,9 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.textclassifier.TextClassifier;
-import android.view.textclassifier.TextLinks;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -172,11 +169,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             requests.clear();
             requests.addAll(pending);
 
-            if (requests.size() != 0) {
+            if (requests.size() != 0)
                 viewHolder.divider.setVisibility(View.VISIBLE);
-            } else {
+            else
                 viewHolder.divider.setVisibility(View.INVISIBLE);
-            }
 
             requestAdapter.notifyItemRangeInserted(0, pending.size());
 

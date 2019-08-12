@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,13 +144,9 @@ public class HomeFragment extends Fragment implements
      * or is an accepted guest
      */
     public void refreshEventsAsync(int filterType) {
-        // List that represents the timeline if it were to be updates. The timeline only updates
-        // when this list is different from the current timeline.
-        final List<Event> tempEvents = new ArrayList<>();
-
         final String userId = Constants.CURRENT_USER.getObjectId();
         Date currentDate = new Date();
-        final Event.Query query = new Event.Query();
+        Event.Query query = new Event.Query();
 
         if (filterType == 1)
             query.withHost().ownEvent(Constants.CURRENT_USER);
@@ -191,11 +186,6 @@ public class HomeFragment extends Fragment implements
                                 }
                             }
                         }
-                        //if (tempEvents.size() != agenda.size()) { // Only update if events changed
-//                        agenda.clear();
-//                        agenda.addAll(tempEvents);
-//                        homeAdapter.notifyDataSetChanged();
-                        //}
                         if (agenda.size() == 0) {
                             tvNoEventsScheduled.setVisibility(View.VISIBLE);
                             flNoEventsScheduled.setVisibility(View.VISIBLE);
@@ -210,25 +200,6 @@ public class HomeFragment extends Fragment implements
                 }
             }
         });
-    }
-
-    private void refreshRequests() {
-        for (final Event event : agenda) {
-            Event.Query query = new Event.Query();
-            query.whereEqualTo("objectId", event.getObjectId());
-            query.findInBackground(new FindCallback<Event>() {
-                @Override
-                public void done(List<Event> objects, ParseException e) {
-                    Event newEvent = objects.get(0);
-                    List<ParseUser> oldPending = event.getPendingRequests();
-                    List<ParseUser> newPending = newEvent.getPendingRequests();
-                    if (oldPending != null && newPending != null
-                            && newPending.size() > oldPending.size()) {
-                        //homeAdapter.updatePendingRequests(newPending, event.getTitle());
-                    }
-                }
-            });
-        }
     }
 
     /**
