@@ -36,8 +36,6 @@ import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 public class EventDetailsActivity extends AppCompatActivity {
     @BindView(R.id.tvEventTitle)
     TextView tvEventTitle;
-    @BindView(R.id.tvTags)
-    TextView tvCuisine;
     @BindView(R.id.tvDistance)
     TextView tvDistance;
     @BindView(R.id.rvEventDetails)
@@ -95,9 +93,6 @@ public class EventDetailsActivity extends AppCompatActivity {
                             "%s on %s",
                             formatTime(event.getDate(), EventDetailsActivity.this),
                             formatDateWithFullMonth(event.getDate())));
-
-                    List<String> cuisineTags = event.getTags();
-                    tvCuisine.setText(android.text.TextUtils.join(", ", cuisineTags));
 
                     int numGuests;
                     List<ParseUser> accepted = event.getAcceptedGuestsList();
