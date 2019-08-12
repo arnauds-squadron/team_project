@@ -105,7 +105,7 @@ public class ProfileFragment extends Fragment {
         ivSave.setVisibility(View.INVISIBLE);
 
         // load user profileImage
-        ParseFile profileImage = ParseUser.getCurrentUser().getParseFile(KEY_PROFILE_PICTURE);
+        ParseFile profileImage = Constants.CURRENT_USER.getParseFile(KEY_PROFILE_PICTURE);
 
         if (profileImage != null) {
             Glide.with(this)

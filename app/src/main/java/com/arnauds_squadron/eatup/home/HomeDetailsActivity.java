@@ -1,16 +1,12 @@
 package com.arnauds_squadron.eatup.home;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -20,10 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arnauds_squadron.eatup.R;
-import com.arnauds_squadron.eatup.RateUserActivity;
 import com.arnauds_squadron.eatup.models.Business;
 import com.arnauds_squadron.eatup.models.Event;
-import com.arnauds_squadron.eatup.models.Location;
 import com.arnauds_squadron.eatup.profile.HostProfileActivity;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FormatHelper;
@@ -32,7 +26,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.parse.DeleteCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -40,14 +33,10 @@ import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -225,7 +214,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
         }
 
         // check if the current user is the host of the event
-        if(event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+        if(event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
             btnCancel.setText("Cancel event");
         } else {
             btnCancel.setText("Remove RSVP");
@@ -235,7 +224,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // delete entire event if user is host
-                if(event.getHost().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                if(event.getHost().getObjectId().equals(Constants.CURRENT_USER.getObjectId())) {
                     event.deleteInBackground(new DeleteCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -250,7 +239,7 @@ public class HomeDetailsActivity extends AppCompatActivity {
                 // remove user from attending guest list otherwise
                 else {
                     List<ParseUser> attendingUsers = event.getAcceptedGuestsList();
-                    attendingUsers.remove(ParseUser.getCurrentUser());
+                    attendingUsers.remove(Constants.CURRENT_USER);
                     event.setAcceptedGuestsList(attendingUsers);
                     event.saveInBackground(new SaveCallback() {
                         @Override

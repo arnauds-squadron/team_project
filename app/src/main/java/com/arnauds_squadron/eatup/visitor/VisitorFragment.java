@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.BuildConfig;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.models.Event;
+import com.arnauds_squadron.eatup.utils.Constants;
 import com.arnauds_squadron.eatup.utils.FetchAddressIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -321,7 +322,7 @@ public class VisitorFragment extends Fragment {
                 .getTopAscending()
                 .withHost()
                 .notFilled()
-                .notOwnEvent(ParseUser.getCurrentUser());
+                .notOwnEvent(Constants.CURRENT_USER);
         eventAdapter.clear();
         eventsQuery.findInBackground(new FindCallback<Event>() {
             @Override

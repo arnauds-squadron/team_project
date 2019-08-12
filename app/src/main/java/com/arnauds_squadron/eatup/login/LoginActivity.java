@@ -19,6 +19,7 @@ import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import butterknife.BindView;

@@ -143,8 +143,6 @@ public class ChatDashboardFragment extends Fragment {
                         tvNoChats.setVisibility(View.INVISIBLE);
                     }
                 } else if (e != null) {
-                    Toast.makeText(getActivity(), "Could not load chats",
-                            Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 } else {
                     tvNoChats.setVisibility(View.VISIBLE);
