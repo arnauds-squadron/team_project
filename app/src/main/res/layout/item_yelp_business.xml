@@ -6,7 +6,12 @@
     card_view:cardBackgroundColor="#FAFAFA"
     card_view:cardCornerRadius="15dp"
     card_view:cardElevation="8dp"
-    card_view:cardUseCompatPadding="true">
+    android:layout_marginStart="4dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginBottom="4dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -30,42 +35,57 @@
             android:id="@+id/tvPlace"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:text="Place"
+            android:textSize="20sp"
             android:textStyle="bold"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toEndOf="@+id/ivYelpImage"
             card_view:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/ivLocation"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            card_view:layout_constraintStart_toEndOf="@+id/ivYelpImage"
-            card_view:layout_constraintTop_toBottomOf="@+id/tvPlace"
-            card_view:srcCompat="@drawable/ic_current_location" />
-
-        <TextView
-            android:id="@+id/tvAddress"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/clAddress"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:text="Address"
-            android:autoLink = "map"
+            android:layout_marginBottom="8dp"
+            card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintEnd_toEndOf="parent"
-            card_view:layout_constraintStart_toEndOf="@+id/ivLocation"
-            card_view:layout_constraintTop_toBottomOf="@+id/tvPlace" />
+            card_view:layout_constraintHorizontal_bias="0.0"
+            card_view:layout_constraintStart_toEndOf="@+id/ivYelpImage"
+            card_view:layout_constraintTop_toBottomOf="@+id/tvPlace">
+
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginLeft="2dp"
+                android:autoLink="map"
+                android:text="@string/detailview_address"
+                android:textSize="17sp"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintStart_toEndOf="@+id/ivLocation"
+                card_view:layout_constraintTop_toTopOf="@+id/ivLocation" />
+
+            <ImageView
+                android:id="@+id/ivLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                card_view:layout_constraintStart_toStartOf="parent"
+                card_view:layout_constraintTop_toTopOf="parent"
+                card_view:srcCompat="@drawable/location_search_icon" />
+        </android.support.constraint.ConstraintLayout>
+
         <!--<fragment-->
             <!--class="com.arnauds_squadron.eatup.local.setup.AddressFragment"-->
             <!--android:id="@+id/dateFragment"-->
