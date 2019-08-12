@@ -69,8 +69,7 @@ public class HomeFragment extends Fragment implements
     private Runnable refreshEventsRunnable = new Runnable() {
         @Override
         public void run() {
-            refreshEventsAsync(0);
-            //refreshRequests();
+            refreshEventsAsync(spinner != null ? spinner.getSelectedItemPosition() : 0);
             updateHandler.postDelayed(this, Constants.EVENT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -147,54 +146,56 @@ public class HomeFragment extends Fragment implements
         final String userId = Constants.CURRENT_USER.getObjectId();
         Date currentDate = new Date();
         Event.Query query = new Event.Query();
+        query.withHost().whereGreaterThanOrEqualTo("date", currentDate);
 
-        if (filterType == 1)
-            query.withHost().ownEvent(Constants.CURRENT_USER);
-        else if (filterType == 2)
-            query.withHost().notOwnEvent(Constants.CURRENT_USER);
+        if (filterType != 0) {
+            if (filterType == 1)
+                query.ownEvent(Constants.CURRENT_USER);
+            else if (filterType == 2)
+                query.notOwnEvent(Constants.CURRENT_USER);
+        }
 
-        query.whereGreaterThanOrEqualTo("date", currentDate).orderByAscending("date").findInBackground(new FindCallback<Event>() {
+        query.orderByAscending("date").findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
                 if (e == null && objects != null) {
-                    if (agenda == null || agenda.size() == 0) {
-                        agenda.addAll(objects);
-                        homeAdapter.notifyItemRangeInserted(0, agenda.size());
+                    List<Event> usersEvents = new ArrayList<>();
+
+                    for (Event event : objects) {
+                        final JSONArray guests = event.getAcceptedGuests();
+                        String hostId = event.getHost().getObjectId();
+                        if (userId.equals(hostId) || (guests != null &&
+                                guests.toString().contains(userId))) // host or accepted guest
+                            usersEvents.add(event);
+                    }
+                    if (agenda == null || agenda.size() != usersEvents.size()) {
+                        agenda.clear();
+                        agenda.addAll(usersEvents);
+                        homeAdapter.notifyDataSetChanged();
                     } else {
-                        for (Event event : objects) {
-                            final JSONArray guests = event.getAcceptedGuests();
-                            String hostId = event.getHost().getObjectId();
-                            if (userId.equals(hostId) || (guests != null && guests.toString().contains(userId))) { // host or accepted guest
-                                boolean eventFound = false;
-                                for (int i = agenda.size() - 1; i >= 0; i--) {
-                                    Event oldEvent = agenda.get(i);
-                                    if (oldEvent.getObjectId().equals(event.getObjectId())) { // same event
-                                        eventFound = true;
-                                        List<ParseUser> oldPending = oldEvent.getPendingRequests();
-                                        List<ParseUser> newPending = event.getPendingRequests();
-                                        if (oldPending != null && newPending != null
-                                                && newPending.size() > oldPending.size()) {
-                                            agenda.set(agenda.indexOf(oldEvent), event);
-                                            homeAdapter.notifyItemChanged(agenda.indexOf(event));
-                                        }
+                        for (Event event : usersEvents) {
+                            for (int i = agenda.size() - 1; i >= 0; i--) {
+                                Event oldEvent = agenda.get(i);
+                                if (oldEvent.getObjectId().equals(event.getObjectId())) { // same event
+                                    List<ParseUser> oldPending = oldEvent.getPendingRequests();
+                                    List<ParseUser> newPending = event.getPendingRequests();
+                                    if (oldPending != null && newPending != null
+                                            && newPending.size() > oldPending.size()) {
+                                        agenda.set(agenda.indexOf(oldEvent), event);
+                                        homeAdapter.notifyItemChanged(agenda.indexOf(event));
                                     }
-                                }
-                                if (!eventFound) {
-                                    agenda.clear();
-                                    agenda.addAll(objects);
-                                    homeAdapter.notifyDataSetChanged();
                                 }
                             }
                         }
-                        if (agenda.size() == 0) {
-                            tvNoEventsScheduled.setVisibility(View.VISIBLE);
-                            flNoEventsScheduled.setVisibility(View.VISIBLE);
-                        } else {
-                            tvNoEventsScheduled.setVisibility(View.INVISIBLE);
-                            flNoEventsScheduled.setVisibility(View.INVISIBLE);
-                        }
-                        progressBar.setVisibility(View.INVISIBLE);
                     }
+                    if (agenda.size() == 0) {
+                        tvNoEventsScheduled.setVisibility(View.VISIBLE);
+                        flNoEventsScheduled.setVisibility(View.VISIBLE);
+                    } else {
+                        tvNoEventsScheduled.setVisibility(View.INVISIBLE);
+                        flNoEventsScheduled.setVisibility(View.INVISIBLE);
+                    }
+                    progressBar.setVisibility(View.INVISIBLE);
                 } else {
                     e.printStackTrace();
                 }
@@ -221,7 +222,7 @@ public class HomeFragment extends Fragment implements
      * Method called to start the runnable so the events are constantly refreshing.
      */
     private void startUpdatingEvents() {
-        refreshEventsAsync(0);
+        refreshEventsAsync(spinner != null ? spinner.getSelectedItemPosition() : 0);
 
         if (!refreshRunnableNotStarted) { // only one runnable
             refreshEventsRunnable.run();
