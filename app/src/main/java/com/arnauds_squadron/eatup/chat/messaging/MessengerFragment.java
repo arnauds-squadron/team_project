@@ -271,8 +271,6 @@ public class MessengerFragment extends Fragment {
                         appendMessage(message);
                     }
                 } else if (e != null) {
-                    Toast.makeText(getActivity(), "Could not load messages",
-                            Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }

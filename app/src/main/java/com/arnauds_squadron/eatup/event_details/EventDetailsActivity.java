@@ -27,7 +27,6 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.arnauds_squadron.eatup.utils.FormatHelper.formatDateWithFullMonth;
 import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
@@ -36,16 +35,25 @@ import static com.arnauds_squadron.eatup.utils.FormatHelper.formatTime;
 public class EventDetailsActivity extends AppCompatActivity {
     @BindView(R.id.tvEventTitle)
     TextView tvEventTitle;
+
     @BindView(R.id.tvDistance)
     TextView tvDistance;
+
     @BindView(R.id.rvEventDetails)
     RecyclerView rvEventDetails;
+
+    @BindView(R.id.recyclerview_pager_indicator)
+    IndefinitePagerIndicator indefinitePagerIndicator;
+
     @BindView(R.id.btRequest)
     Button btRequest;
+
     @BindView(R.id.btRequested)
     Button btRequested;
+
     @BindView(R.id.tvNumGuests)
     TextView tvNumGuests;
+
     @BindView(R.id.tvDay)
     TextView tvDate;
 
@@ -59,9 +67,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_details);
         ButterKnife.bind(this);
 
-        if (Constants.CURRENT_USER == null) {
+        if (Constants.CURRENT_USER == null)
             gotoLoginActivity();
-        }
 
         String eventId = getIntent().getStringExtra("event_id");
         String distanceString = getIntent().getStringExtra("distance");
@@ -84,8 +91,6 @@ public class EventDetailsActivity extends AppCompatActivity {
                     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1, GridLayoutManager.HORIZONTAL, false);
                     rvEventDetails.setLayoutManager(gridLayoutManager);
                     rvEventDetails.setAdapter(eventDetailsAdapter);
-
-                    IndefinitePagerIndicator indefinitePagerIndicator = findViewById(R.id.recyclerview_pager_indicator);
                     indefinitePagerIndicator.attachToRecyclerView(rvEventDetails);
 
                     tvEventTitle.setText(event.getTitle());
@@ -94,14 +99,11 @@ public class EventDetailsActivity extends AppCompatActivity {
                             formatTime(event.getDate(), EventDetailsActivity.this),
                             formatDateWithFullMonth(event.getDate())));
 
-                    int numGuests;
                     List<ParseUser> accepted = event.getAcceptedGuestsList();
-                    if(accepted != null) {
-                        numGuests = accepted.size();
-                    } else {
-                        numGuests = 0;
-                    }
-                    tvNumGuests.setText(String.format(Locale.getDefault(), "%s/%s slots filled", numGuests, event.getMaxGuests()));
+                    int numGuests = accepted != null ? accepted.size() : 0;
+
+                    tvNumGuests.setText(String.format(Locale.getDefault(), "%s/%s slots filled",
+                            numGuests, event.getMaxGuests()));
 
                     if (currentEvent.checkRequest(Constants.CURRENT_USER)) {
                         btRequest.setVisibility(View.GONE);
@@ -124,7 +126,8 @@ public class EventDetailsActivity extends AppCompatActivity {
                     btRequested.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Toast.makeText(getApplicationContext(), "RSVP already requested", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "RSVP already requested",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

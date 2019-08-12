@@ -289,10 +289,6 @@ public class Event extends ParseObject {
             return this;
         }
 
-        public Query getOlder(Date maxId) {
-            whereLessThan(KEY_DATE, maxId);
-            return this;
-        }
         public Query getAvailable(Date date) {
             whereGreaterThan(KEY_DATE, date);
             return this;

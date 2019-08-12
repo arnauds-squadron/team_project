@@ -180,7 +180,7 @@ public class HomeFragment extends Fragment implements
                                     List<ParseUser> oldPending = oldEvent.getPendingRequests();
                                     List<ParseUser> newPending = event.getPendingRequests();
                                     if (oldPending != null && newPending != null
-                                            && newPending.size() > oldPending.size()) {
+                                            && newPending.size() != oldPending.size()) {
                                         agenda.set(agenda.indexOf(oldEvent), event);
                                         homeAdapter.notifyItemChanged(agenda.indexOf(event));
                                     }

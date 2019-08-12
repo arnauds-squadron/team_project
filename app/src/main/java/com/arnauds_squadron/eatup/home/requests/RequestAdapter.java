@@ -111,7 +111,9 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
                     int position = getAdapterPosition();
                     ParseUser user = requests.get(position);
                     handleRequest(user, position, true);
-                    event.getChat().addMember(user);
+                    Chat chat = event.getChat();
+                    chat.addMember(user);
+                    chat.saveInBackground();
                 }
             });
 
@@ -124,13 +126,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHold
                 }
             });
 
-//            for(int i = 0; i < event.getAcceptedGuests().length(); i++) {
-//                try {
-//                    event.getChat().addMember((ParseUser) event.getAcceptedGuests().get(i));
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -1,7 +1,6 @@
 package com.arnauds_squadron.eatup.models;
 
 import com.parse.ParseClassName;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -12,7 +11,6 @@ import java.util.List;
 @ParseClassName("Chat")
 public class Chat extends ParseObject {
     private static final String KEY_NAME = "name";
-    private static final String KEY_IMAGE = "image";
     private static final String KEY_MEMBERS = "members";
     private static final String KEY_UPDATED_AT = "updatedAt";
 
@@ -22,14 +20,6 @@ public class Chat extends ParseObject {
 
     public void setName(String name) {
         put(KEY_NAME, name);
-    }
-
-    public ParseFile getImage() {
-        return getParseFile(KEY_IMAGE);
-    }
-
-    public void setImage(ParseFile image) {
-        put(KEY_IMAGE, image);
     }
 
     public void justUpdated() {
