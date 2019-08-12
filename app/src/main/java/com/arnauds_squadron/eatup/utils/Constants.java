@@ -38,14 +38,13 @@ public final class Constants {
     public final static float DETAILED_MAP_ZOOM = 18;
     // search constants
     public static final String SEARCH_CATEGORY = "searchCategory";
-    public static final int NO_SEARCH = 0;
     public static final int CUISINE_SEARCH = 1;
     public static final int LOCATION_SEARCH = 2;
 
     // Update speed to refresh messages: 1 second
     public static final int CHAT_UPDATE_SPEED_MILLIS = 1000;
     // Update speed to refresh events: 5 seconds
-    public static final int EVENT_UPDATE_SPEED_MILLIS = 10000;
+    public static final int EVENT_UPDATE_SPEED_MILLIS = 1000;
 
     // PagerAdapter constants
     public static final int LOCAL_FRAGMENT_INDEX = 1;

@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,7 @@ public class HomeFragment extends Fragment implements
         @Override
         public void run() {
             refreshEventsAsync(0);
+            //refreshRequests();
             updateHandler.postDelayed(this, Constants.EVENT_UPDATE_SPEED_MILLIS);
         }
     };
@@ -148,6 +150,7 @@ public class HomeFragment extends Fragment implements
         final List<Event> tempEvents = new ArrayList<>();
 
         final String userId = Constants.CURRENT_USER.getObjectId();
+        Date currentDate = new Date();
         final Event.Query query = new Event.Query();
 
         if (filterType == 1)
@@ -155,40 +158,77 @@ public class HomeFragment extends Fragment implements
         else if (filterType == 2)
             query.withHost().notOwnEvent(Constants.CURRENT_USER);
 
-        query.orderByAscending("date").findInBackground(new FindCallback<Event>() {
+        query.whereGreaterThanOrEqualTo("date", currentDate).orderByAscending("date").findInBackground(new FindCallback<Event>() {
             @Override
             public void done(List<Event> objects, ParseException e) {
-                if (e == null) {
-                    for (final Event event : objects) {
-                        final JSONArray guests = event.getAcceptedGuests();
-                        String hostId = event.getHost().getObjectId();
-                        if (userId.equals(hostId) || (guests != null &&
-                                guests.toString().contains(userId))) {
-                            // if the event is past, with no guests, don't add event to the agenda
-                            Date currentDate = new Date();
-                            if (!(currentDate.after(event.getDate()))) { // && event.getAcceptedGuestsList().size() == 0)) {
-                                tempEvents.add(event);
+                if (e == null && objects != null) {
+                    if (agenda == null || agenda.size() == 0) {
+                        agenda.addAll(objects);
+                        homeAdapter.notifyItemRangeInserted(0, agenda.size());
+                    } else {
+                        for (Event event : objects) {
+                            final JSONArray guests = event.getAcceptedGuests();
+                            String hostId = event.getHost().getObjectId();
+                            if (userId.equals(hostId) || (guests != null && guests.toString().contains(userId))) { // host or accepted guest
+                                boolean eventFound = false;
+                                for (int i = agenda.size() - 1; i >= 0; i--) {
+                                    Event oldEvent = agenda.get(i);
+                                    if (oldEvent.getObjectId().equals(event.getObjectId())) { // same event
+                                        eventFound = true;
+                                        List<ParseUser> oldPending = oldEvent.getPendingRequests();
+                                        List<ParseUser> newPending = event.getPendingRequests();
+                                        if (oldPending != null && newPending != null
+                                                && newPending.size() > oldPending.size()) {
+                                            agenda.set(agenda.indexOf(oldEvent), event);
+                                            homeAdapter.notifyItemChanged(agenda.indexOf(event));
+                                        }
+                                    }
+                                }
+                                if (!eventFound) {
+                                    agenda.clear();
+                                    agenda.addAll(objects);
+                                    homeAdapter.notifyDataSetChanged();
+                                }
                             }
                         }
+                        //if (tempEvents.size() != agenda.size()) { // Only update if events changed
+//                        agenda.clear();
+//                        agenda.addAll(tempEvents);
+//                        homeAdapter.notifyDataSetChanged();
+                        //}
+                        if (agenda.size() == 0) {
+                            tvNoEventsScheduled.setVisibility(View.VISIBLE);
+                            flNoEventsScheduled.setVisibility(View.VISIBLE);
+                        } else {
+                            tvNoEventsScheduled.setVisibility(View.INVISIBLE);
+                            flNoEventsScheduled.setVisibility(View.INVISIBLE);
+                        }
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
-                    if (tempEvents.size() != agenda.size()) { // Only update if events changed
-                        agenda.clear();
-                        agenda.addAll(tempEvents);
-                        homeAdapter.notifyDataSetChanged();
-                    }
-                    if (agenda.size() == 0) {
-                        tvNoEventsScheduled.setVisibility(View.VISIBLE);
-                        flNoEventsScheduled.setVisibility(View.VISIBLE);
-                    } else {
-                        tvNoEventsScheduled.setVisibility(View.INVISIBLE);
-                        flNoEventsScheduled.setVisibility(View.INVISIBLE);
-                    }
-                    progressBar.setVisibility(View.INVISIBLE);
                 } else {
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+    private void refreshRequests() {
+        for (final Event event : agenda) {
+            Event.Query query = new Event.Query();
+            query.whereEqualTo("objectId", event.getObjectId());
+            query.findInBackground(new FindCallback<Event>() {
+                @Override
+                public void done(List<Event> objects, ParseException e) {
+                    Event newEvent = objects.get(0);
+                    List<ParseUser> oldPending = event.getPendingRequests();
+                    List<ParseUser> newPending = newEvent.getPendingRequests();
+                    if (oldPending != null && newPending != null
+                            && newPending.size() > oldPending.size()) {
+                        //homeAdapter.updatePendingRequests(newPending, event.getTitle());
+                    }
+                }
+            });
+        }
     }
 
     /**

@@ -12,15 +12,14 @@ import android.widget.Toast;
 import com.arnauds_squadron.eatup.R;
 import com.arnauds_squadron.eatup.local.setup.AddressFragment;
 import com.arnauds_squadron.eatup.local.setup.ReviewFragment;
-import com.arnauds_squadron.eatup.local.setup.yelp_selection.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.local.setup.start.StartFragment;
+import com.arnauds_squadron.eatup.local.setup.yelp_selection.YelpBusinessFragment;
 import com.arnauds_squadron.eatup.models.Chat;
 import com.arnauds_squadron.eatup.models.Event;
 import com.arnauds_squadron.eatup.navigation.NoSwipingViewPager;
 import com.arnauds_squadron.eatup.utils.Constants;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.json.JSONArray;
@@ -109,13 +108,13 @@ public class LocalFragment extends Fragment implements
     }
 
     @Override
-    public void updateFinalFields(String title, Date date, int maxGuests, boolean over21, ParseUser host) {
+    public void updateFinalFields(String title, Date date, int maxGuests, boolean over21) {
         currentEvent.setTitle(title);
         currentEvent.setDate(date);
         currentEvent.setMaxGuests(maxGuests);
         currentEvent.setOver21(over21);
         currentEvent.setIsFilled(false);
-        currentEvent.addToNoRatingSubmitted(host);
+        currentEvent.addToNoRatingSubmitted(Constants.CURRENT_USER);
         currentEvent.setPendingRequests(new JSONArray());
         currentEvent.setAllRequests(new JSONArray());
         currentEvent.setAcceptedGuests(new JSONArray());

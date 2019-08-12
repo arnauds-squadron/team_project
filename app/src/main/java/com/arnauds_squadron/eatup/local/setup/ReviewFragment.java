@@ -40,8 +40,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.Parse;
-import com.parse.ParseUser;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -351,9 +349,7 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         Date date = selectedTime.getTime();
         int maxGuests = Integer.parseInt(tvMaxGuests.getText().toString());
         boolean over21 = cbOver21.isChecked();
-        ParseUser host = ParseUser.getCurrentUser();
-
-        mListener.updateFinalFields(title, date, maxGuests, over21, host);
+        mListener.updateFinalFields(title, date, maxGuests, over21);
     }
 
     /**
@@ -410,6 +406,6 @@ public class ReviewFragment extends Fragment implements OnMapReadyCallback {
         /**
          * Method that triggers the recentEvent creation method in the parent fragment
          */
-        void updateFinalFields(String title, Date date, int maxGuests, boolean over21, ParseUser host);
+        void updateFinalFields(String title, Date date, int maxGuests, boolean over21);
     }
 }

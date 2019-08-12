@@ -108,7 +108,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     }
                     tvNumGuests.setText(String.format(Locale.getDefault(), "%s/%s slots filled", numGuests, event.getMaxGuests()));
 
-                    if (currentEvent.checkRequest(ParseUser.getCurrentUser())) {
+                    if (currentEvent.checkRequest(Constants.CURRENT_USER)) {
                         btRequest.setVisibility(View.GONE);
                         btRequested.setVisibility(View.VISIBLE);
                     } else {

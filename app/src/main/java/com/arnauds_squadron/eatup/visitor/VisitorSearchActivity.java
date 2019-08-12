@@ -263,7 +263,6 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
         }
     }
 
-
     // Search by location only (all events)
     private void locationSearch(ParseGeoPoint geoPoint) {
         final Event.Query eventsQuery = new Event.Query();
@@ -271,7 +270,7 @@ public class VisitorSearchActivity extends AppCompatActivity implements GoogleAp
                 .getClosest(geoPoint)
                 .getTopAscending()
                 .withHost()
-                .notOwnEvent(ParseUser.getCurrentUser())
+                .notOwnEvent(Constants.CURRENT_USER)
                 .notFilled()
                 .getPrevious(mEvents.size());
 
